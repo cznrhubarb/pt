@@ -1,4 +1,6 @@
-public class Pulse : Ecs.Component
+using Ecs;
+
+public class Pulse : Component
 {
     public float squishSpeed { get; set; }
 

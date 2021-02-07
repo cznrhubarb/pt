@@ -89,7 +89,7 @@ namespace Ecs
         {
             foreach (int id in toDelete)
             {
-                if (!EntityExists(id)) //safeguard against deleting twice
+                if (!EntityExists(id))
                     continue;
 
                 foreach (System system in systems.Values)

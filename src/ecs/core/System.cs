@@ -34,7 +34,7 @@ namespace Ecs
             }
         }
 
-        public void UpdateEntityRegistration(Entity entity)
+        public virtual void UpdateEntityRegistration(Entity entity)
         {
             bool matches = Matches(entity);
             if (registeredEntityIds.Contains(entity.Id))

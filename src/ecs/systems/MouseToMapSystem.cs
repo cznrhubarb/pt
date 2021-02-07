@@ -1,22 +1,24 @@
 using Ecs;
 using Godot;
+using System.Linq;
 
-public class MouseToMapSystem : Ecs.System
+public class MouseToMapSystem : Ecs.DyadicSystem
 {
     private Vector2 mousePosition;
 
     public MouseToMapSystem()
     {
-        AddRequiredComponent<FollowMouse>();
+        AddRequiredComponent<Reticle>();
         AddRequiredComponent<TileLocation>();
         AddRequiredComponent<CameraRef>();
+        AddRequiredSecondaryComponent<Map>();
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
         var tileLocationComp = entity.GetComponent<TileLocation>();
         var cameraComp = entity.GetComponent<CameraRef>();
-        var tilemaps = tileLocationComp.MapRef.TileMaps;
+        var tilemaps = SecondaryEntities.First().GetComponent<Map>().TileMaps;
         var translatedMousePos = mousePosition + cameraComp.Camera.Position;
 
         for (var i = 0; i < tilemaps.Count; i++)

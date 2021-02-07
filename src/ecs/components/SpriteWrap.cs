@@ -1,6 +1,7 @@
+using Ecs;
 using Godot;
 
-public class SpriteWrap : Ecs.WrapComponent<Sprite>
+public class SpriteWrap : WrapComponent<Sprite>
 {
     public Sprite Sprite
     {
