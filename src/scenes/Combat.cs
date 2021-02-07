@@ -1,56 +1,50 @@
 using Godot;
-using System.Linq;
-using System.Collections.Generic;
+using Ecs;
 
-public class Combat : Ecs.Manager
+public class Combat : Manager
 {
-    private List<TileMap> tilemaps = null;
-    private Node2D target = null;
-    private Camera2D camera = null;
-
     public override void _Ready()
     {
         base._Ready();
 
-        tilemaps = new List<TileMap>();
-        foreach (var child in this.GetChildren())
-        {
-            if (child is TileMap map)
-            {
-                tilemaps.Insert(0, map);
-            }
-        }
+        AddSystem(new MouseToMapSystem());
+        AddSystem(new PulseSystem());
+        AddSystem(new ClampToMapSystem());
 
-        target = FindNode("target") as Node2D;
-        camera = FindNode("Camera2D") as Camera2D;
-    }
+        var camera = FindNode("Camera2D") as Camera2D;
 
-    public override void _Input(InputEvent inputEvent)
-    {
-        base._Input(inputEvent);
+        var map = FindNode("Map") as Entity;
+        RegisterExistingEntity(map);
+        var mapComponent = new Map();
+        AddComponentToEntity(map, mapComponent);
 
-        if (inputEvent is InputEventMouseMotion mouseMotion)
-        {
-            var mousePos = mouseMotion.GlobalPosition + camera.Position;
-            // TODO: Slight problem in not being able to select tiles that are behind other tiles
-            // TODO: No multi-level map support (bridges, etc)
-            for (var i = 0; i < tilemaps.Count; i++)
-            {
-                var tilemap = tilemaps[i];
+        var target = FindNode("Target") as Entity;
+        RegisterExistingEntity(target);
+        AddComponentToEntity(target, new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 5 });
+        AddComponentToEntity(target, new SpriteWrap());
+        AddComponentToEntity(target, new FollowMouse());
+        AddComponentToEntity(target, new CameraRef() { Camera = camera });
+        AddComponentToEntity(target, new TileLocation() { MapRef = mapComponent, ZLayer = 1 });
 
-                var tilePos = tilemap.WorldToMap(mousePos - tilemap.Position);
-                if (tilemap.GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
-                {
-                    var targetMap = tilemap;
-                    while (i > 0 && tilemaps[i-1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
-                    {
-                        targetMap = tilemaps[i - 1];
-                        i--;
-                    }
-                    target.Position = targetMap.MapToWorld(tilePos) + new Vector2(0, 24) + targetMap.Position;
-                    break;
-                }
-            }
-        }
+        var actor = FindNode("Vaporeon") as Ecs.Entity;
+        RegisterExistingEntity(actor);
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(11,3), Height = 3, MapRef = mapComponent, ZLayer = 5 });
+        AddComponentToEntity(actor, new SpriteWrap());
+
+        actor = FindNode("Scyther") as Ecs.Entity;
+        RegisterExistingEntity(actor);
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(9, -4), Height = 3, MapRef = mapComponent, ZLayer = 5 });
+        AddComponentToEntity(actor, new SpriteWrap());
+
+        actor = FindNode("Zapdos") as Ecs.Entity;
+        RegisterExistingEntity(actor);
+        AddComponentToEntity(actor, new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(4, 0), Height = 0, MapRef = mapComponent, ZLayer = 5 });
+        AddComponentToEntity(actor, new SpriteWrap());
+
+        actor = FindNode("Machamp") as Ecs.Entity;
+        RegisterExistingEntity(actor);
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(12, 0), Height = 3, MapRef = mapComponent, ZLayer = 5 });
+        AddComponentToEntity(actor, new SpriteWrap());
     }
 }

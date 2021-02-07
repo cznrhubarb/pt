@@ -4,21 +4,24 @@ using System.Collections.Generic;
 
 namespace Ecs
 {
-    public class Entity : Node
+    public class Entity : Node2D
     {
+        private static int nextAvailableIndex = 0;
+
         public int Id { get; private set; }
 
         private Dictionary<Type, Component> components;
 
-        public Entity(int id)
+        public Entity()
         {
-            Id = id;
+            Id = nextAvailableIndex++;
             components = new Dictionary<Type, Component>();
         }
 
         internal void AddComponent(Component component)
         {
             components[component.GetType()] = component;
+            component.GrabReferences(this);
         }
 
         internal void RemoveComponent<T>() where T : Component

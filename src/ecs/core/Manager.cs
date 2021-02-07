@@ -9,7 +9,6 @@ namespace Ecs
         private Dictionary<int, Entity> entities;
         private Dictionary<Type, System> systems;
         private List<int> toDelete;
-        private int currentId = 0;
 
         public Manager()
         {
@@ -29,9 +28,14 @@ namespace Ecs
 
         public Entity GetNewEntity()
         {
-            Entity entity = new Entity(currentId++);
+            Entity entity = new Entity();
             entities[entity.Id] = entity;
             return entity;
+        }
+
+        public void RegisterExistingEntity(Entity entity)
+        {
+            entities[entity.Id] = entity;
         }
 
         public void DeleteEntity(int id)
@@ -65,6 +69,7 @@ namespace Ecs
         {
             systems[system.GetType()] = system;
             system.BindManager(this);
+            AddChild(system);
         }
 
         public T GetSystem<T>() where T : System

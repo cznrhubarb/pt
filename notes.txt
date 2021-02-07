@@ -1,0 +1,23 @@
+﻿Entities
+--------
+Target
+	TileLocation
+	Sprite
+	Pulse
+	PlayerInput
+PC
+	TileLocation
+	Sprite
+	Health
+	Selectable
+NPC
+	TileLocation
+	Health
+	Sprite
+	Selectable
+Tile???
+TileMap???
+Obstacle
+	TileLocation
+	Health
+	Sprite

@@ -3,4 +3,7 @@
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>PokemonTactics</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="notes.txt" />
+  </ItemGroup>
 </Project>
