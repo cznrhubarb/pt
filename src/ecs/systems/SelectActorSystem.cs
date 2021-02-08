@@ -1,20 +1,24 @@
 using Ecs;
 using Godot;
 
-public class SelectActorSystem : Ecs.DyadicSystem
+public class SelectActorSystem : Ecs.System
 {
+    private const string SelectableEntityKey = "selectable";
+
     private bool selectThisFrame;
 
     public SelectActorSystem()
     {
         AddRequiredComponent<Reticle>();
         AddRequiredComponent<TileLocation>();
-        AddRequiredSecondaryComponent<Selectable>();
-        AddRequiredSecondaryComponent<TileLocation>();
+        AddRequiredComponent<Selectable>(SelectableEntityKey);
+        AddRequiredComponent<TileLocation>(SelectableEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
+        var selectableEntities = EntitiesFor(SelectableEntityKey);
+
         if (selectThisFrame)
         {
             var tileLocationComp = entity.GetComponent<TileLocation>();
@@ -26,7 +30,7 @@ public class SelectActorSystem : Ecs.DyadicSystem
                 reticleComp.CurrentTarget = null;
             }
 
-            foreach (var target in SecondaryEntities)
+            foreach (var target in selectableEntities)
             {
                 var targetLocationComp = target.GetComponent<TileLocation>();
                 if (targetLocationComp.TilePosition == tileLocationComp.TilePosition &&

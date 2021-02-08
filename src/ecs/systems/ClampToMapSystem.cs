@@ -2,17 +2,19 @@ using Ecs;
 using Godot;
 using System.Linq;
 
-public class ClampToMapSystem : Ecs.DyadicSystem
+public class ClampToMapSystem : Ecs.System
 {
+    const string MapEntityKey = "map";
+
     public ClampToMapSystem()
     {
         AddRequiredComponent<TileLocation>();
-        AddRequiredSecondaryComponent<Map>();
+        AddRequiredComponent<Map>(MapEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        var map = SecondaryEntities.First().GetComponent<Map>();
+        var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
 
         var tileLocationComp = entity.GetComponent<TileLocation>();
         var tileMap = map.TileMaps[tileLocationComp.Height];

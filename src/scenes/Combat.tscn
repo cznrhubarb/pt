@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://src/scenes/Combat.cs" type="Script" id=1]
 [ext_resource path="res://res/field_tileset.tres" type="TileSet" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://img/actors/134.png" type="Texture" id=6]
 [ext_resource path="res://img/tiles/image_part_028.png" type="Texture" id=7]
 [ext_resource path="res://src/ecs/core/Entity.cs" type="Script" id=8]
+[ext_resource path="res://img/tiles/image_part_026.png" type="Texture" id=9]
 
 [node name="Combat" type="Node2D"]
 script = ExtResource( 1 )
@@ -100,3 +101,10 @@ script = ExtResource( 8 )
 [node name="134" type="Sprite" parent="Vaporeon"]
 position = Vector2( 0, -18 )
 texture = ExtResource( 6 )
+
+[node name="Rock" type="Node2D" parent="."]
+script = ExtResource( 8 )
+
+[node name="Sprite" type="Sprite" parent="Rock"]
+position = Vector2( 0, -24 )
+texture = ExtResource( 9 )

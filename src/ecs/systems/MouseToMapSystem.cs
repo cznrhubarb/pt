@@ -2,41 +2,49 @@ using Ecs;
 using Godot;
 using System.Linq;
 
-public class MouseToMapSystem : Ecs.DyadicSystem
+public class MouseToMapSystem : Ecs.System
 {
+    private const string MapEntityKey = "map";
+
     private Vector2 mousePosition;
+    private bool dirty = false;
 
     public MouseToMapSystem()
     {
         AddRequiredComponent<Reticle>();
         AddRequiredComponent<TileLocation>();
         AddRequiredComponent<CameraRef>();
-        AddRequiredSecondaryComponent<Map>();
+        AddRequiredComponent<Map>(MapEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        var tileLocationComp = entity.GetComponent<TileLocation>();
-        var cameraComp = entity.GetComponent<CameraRef>();
-        var tilemaps = SecondaryEntities.First().GetComponent<Map>().TileMaps;
-        var translatedMousePos = mousePosition + cameraComp.Camera.Position;
-
-        for (var i = 0; i < tilemaps.Count; i++)
+        if (dirty)
         {
-            var tilemap = tilemaps[i];
+            var tileLocationComp = entity.GetComponent<TileLocation>();
+            var cameraComp = entity.GetComponent<CameraRef>();
+            var tilemaps = SingleEntityFor(MapEntityKey).GetComponent<Map>().TileMaps;
+            var translatedMousePos = mousePosition + cameraComp.Camera.Position;
 
-            var tilePos = tilemap.WorldToMap(translatedMousePos - tilemap.Position);
-            if (tilemap.GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
+            for (var i = 0; i < tilemaps.Count; i++)
             {
-                while (i > 0 && tilemaps[i - 1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
-                {
-                    i--;
-                }
+                var tilemap = tilemaps[i];
 
-                tileLocationComp.TilePosition = tilePos;
-                tileLocationComp.Height = i;
-                break;
+                var tilePos = tilemap.WorldToMap(translatedMousePos - tilemap.Position);
+                if (tilemap.GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
+                {
+                    while (i > 0 && tilemaps[i - 1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
+                    {
+                        i--;
+                    }
+
+                    tileLocationComp.TilePosition = tilePos;
+                    tileLocationComp.Height = i;
+                    break;
+                }
             }
+
+            dirty = false;
         }
     }
 
@@ -47,6 +55,7 @@ public class MouseToMapSystem : Ecs.DyadicSystem
         if (inputEvent is InputEventMouseMotion mouseMotion)
         {
             mousePosition = mouseMotion.GlobalPosition;
+            dirty = true;
         }
     }
 }

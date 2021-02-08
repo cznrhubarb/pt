@@ -34,6 +34,13 @@ namespace Ecs
             return (T)components[typeof(T)];
         }
 
+        public T GetComponentOrNull<T>() where T : Component
+        {
+            return HasComponent<T>() 
+                ? (T)components[typeof(T)] 
+                : null;
+        }
+
         public bool HasComponent(Type componentType)
         {
             return components.ContainsKey(componentType);
