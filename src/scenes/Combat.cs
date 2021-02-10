@@ -30,7 +30,7 @@ public class Combat : Manager
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(11,3), Height = 3, ZLayer = 5 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(11,3), Height = 0, ZLayer = 5 });
         AddComponentToEntity(actor, new SpriteWrap());
         AddComponentToEntity(actor, new Selectable());
         AddComponentToEntity(actor, new PlayerCharacter());
@@ -42,7 +42,7 @@ public class Combat : Manager
 
         actor = FindNode("Scyther") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(9, -4), Height = 3,ZLayer = 5 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(9, -4), Height = 0, ZLayer = 5 });
         AddComponentToEntity(actor, new SpriteWrap());
         AddComponentToEntity(actor, new Selectable());
         AddComponentToEntity(actor, new PlayerCharacter());
@@ -55,7 +55,7 @@ public class Combat : Manager
         actor = FindNode("Zapdos") as Entity;
         RegisterExistingEntity(actor);
         AddComponentToEntity(actor, new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 });
-        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(4, 0), Height = 0, ZLayer = 5 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(4, 0), Height = 3, ZLayer = 5 });
         AddComponentToEntity(actor, new SpriteWrap());
         AddComponentToEntity(actor, new Selectable());
         AddComponentToEntity(actor, new EnemyNpc());
@@ -67,7 +67,7 @@ public class Combat : Manager
 
         actor = FindNode("Machamp") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(12, 0), Height = 3, ZLayer = 5 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(12, 0), Height = 0, ZLayer = 5 });
         AddComponentToEntity(actor, new SpriteWrap());
         AddComponentToEntity(actor, new Selectable());
         AddComponentToEntity(actor, new EnemyNpc());
@@ -79,7 +79,7 @@ public class Combat : Manager
 
         actor = FindNode("Rock") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(9, 2), Height = 3, ZLayer = 3 });
+        AddComponentToEntity(actor, new TileLocation() { TilePosition = new Vector2(9, 2), Height = 0, ZLayer = 3 });
         AddComponentToEntity(actor, new SpriteWrap());
         AddComponentToEntity(actor, new Obstacle());
         AddComponentToEntity(actor, new Selectable());

@@ -26,16 +26,16 @@ public class MouseToMapSystem : Ecs.System
             var tilemaps = SingleEntityFor(MapEntityKey).GetComponent<Map>().TileMaps;
             var translatedMousePos = mousePosition + cameraComp.Camera.Position;
 
-            for (var i = 0; i < tilemaps.Count; i++)
+            for (var i = tilemaps.Count - 1; i >= 0; i--)
             {
                 var tilemap = tilemaps[i];
 
                 var tilePos = tilemap.WorldToMap(translatedMousePos - tilemap.Position);
                 if (tilemap.GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
                 {
-                    while (i > 0 && tilemaps[i - 1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
+                    while (i < tilemaps.Count - 1 && tilemaps[i + 1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
                     {
-                        i--;
+                        i++;
                     }
 
                     tileLocationComp.TilePosition = tilePos;

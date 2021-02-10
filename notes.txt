@@ -1,23 +1,11 @@
-﻿Entities
---------
-Target
-	TileLocation
-	Sprite
-	Pulse
-	PlayerInput
-PC
-	TileLocation
-	Sprite
-	Health
-	Selectable
-NPC
-	TileLocation
-	Health
-	Sprite
-	Selectable
-Tile???
-TileMap???
-Obstacle
-	TileLocation
-	Health
-	Sprite
+﻿Things to figure out next
+
+How do we late add new entities to our ECS in Godot with the wrap components
+How does AStar fit into the ECS architecture?
+
+Display potential move spots / test AStarEx
+
+Terrain types
+
+Display action tree menu
+

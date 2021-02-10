@@ -13,7 +13,7 @@ public class Map : Component
         {
             if (child is TileMap map)
             {
-                TileMaps.Insert(0, map);
+                TileMaps.Add(map);
             }
         }
     }
