@@ -13,6 +13,7 @@ namespace Ecs
 
         protected System()
         {
+            Name = GetType().Name;
             entitySelections = new Dictionary<string, EntitySelection>();
         }
 

@@ -26,7 +26,7 @@ public class SelectActorSystem : Ecs.System
 
             if (reticleComp.CurrentTarget != null)
             {
-                reticleComp.CurrentTarget.GetComponent<Selectable>().Selected = false;
+                manager.RemoveComponentFromEntity<Selected>(reticleComp.CurrentTarget);
                 reticleComp.CurrentTarget = null;
             }
 
@@ -36,9 +36,7 @@ public class SelectActorSystem : Ecs.System
                 if (targetLocationComp.TilePosition == tileLocationComp.TilePosition &&
                     targetLocationComp.Height == tileLocationComp.Height)
                 {
-                    var selectableComp = target.GetComponent<Selectable>();
-                    selectableComp.Selected = true;
-
+                    manager.AddComponentToEntity(target, new Selected());
                     reticleComp.CurrentTarget = target;
                 }
             }

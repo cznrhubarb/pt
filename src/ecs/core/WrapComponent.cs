@@ -1,4 +1,5 @@
 ﻿using Godot;
+using System;
 
 namespace Ecs
 {
@@ -8,15 +9,19 @@ namespace Ecs
 
         public override void GrabReferences(Entity owner)
         {
-            // TODO: If we generate objects later on, wrapped nodes might not be ready when this is called.
+            // Wrap existing if it is there
             foreach (var child in owner.GetChildren())
             {
                 if (child is T wrapMe)
                 {
                     wrappedNode = wrapMe;
-                    break;
+                    return;
                 }
             }
+
+            // If there are none, create a new one
+            wrappedNode = Activator.CreateInstance<T>();
+            owner.AddChild(wrappedNode);
         }
     }
 }

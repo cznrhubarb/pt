@@ -29,6 +29,8 @@ namespace Ecs
         public Entity GetNewEntity()
         {
             Entity entity = new Entity();
+            AddChild(entity);
+            //entity.SetScript(GD.Load("res://src/ecs/core/Entity.cs"));
             entities[entity.Id] = entity;
             return entity;
         }
@@ -97,6 +99,7 @@ namespace Ecs
                     system.DeleteEntity(id);
                 }
 
+                entities[id].QueueFree();
                 entities.Remove(id);
             }
             toDelete.Clear();

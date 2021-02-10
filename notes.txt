@@ -1,11 +1,10 @@
 ﻿Things to figure out next
 
-How do we late add new entities to our ECS in Godot with the wrap components
-How does AStar fit into the ECS architecture?
 
-Display potential move spots / test AStarEx
+Ignore obstacles in AStarEx when they exist
 
 Terrain types
 
 Display action tree menu
 
+Remove move locations if deselect by clicking a null

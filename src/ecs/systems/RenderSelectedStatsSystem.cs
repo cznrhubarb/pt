@@ -4,16 +4,11 @@ public class RenderSelectedStatsSystem : Ecs.System
 {
     public RenderSelectedStatsSystem()
     {
-        AddRequiredComponent<Selectable>();
+        AddRequiredComponent<Selected>();
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        var selectableComp = entity.GetComponent<Selectable>();
-
-        if (selectableComp.Selected)
-        {
-            entity.GetComponentOrNull<Speed>();
-        }
+        entity.GetComponentOrNull<Speed>();
     }
 }

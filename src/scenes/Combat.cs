@@ -12,6 +12,7 @@ public class Combat : Manager
         AddSystem(new ClampToMapSystem());
         AddSystem(new SelectActorSystem());
         AddSystem(new RenderSelectedStatsSystem());
+        AddSystem(new RenderSelectedMovementSystem());
 
         var camera = FindNode("Camera2D") as Camera2D;
 
@@ -26,7 +27,7 @@ public class Combat : Manager
         AddComponentToEntity(target, new SpriteWrap());
         AddComponentToEntity(target, new Reticle());
         AddComponentToEntity(target, new CameraRef() { Camera = camera });
-        AddComponentToEntity(target, new TileLocation() { ZLayer = 1 });
+        AddComponentToEntity(target, new TileLocation() { ZLayer = 2 });
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
@@ -62,7 +63,7 @@ public class Combat : Manager
         AddComponentToEntity(actor, new Health() { Current = 30, Max = 30 });
         AddComponentToEntity(actor, new Mana() { Current = 20, Max = 20 });
         AddComponentToEntity(actor, new CombatStats() { Attack = 4, Defense = 3 });
-        AddComponentToEntity(actor, new MoveStats() { Move = 4, Jump = 2 });
+        AddComponentToEntity(actor, new MoveStats() { Move = 4, Jump = 10 });
         AddComponentToEntity(actor, new Speed() { Value = 5 });
 
         actor = FindNode("Machamp") as Entity;

@@ -8,11 +8,24 @@ public class AStarEx : AStar
     private const int MinimumHeadRoom = 5;
     private const int MaxWidth = 100;
     private const int MaxLayers = 100;
+    private const int MaxHeight = 30;
+
+    private struct MapSortPoint
+    {
+        public MapSortPoint(int p, float c) { point = p; remainingCost = c; }
+        public int point;
+        public float remainingCost;
+    }
 
     // TODO: second parameter should be a TerrainType enum
     private Dictionary<int, int> terrainTypes;
 
     private MoveStats mover;
+
+    public AStarEx(List<TileMap> tileMaps)
+    {
+        Build(tileMaps);
+    }
 
     public override float _ComputeCost(int fromId, int toId)
     {
@@ -27,7 +40,7 @@ public class AStarEx : AStar
         if (Mathf.Abs(fromPos.z - toPos.z) <= mover.Jump)
         {
             // TODO: Take into account TerrainType vs moveStats affinities
-            return (fromPos.x - toPos.x) * (fromPos.y - toPos.y);
+            return Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
         }
         else
         {
@@ -36,7 +49,7 @@ public class AStarEx : AStar
     }
 
     private int HashId(Vector3 position) =>
-        Convert.ToInt32(position.x + position.y * MaxWidth + position.z * MaxWidth * MaxLayers);
+        Convert.ToInt32(position.x + position.y * MaxWidth + position.z * MaxWidth * MaxLayers) + MaxWidth * MaxLayers * MaxHeight;
 
     private string FlatKey(Vector2 position) =>
         position.x + "," + position.y;
@@ -46,7 +59,7 @@ public class AStarEx : AStar
         var testPosition = new Vector3(position);
         for (var heightDelta = 1; heightDelta < MinimumHeadRoom; heightDelta++)
         {
-            testPosition.z = position.z + heightDelta * MaxWidth * MaxLayers;
+            testPosition.z = position.z + heightDelta;
             if (HasPoint(HashId(testPosition)))
             {
                 return true;
@@ -56,7 +69,7 @@ public class AStarEx : AStar
         return false;
     }
 
-    public void Build(List<TileMap> tileMaps)
+    private void Build(List<TileMap> tileMaps)
     {
         var flatMap = new Dictionary<string, List<int>>();
 
@@ -88,6 +101,11 @@ public class AStarEx : AStar
             var map = tileMaps[height];
             foreach (Vector2 tilePos in map.GetUsedCells())
             {
+                if (!HasPoint(HashId(new Vector3(tilePos.x, tilePos.y, height))))
+                {
+                    continue;
+                }
+
                 foreach (var offset in Offsets)
                 {
                     var flatKey = FlatKey(tilePos + offset);
@@ -109,32 +127,42 @@ public class AStarEx : AStar
         return GetPointPath(startingPoint, endingPoint);
     }
 
-    public List<Vector3> GetPointsInRange(MoveStats moveStats, int startingPoint, float maxCost)
+    public List<Vector3> GetPointsInRange(MoveStats moveStats, int startingPoint)
     {
-        var pointsInRange = new List<int>() { startingPoint };
+        var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, moveStats.Move) };
 
         mover = moveStats;
-        rGetPointsInRange(startingPoint, pointsInRange, maxCost);
 
-        pointsInRange.RemoveAt(0);
-        return pointsInRange.Select(pointId => GetPointPosition(pointId)).ToList();
-    }
-
-    private void rGetPointsInRange(int fromPoint, List<int> pointsInRange, float remainingCost)
-    {
-        var connections = GetPointConnections(fromPoint);
-
-        foreach (var connection in connections)
+        var evalIndex = 0;
+        while (evalIndex < pointsInRange.Count)
         {
-            if (!pointsInRange.Contains(connection))
+            var from = pointsInRange[evalIndex];
+            if (Mathf.IsZeroApprox(from.remainingCost))
             {
-                var cost = _ComputeCost(fromPoint, connection);
-                if (cost <= remainingCost)
+                break;
+            }
+
+            var connections = GetPointConnections(from.point);
+
+            foreach (var connection in connections)
+            {
+                if (!pointsInRange.Any(msp => msp.point == connection))
                 {
-                    pointsInRange.Add(connection);
-                    rGetPointsInRange(connection, pointsInRange, remainingCost - cost);
+                    var cost = _ComputeCost(from.point, connection);
+                    var newCostAtDest = from.remainingCost - cost;
+                    if (newCostAtDest >= 0)
+                    {
+                        var insertIdx = pointsInRange.FindIndex(msp => newCostAtDest > msp.remainingCost);
+                        insertIdx = insertIdx != -1 ? insertIdx : pointsInRange.Count;
+                        pointsInRange.Insert(insertIdx, new MapSortPoint(connection, newCostAtDest));
+                    }
                 }
             }
+
+            evalIndex++;
         }
+
+        pointsInRange.RemoveAt(0);
+        return pointsInRange.Select(msp => GetPointPosition(msp.point)).ToList();
     }
 }
