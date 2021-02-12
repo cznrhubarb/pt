@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<testsuites failures="1" name="TestXML" tests="1" time="0">
+	<testsuite name="IsoMap" failures="4"  tests="10" time="0">
+		<testcase name="GetTileAtXYZ ReturnsNull NoTiles" time="0"></testcase>
+		<testcase name="GetTileAtXYZ ReturnsTile TileAtLocation" time="0"></testcase>
+		<testcase name="GetTileAtXYZ ReturnsNull NoTileAtLocation" time="0"></testcase>
+		<testcase name="MapToWorld ReturnsCorrectPoint" time="0"></testcase>
+		<testcase name="Pick ReturnsEmptyList NoTileUnderWorldPosition" time="0"></testcase>
+		<testcase name="Pick ReturnsSingleTile SingleTileUnderWorldPosition" time="0">
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure></testcase>
+		<testcase name="Pick ReturnsCorrectTile ExtentsOfTileBounds" time="0">
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure>
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure>
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure>
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure>
+			<failure message="EXPECTED: |System.Int32| 0 is equal to |System.Int32|1 but GOT |System.Int32| 0 is not equal to |System.Int32|1"></failure></testcase>
+		<testcase name="Pick ReturnsMultipleTiles MultipleTilesUnderWorldPosition" time="0">
+			<failure message="EXPECTED: |System.Int32| 1 is equal to |System.Int32|2 but GOT |System.Int32| 1 is not equal to |System.Int32|2"></failure></testcase>
+		<testcase name="PickUncovered ReturnsSameAsPick NoCoveredTiles" time="0"></testcase>
+		<testcase name="PickUncovered AdjustsTilesPicked CoveredTile" time="0">
+			<failure message="EXPECTED: |Ecs.Entity| [Node2D:1297] is equal to |Ecs.Entity|[Node2D:1294] but GOT |Ecs.Entity| [Node2D:1297] is not equal to |Ecs.Entity|[Node2D:1294]"></failure></testcase>
+	</testsuite>
+
+</testsuites>

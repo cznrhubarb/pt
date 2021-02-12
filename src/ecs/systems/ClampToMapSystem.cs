@@ -16,9 +16,14 @@ public class ClampToMapSystem : Ecs.System
     {
         var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
 
+        // NEW_MAP
+        //var tileLocationComp = entity.GetComponent<TileLocation>();
+        //entity.Position = tileMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24);
+
         var tileLocationComp = entity.GetComponent<TileLocation>();
-        var tileMap = map.TileMaps[tileLocationComp.Height];
-        entity.Position = tileMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24) + tileMap.Position;
-        entity.ZIndex = tileMap.ZIndex + tileLocationComp.ZLayer;
+    //    var tileMap = map.TileMaps[tileLocationComp.Height];
+        // TODO: MAP
+    //    entity.Position = tileMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24) + tileMap.Position;
+        //entity.ZIndex = tileMap.ZIndex + tileLocationComp.ZLayer;
     }
 }

@@ -11,39 +11,32 @@ public class RenderSelectedMovementSystem : Ecs.System
 
     public RenderSelectedMovementSystem()
     {
-        AddRequiredComponent<Selected>();
-        AddRequiredComponent<TileLocation>();
-        AddRequiredComponent<MoveStats>();
+        AddRequiredComponent<Reticle>();
         AddRequiredComponent<Map>(MapEntityKey);
         AddRequiredComponent<TravelLocation>(TravelLocationEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        if (lastSelected != entity)
+        var target = entity.GetComponent<Reticle>().CurrentTarget;
+        if (lastSelected != target)
         {
-            if (lastSelected != null)
-            {
-                foreach (var spot in EntitiesFor(TravelLocationEntityKey))
-                {
-                    manager.DeleteEntity(spot.Id);
-                }
-            }
+            ClearOldMarkers();
 
-            if (entity != null)
+            if (target?.GetComponentOrNull<Movable>() != null)
             {
                 var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
-                var moveStats = entity.GetComponent<MoveStats>();
-                var tileLocation = entity.GetComponent<TileLocation>();
+                var moveStats = target.GetComponent<Movable>();
+                var tileLocation = target.GetComponent<TileLocation>();
 
-                var startingPoint = map.AStar.GetClosestPoint(
-                    new Vector3(tileLocation.TilePosition.x, tileLocation.TilePosition.y, tileLocation.Height));
+                // TODO: MAP??
+                var startingPoint = map.AStar.GetClosestPoint(tileLocation.TilePosition);
                 var travelLocations = map.AStar.GetPointsInRange(moveStats, startingPoint);
 
                 foreach (var spot in travelLocations)
                 {
                     var ent = manager.GetNewEntity();
-                    manager.AddComponentToEntity(ent, new TileLocation() { Height = Convert.ToInt32(spot.z), TilePosition = new Vector2(spot.x, spot.y), ZLayer = 1 });
+                    manager.AddComponentToEntity(ent, new TileLocation() { TilePosition = new Vector3(spot.x, spot.y, spot.z), ZLayer = 1 });
                     manager.AddComponentToEntity(ent, new SpriteWrap());
                     manager.AddComponentToEntity(ent, new TravelLocation());
 
@@ -51,7 +44,20 @@ public class RenderSelectedMovementSystem : Ecs.System
                 }
             }
 
-            lastSelected = entity;
+            lastSelected = target;
+        }
+        else if (target != null && target.GetComponentOrNull<Movable>()?.StartingLocation != null)
+        {
+            // Still the same target, but it moved on us.
+            ClearOldMarkers();
         }
     }
-}
+
+    private void ClearOldMarkers()
+    {
+        foreach (var spot in EntitiesFor(TravelLocationEntityKey))
+        {
+            manager.DeleteEntity(spot.Id);
+        }
+    }
+    }

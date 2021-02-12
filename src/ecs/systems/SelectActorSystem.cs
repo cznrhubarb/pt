@@ -6,6 +6,7 @@ public class SelectActorSystem : Ecs.System
     private const string SelectableEntityKey = "selectable";
 
     private bool selectThisFrame;
+    private bool lastSelectThisFrame;
 
     public SelectActorSystem()
     {
@@ -19,7 +20,7 @@ public class SelectActorSystem : Ecs.System
     {
         var selectableEntities = EntitiesFor(SelectableEntityKey);
 
-        if (selectThisFrame)
+        if (selectThisFrame && !lastSelectThisFrame)
         {
             var tileLocationComp = entity.GetComponent<TileLocation>();
             var reticleComp = entity.GetComponent<Reticle>();
@@ -33,8 +34,7 @@ public class SelectActorSystem : Ecs.System
             foreach (var target in selectableEntities)
             {
                 var targetLocationComp = target.GetComponent<TileLocation>();
-                if (targetLocationComp.TilePosition == tileLocationComp.TilePosition &&
-                    targetLocationComp.Height == tileLocationComp.Height)
+                if (targetLocationComp.TilePosition == tileLocationComp.TilePosition)
                 {
                     manager.AddComponentToEntity(target, new Selected());
                     reticleComp.CurrentTarget = target;
@@ -42,8 +42,10 @@ public class SelectActorSystem : Ecs.System
             }
 
             GD.Print(reticleComp.CurrentTarget?.Name);
-            selectThisFrame = false;
         }
+
+        lastSelectThisFrame = selectThisFrame;
+        selectThisFrame = false;
     }
 
     public override void _Input(InputEvent inputEvent)

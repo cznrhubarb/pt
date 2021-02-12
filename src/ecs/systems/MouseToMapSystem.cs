@@ -26,6 +26,14 @@ public class MouseToMapSystem : Ecs.System
             var tilemaps = SingleEntityFor(MapEntityKey).GetComponent<Map>().TileMaps;
             var translatedMousePos = mousePosition + cameraComp.Camera.Position;
 
+            // NEW_MAP
+            //var pickedTiles = tileMap.PickUncovered(translatedMousePos);
+            //if (!pickedTiles.IsEmpty)
+            //{
+            //  tileLocationComp.TilePosition = pickedTiles[0];
+            //}
+
+            // TODO: MAP
             for (var i = tilemaps.Count - 1; i >= 0; i--)
             {
                 var tilemap = tilemaps[i];
@@ -38,8 +46,7 @@ public class MouseToMapSystem : Ecs.System
                         i++;
                     }
 
-                    tileLocationComp.TilePosition = tilePos;
-                    tileLocationComp.Height = i;
+                //    tileLocationComp.TilePosition = tilePos;
                     break;
                 }
             }

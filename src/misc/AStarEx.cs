@@ -5,6 +5,11 @@ using System.Linq;
 
 public class AStarEx : AStar
 {
+    // AStarEx is tied to TileMap right now. Is this necessarily a bad thing?
+    //  Pros are that it is done already, and it will always be used with a tile map
+    //  Cons are that testing is much harder, and maybe I want to make my tiles have 
+    //      additional information in the future that tilemap doesn't store, like terrain types
+
     private const int MinimumHeadRoom = 5;
     private const int MaxWidth = 100;
     private const int MaxLayers = 100;
@@ -18,9 +23,9 @@ public class AStarEx : AStar
     }
 
     // TODO: second parameter should be a TerrainType enum
-    private Dictionary<int, int> terrainTypes;
+    //private Dictionary<int, int> terrainTypes;
 
-    private MoveStats mover;
+    private Movable mover;
 
     public AStarEx(List<TileMap> tileMaps)
     {
@@ -37,7 +42,7 @@ public class AStarEx : AStar
         var fromPos = GetPointPosition(fromId);
         var toPos = GetPointPosition(toId);
 
-        if (Mathf.Abs(fromPos.z - toPos.z) <= mover.Jump)
+        if (Mathf.Abs(fromPos.z - toPos.z) <= mover.MaxJump)
         {
             // TODO: Take into account TerrainType vs moveStats affinities
             return Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
@@ -71,6 +76,7 @@ public class AStarEx : AStar
 
     private void Build(List<TileMap> tileMaps)
     {
+        // TODO: MAP
         var flatMap = new Dictionary<string, List<int>>();
 
         for (var height = tileMaps.Count - 1; height >= 0; height--)
@@ -79,6 +85,9 @@ public class AStarEx : AStar
             foreach (Vector2 tilePos in map.GetUsedCells())
             {
                 var position = new Vector3(tilePos.x, tilePos.y, height);
+                // Assumes that we're going top to bottom. If we switch to a straight list,
+                //  we'll need to switch this to doing this in the second pass through and removing
+                //  Or a set by z before we go in here
                 if (!AnyTileInHeadSpace(position))
                 {
                     var hash = HashId(position);
@@ -101,7 +110,8 @@ public class AStarEx : AStar
             var map = tileMaps[height];
             foreach (Vector2 tilePos in map.GetUsedCells())
             {
-                if (!HasPoint(HashId(new Vector3(tilePos.x, tilePos.y, height))))
+                var hash = HashId(new Vector3(tilePos.x, tilePos.y, height));
+                if (!HasPoint(hash))
                 {
                     continue;
                 }
@@ -113,7 +123,7 @@ public class AStarEx : AStar
                     {
                         foreach (var tileId in flatMap[flatKey])
                         {
-                            ConnectPoints(HashId(new Vector3(tilePos.x, tilePos.y, height)), tileId);
+                            ConnectPoints(hash, tileId);
                         }
                     }
                 }
@@ -121,15 +131,15 @@ public class AStarEx : AStar
         }
     }
 
-    public Vector3[] GetPath(MoveStats moveStats, int startingPoint, int endingPoint)
+    public Vector3[] GetPath(Movable moveStats, int startingPoint, int endingPoint)
     {
         mover = moveStats;
         return GetPointPath(startingPoint, endingPoint);
     }
 
-    public List<Vector3> GetPointsInRange(MoveStats moveStats, int startingPoint)
+    public List<Vector3> GetPointsInRange(Movable moveStats, int startingPoint)
     {
-        var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, moveStats.Move) };
+        var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, moveStats.MaxMove) };
 
         mover = moveStats;
 

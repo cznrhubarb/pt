@@ -1,10 +1,24 @@
 ﻿Things to figure out next
+=========================
 
+Unit tests
+Decode and import tilemap from editor into entities and IsoMap them
+Switch to sprites for tiles
 
+ZSort issues near different height tile maps (actors that should be above appear below because of their height)
+
+Only move player characters
+Show red movement for enemy NPC
+Show yellow movement for friendly NPC
+Terrain type weights
+Terrain type weights overridable by movestats
 Ignore obstacles in AStarEx when they exist
 
-Terrain types
+End turn and reset startinglocation values
+Undo move
+
+Animate move objects to move locations (animate along path)
+
+OR condition in systems
 
 Display action tree menu
-
-Remove move locations if deselect by clicking a null

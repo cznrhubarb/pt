@@ -29,8 +29,9 @@ namespace Ecs
         public Entity GetNewEntity()
         {
             Entity entity = new Entity();
+            // Throw it off screen and expect someone else will place it properly
+            entity.Position = Vector2.Inf;
             AddChild(entity);
-            //entity.SetScript(GD.Load("res://src/ecs/core/Entity.cs"));
             entities[entity.Id] = entity;
             return entity;
         }
