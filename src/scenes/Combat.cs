@@ -39,7 +39,7 @@ public class Combat : Manager
                 foreach (Vector2 tile in map.GetUsedCells())
                 {
                     var tileEnt = GetNewEntity();
-                    AddComponentToEntity(tileEnt, new TileLocation() { TilePosition = new Vector3(tile.x + 20, tile.y + 20, height), ZLayer = 0 });
+                    AddComponentToEntity(tileEnt, new TileLocation() { TilePosition = new Vector3(tile.x, tile.y, height), ZLayer = 0 });
                     AddComponentToEntity(tileEnt, new SpriteWrap());
                     AddComponentToEntity(tileEnt, new Terrain());
                     tileEntities.Add(tileEnt);

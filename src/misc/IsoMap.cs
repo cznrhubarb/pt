@@ -62,8 +62,8 @@ public class IsoMap
         var flatTy = -worldPosition.x / TileWidth + worldPosition.y / TileHeight;
         for (var tz = mapDepth - 1; tz >= 0; tz--)
         {
-            var tx = (int)(flatTx + tz * TileThickness / TileHeight);
-            var ty = (int)(flatTy + tz * TileThickness / TileHeight);
+            var tx = Mathf.FloorToInt(flatTx + tz * TileThickness / TileHeight);
+            var ty = Mathf.FloorToInt(flatTy + tz * TileThickness / TileHeight);
 
             // If (tx, ty, tz) exists, add it to the list of possible tiles
             var key = new TileKey(tx, ty, tz);
@@ -73,7 +73,6 @@ public class IsoMap
             }
         }
 
-        GD.Print("Done");
         return results;
     }
 
