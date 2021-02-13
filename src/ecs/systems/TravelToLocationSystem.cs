@@ -29,7 +29,7 @@ public class TravelToLocationSystem : Ecs.System
                 location =>
                  location.TilePosition == reticleLocationComp.TilePosition);
 
-            if (targetLocation != null)
+            if (targetLocation != null && movingActor.HasComponent<PlayerCharacter>())
             {
                 var actorMovable = movingActor.GetComponent<Movable>();
                 var actorLocation = movingActor.GetComponent<TileLocation>();

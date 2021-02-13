@@ -1,19 +1,12 @@
 ﻿Things to figure out next
 =========================
 
-Fix IsoMap::Pick
-
-Show red movement for enemy NPC
-Show yellow movement for friendly NPC
-Only move player characters
-Terrain type weights
-Terrain type weights overridable by movestats
-Turn off tiles for obstacles in AStarEx when they exist
-
 End turn and reset startinglocation values
 Undo move
 
 Animate move objects to move locations (animate along path)
+	Sliding
+	Jumping for height deltas
 
 Unit tests
 	All the systems...
@@ -21,3 +14,9 @@ Unit tests
 OR condition in systems
 
 Display action tree menu
+
+...
+...
+...
+
+AI

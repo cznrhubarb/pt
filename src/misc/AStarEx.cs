@@ -10,6 +10,19 @@ public class AStarEx : AStar
     private const int MaxLayers = 100;
     private const int MaxHeight = 30;
 
+    private Dictionary<TerrainType, float> DefaultCosts = new Dictionary<TerrainType, float>()
+    {
+        { TerrainType.Even, 1 },
+        { TerrainType.Difficult, 2 },
+        { TerrainType.Stone, 1 },
+        { TerrainType.Wood, 1 },
+        { TerrainType.Grass, 1.2f },
+        { TerrainType.Dirt, 1.1f },
+        { TerrainType.Water, 2 },
+        { TerrainType.DeepWater, 99 },
+        { TerrainType.Sand, 1.4f },
+    };
+
     private struct MapSortPoint
     {
         public MapSortPoint(int p, float c) { point = p; remainingCost = c; }
@@ -17,10 +30,9 @@ public class AStarEx : AStar
         public float remainingCost;
     }
 
-    // TODO: second parameter should be a TerrainType enum
-    //private Dictionary<int, int> terrainTypes;
-
-    private Movable mover;
+    private Movable mover = null;
+    private Dictionary<int, TerrainType> terrainTypes = new Dictionary<int, TerrainType>();
+    private Dictionary<int, Affiliation> obstacles = new Dictionary<int, Affiliation>();
 
     public AStarEx(IsoMap map)
     {
@@ -37,10 +49,19 @@ public class AStarEx : AStar
         var fromPos = GetPointPosition(fromId);
         var toPos = GetPointPosition(toId);
 
-        if (Mathf.Abs(fromPos.z - toPos.z) <= mover.MaxJump)
+        var differingObstacleAtLocation = obstacles.ContainsKey(toId)
+            ? obstacles[toId] != mover.Affiliation
+            : false;
+
+        if (Mathf.Abs(fromPos.z - toPos.z) <= mover.MaxJump && !differingObstacleAtLocation)
         {
-            // TODO: Take into account TerrainType vs moveStats affinities
-            return Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
+            var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
+            var terrain = terrainTypes[toId];
+            var costModifier = mover.TerrainCostModifiers.ContainsKey(terrain)
+                ? mover.TerrainCostModifiers[terrain]
+                : DefaultCosts[terrain];
+            costModifier = Mathf.Pow(costModifier, 2);
+            return baseCost * costModifier;
         }
         else
         {
@@ -74,18 +95,22 @@ public class AStarEx : AStar
         var flatMap = new Dictionary<string, List<int>>();
 
         var sortedTiles = map.Tiles
-            .Select(ent => ent.GetComponent<TileLocation>().TilePosition)
-            .OrderBy(tp => -tp.z);
+            .Select(ent => new TileData() 
+            { 
+                position = ent.GetComponent<TileLocation>().TilePosition, 
+                terrain = ent.GetComponent<Terrain>().Type
+            })
+            .OrderBy(t => -t.position.z);
 
-        foreach (var tilePosition in sortedTiles)
+        foreach (var tile in sortedTiles)
         {
-            if (!AnyTileInHeadSpace(tilePosition))
+            if (!AnyTileInHeadSpace(tile.position))
             {
-                var hash = HashId(tilePosition);
-                AddPoint(hash, tilePosition);
-                // TODO: Add it to the terrain type map also
+                var hash = HashId(tile.position);
+                AddPoint(hash, tile.position);
+                terrainTypes[hash] = tile.terrain;
 
-                var flatKey = FlatKey(tilePosition);
+                var flatKey = FlatKey(tile.position);
                 if (!flatMap.ContainsKey(flatKey))
                 {
                     flatMap.Add(flatKey, new List<int>());
@@ -155,6 +180,25 @@ public class AStarEx : AStar
         }
 
         pointsInRange.RemoveAt(0);
-        return pointsInRange.Select(msp => GetPointPosition(msp.point)).ToList();
+        return pointsInRange
+            .Where(msp => !obstacles.ContainsKey(msp.point))
+            .Select(msp => GetPointPosition(msp.point))
+            .ToList();
+    }
+
+    public void SetObstacle(Vector3 position, Affiliation affiliation)
+    {
+        obstacles.Add(HashId(position), affiliation);
+    }
+
+    public void ClearObstacles()
+    {
+        obstacles.Clear();
+    }
+
+    private struct TileData
+    {
+        public Vector3 position;
+        public TerrainType terrain;
     }
 }

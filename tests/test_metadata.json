@@ -4,7 +4,7 @@
 		"tags": [
 
 		],
-		"passing": false
+		"passing": true
 	},
 	"res://tests/IsoMapTest.cs": {
 		"path": "res://tests/IsoMapTest.cs",

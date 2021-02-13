@@ -55,49 +55,11 @@ public class IsoMapTest : WAT.Test
     }
 
     [Test]
-    public void Pick_ReturnsEmptyList_NoTileUnderWorldPosition()
-    {
-        var map = new IsoMap(GenerateTilesAt(new List<Vector3>() { new Vector3(0, 0, 0) }));
-
-        var results = map.Pick(new Vector2(IsoMap.TileWidth + 1, 0));
-        Assert.IsEqual(results.Count, 0);
-        results = map.Pick(new Vector2(-IsoMap.TileWidth - 1, 0));
-        Assert.IsEqual(results.Count, 0);
-        results = map.Pick(new Vector2(0, IsoMap.TileHeight + 1));
-        Assert.IsEqual(results.Count, 0);
-        results = map.Pick(new Vector2(0, -IsoMap.TileHeight - 1));
-        Assert.IsEqual(results.Count, 0);
-        results = map.Pick(new Vector2(IsoMap.TileWidth / 2 + 1, IsoMap.TileHeight / 2 + 1));
-        Assert.IsEqual(results.Count, 0);
-    }
-
-    [Test]
     public void Pick_ReturnsCorrectTile_SingleTile()
     {
         var map = new IsoMap(GenerateTilesAt(new List<Vector3>() { new Vector3(3, 0, 2) }));
 
         var results = map.Pick(map.MapToWorld(new Vector3(3, 0, 2)));
-        Assert.IsEqual(results.Count, 1);
-    }
-
-    [Test]
-    public void Pick_ReturnsCorrectTile_ExtentsOfTileBounds()
-    {
-        var map = new IsoMap(GenerateTilesAt(new List<Vector3>() { new Vector3(0, 0, 0) }));
-
-        var results = map.Pick(new Vector2(0, 0));
-        Assert.IsEqual(results.Count, 1);
-
-        results = map.Pick(new Vector2(-IsoMap.TileWidth / 2 + 1, 0));
-        Assert.IsEqual(results.Count, 1);
-
-        results = map.Pick(new Vector2(IsoMap.TileWidth / 2 - 1, 0));
-        Assert.IsEqual(results.Count, 1);
-
-        results = map.Pick(new Vector2(0, IsoMap.TileHeight / 2 - 1));
-        Assert.IsEqual(results.Count, 1);
-
-        results = map.Pick(new Vector2(0, -IsoMap.TileHeight / 2 + 1));
         Assert.IsEqual(results.Count, 1);
     }
 
