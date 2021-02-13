@@ -28,7 +28,17 @@ namespace WAT {
 		{
 			Output(Boolean.IsFalse(a, context));
 		}
-		
+
+		public void ListContains<T>(List<T> list, T value, string context = "")
+		{
+			Output(Container.ListContains(list, value, context));
+		}
+
+		public void ListDoesNotContain<T>(List<T> list, T value, string context = "")
+		{
+			Output(Container.ListDoesNotContain(list, value, context));
+		}
+
 		public void IsEqual(object a, object b, string context = "")
 		{
 			Output(Equality.IsEqual(a, b, context));

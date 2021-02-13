@@ -4,22 +4,14 @@ using System.Collections.Generic;
 
 public class Map : Component
 {
-    public List<TileMap> TileMaps { get; private set; }
+    public IsoMap IsoMap { get; private set; }
 
     public AStarEx AStar { get; private set; }
 
-    public override void GrabReferences(Entity owner)
+    public Map(List<Entity> tiles)
     {
-        TileMaps = new List<TileMap>();
-        foreach (var child in owner.GetChildren())
-        {
-            if (child is TileMap map)
-            {
-                TileMaps.Add(map);
-            }
-        }
-
         // Not the most ECS-esque thing, but it is what it is
-        AStar = new AStarEx(TileMaps);
+        IsoMap = new IsoMap(tiles);
+        AStar = new AStarEx(IsoMap);
     }
 }

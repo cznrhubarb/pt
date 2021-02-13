@@ -1,4 +1,11 @@
 {
+	"res://tests/AStarExTest.cs": {
+		"path": "res://tests/AStarExTest.cs",
+		"tags": [
+
+		],
+		"passing": false
+	},
 	"res://tests/IsoMapTest.cs": {
 		"path": "res://tests/IsoMapTest.cs",
 		"tags": [

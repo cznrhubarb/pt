@@ -15,6 +15,6 @@ public class DepthSortSystem : Ecs.System
     {
         var locationComp = entity.GetComponent<TileLocation>();
 
-        entity.ZIndex = Convert.ToInt32((locationComp.TilePosition.x + locationComp.TilePosition.y + locationComp.TilePosition.z + locationComp.ZLayer) * SpaceFactor);
+        entity.ZIndex = Convert.ToInt32((locationComp.TilePosition.x + locationComp.TilePosition.y + locationComp.TilePosition.z) * SpaceFactor) + locationComp.ZLayer;
     }
 }

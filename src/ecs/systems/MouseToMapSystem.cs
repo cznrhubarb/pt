@@ -23,32 +23,13 @@ public class MouseToMapSystem : Ecs.System
         {
             var tileLocationComp = entity.GetComponent<TileLocation>();
             var cameraComp = entity.GetComponent<CameraRef>();
-            var tilemaps = SingleEntityFor(MapEntityKey).GetComponent<Map>().TileMaps;
+            var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
             var translatedMousePos = mousePosition + cameraComp.Camera.Position;
 
-            // NEW_MAP
-            //var pickedTiles = tileMap.PickUncovered(translatedMousePos);
-            //if (!pickedTiles.IsEmpty)
-            //{
-            //  tileLocationComp.TilePosition = pickedTiles[0];
-            //}
-
-            // TODO: MAP
-            for (var i = tilemaps.Count - 1; i >= 0; i--)
+            var pickedTiles = map.IsoMap.PickUncovered(translatedMousePos);
+            if (pickedTiles.Count != 0)
             {
-                var tilemap = tilemaps[i];
-
-                var tilePos = tilemap.WorldToMap(translatedMousePos - tilemap.Position);
-                if (tilemap.GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
-                {
-                    while (i < tilemaps.Count - 1 && tilemaps[i + 1].GetCell((int)tilePos.x, (int)tilePos.y) != TileMap.InvalidCell)
-                    {
-                        i++;
-                    }
-
-                //    tileLocationComp.TilePosition = tilePos;
-                    break;
-                }
+                tileLocationComp.TilePosition = pickedTiles[0].GetComponent<TileLocation>().TilePosition;
             }
 
             dirty = false;

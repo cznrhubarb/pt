@@ -29,9 +29,7 @@ public class RenderSelectedMovementSystem : Ecs.System
                 var moveStats = target.GetComponent<Movable>();
                 var tileLocation = target.GetComponent<TileLocation>();
 
-                // TODO: MAP??
-                var startingPoint = map.AStar.GetClosestPoint(tileLocation.TilePosition);
-                var travelLocations = map.AStar.GetPointsInRange(moveStats, startingPoint);
+                var travelLocations = map.AStar.GetPointsInRange(moveStats, tileLocation.TilePosition);
 
                 foreach (var spot in travelLocations)
                 {

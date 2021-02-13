@@ -5,11 +5,6 @@ using System.Linq;
 
 public class AStarEx : AStar
 {
-    // AStarEx is tied to TileMap right now. Is this necessarily a bad thing?
-    //  Pros are that it is done already, and it will always be used with a tile map
-    //  Cons are that testing is much harder, and maybe I want to make my tiles have 
-    //      additional information in the future that tilemap doesn't store, like terrain types
-
     private const int MinimumHeadRoom = 5;
     private const int MaxWidth = 100;
     private const int MaxLayers = 100;
@@ -27,9 +22,9 @@ public class AStarEx : AStar
 
     private Movable mover;
 
-    public AStarEx(List<TileMap> tileMaps)
+    public AStarEx(IsoMap map)
     {
-        Build(tileMaps);
+        Build(map);
     }
 
     public override float _ComputeCost(int fromId, int toId)
@@ -56,7 +51,7 @@ public class AStarEx : AStar
     private int HashId(Vector3 position) =>
         Convert.ToInt32(position.x + position.y * MaxWidth + position.z * MaxWidth * MaxLayers) + MaxWidth * MaxLayers * MaxHeight;
 
-    private string FlatKey(Vector2 position) =>
+    private string FlatKey(Vector3 position) =>
         position.x + "," + position.y;
 
     private bool AnyTileInHeadSpace(Vector3 position)
@@ -74,71 +69,58 @@ public class AStarEx : AStar
         return false;
     }
 
-    private void Build(List<TileMap> tileMaps)
+    private void Build(IsoMap map)
     {
-        // TODO: MAP
         var flatMap = new Dictionary<string, List<int>>();
 
-        for (var height = tileMaps.Count - 1; height >= 0; height--)
-        {
-            var map = tileMaps[height];
-            foreach (Vector2 tilePos in map.GetUsedCells())
-            {
-                var position = new Vector3(tilePos.x, tilePos.y, height);
-                // Assumes that we're going top to bottom. If we switch to a straight list,
-                //  we'll need to switch this to doing this in the second pass through and removing
-                //  Or a set by z before we go in here
-                if (!AnyTileInHeadSpace(position))
-                {
-                    var hash = HashId(position);
-                    AddPoint(hash, position);
-                    // TODO: Add it to the terrain type map also
+        var sortedTiles = map.Tiles
+            .Select(ent => ent.GetComponent<TileLocation>().TilePosition)
+            .OrderBy(tp => -tp.z);
 
-                    var flatKey = FlatKey(tilePos);
-                    if (!flatMap.ContainsKey(flatKey))
-                    {
-                        flatMap.Add(flatKey, new List<int>());
-                    }
-                    flatMap[flatKey].Add(hash);
+        foreach (var tilePosition in sortedTiles)
+        {
+            if (!AnyTileInHeadSpace(tilePosition))
+            {
+                var hash = HashId(tilePosition);
+                AddPoint(hash, tilePosition);
+                // TODO: Add it to the terrain type map also
+
+                var flatKey = FlatKey(tilePosition);
+                if (!flatMap.ContainsKey(flatKey))
+                {
+                    flatMap.Add(flatKey, new List<int>());
                 }
+                flatMap[flatKey].Add(hash);
             }
         }
 
-        var Offsets = new List<Vector2>() { new Vector2(-1, 0), new Vector2(1, 0), new Vector2(0, -1), new Vector2(0, 1) };
-        for (var height = 0; height < tileMaps.Count; height++)
+        var Offsets = new List<Vector3>() { new Vector3(-1, 0, 0), new Vector3(1, 0, 0), new Vector3(0, -1, 0), new Vector3(0, 1, 0) };
+        foreach (int point in GetPoints())
         {
-            var map = tileMaps[height];
-            foreach (Vector2 tilePos in map.GetUsedCells())
+            var pointPos = GetPointPosition(point);
+            foreach (var offset in Offsets)
             {
-                var hash = HashId(new Vector3(tilePos.x, tilePos.y, height));
-                if (!HasPoint(hash))
+                var flatKey = FlatKey(pointPos + offset);
+                if (flatMap.ContainsKey(flatKey))
                 {
-                    continue;
-                }
-
-                foreach (var offset in Offsets)
-                {
-                    var flatKey = FlatKey(tilePos + offset);
-                    if (flatMap.ContainsKey(flatKey))
+                    foreach (var tileId in flatMap[flatKey])
                     {
-                        foreach (var tileId in flatMap[flatKey])
-                        {
-                            ConnectPoints(hash, tileId);
-                        }
+                        ConnectPoints(point, tileId);
                     }
                 }
             }
         }
     }
 
-    public Vector3[] GetPath(Movable moveStats, int startingPoint, int endingPoint)
+    public Vector3[] GetPath(Movable moveStats, Vector3 startPosition, Vector3 endPosition)
     {
         mover = moveStats;
-        return GetPointPath(startingPoint, endingPoint);
+        return GetPointPath(GetClosestPoint(startPosition), GetClosestPoint(endPosition));
     }
 
-    public List<Vector3> GetPointsInRange(Movable moveStats, int startingPoint)
+    public List<Vector3> GetPointsInRange(Movable moveStats, Vector3 startPosition)
     {
+        var startingPoint = GetClosestPoint(startPosition);
         var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, moveStats.MaxMove) };
 
         mover = moveStats;

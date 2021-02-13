@@ -1,6 +1,5 @@
 using Ecs;
 using Godot;
-using System.Linq;
 
 public class ClampToMapSystem : Ecs.System
 {
@@ -16,14 +15,7 @@ public class ClampToMapSystem : Ecs.System
     {
         var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
 
-        // NEW_MAP
-        //var tileLocationComp = entity.GetComponent<TileLocation>();
-        //entity.Position = tileMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24);
-
         var tileLocationComp = entity.GetComponent<TileLocation>();
-    //    var tileMap = map.TileMaps[tileLocationComp.Height];
-        // TODO: MAP
-    //    entity.Position = tileMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24) + tileMap.Position;
-        //entity.ZIndex = tileMap.ZIndex + tileLocationComp.ZLayer;
+        entity.Position = map.IsoMap.MapToWorld(tileLocationComp.TilePosition) + new Vector2(0, 24);
     }
 }

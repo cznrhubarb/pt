@@ -3,21 +3,11 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
-//Tile Entity
-//	TileLocation
-//	SpriteWrap
-//	Terrain
-
-//Map Utility
-//	Dictionary<int, Dictionary<int, Dictonary<int, Tile>>>
-//	iterate
-//	MapToWorld, WorldToMap
-
-class IsoMap
+public class IsoMap
 {
-    public const int TileWidth = 96;
-    public const int TileHeight = 48;
-    public const int TileThickness = TileHeight / 2;
+    public const float TileWidth = 96;
+    public const float TileHeight = 48;
+    public const float TileThickness = TileHeight / 2;
 
     public List<Entity> Tiles { get; set; }
 
@@ -35,7 +25,7 @@ class IsoMap
         for (var i = 0; i < tiles.Count; i++)
         {
             var key = TileKey.From(tiles[i]);
-            mapDepth = Mathf.Max(mapDepth, key.z);
+            mapDepth = Mathf.Max(mapDepth, key.z + 1);
 
             tileGridLookup.Add(key, i);
         }
@@ -57,10 +47,10 @@ class IsoMap
 
     public Vector2 MapToWorld(Vector3 tilePosition)
     {
-        var worldPos = new Vector2((tilePosition.x - tilePosition.y) * TileWidth, (tilePosition.x + tilePosition.y) * TileHeight);
-        worldPos.y -= tilePosition.z * TileThickness;
+        var mx = (tilePosition.x - tilePosition.y) * TileWidth / 2;
+        var my = (tilePosition.x + tilePosition.y) * TileHeight / 2 - tilePosition.z * TileThickness;
 
-        return worldPos;
+        return new Vector2(mx, my);
     }
 
     // Returns the list of all tiles this world position pierces, with highest first
@@ -68,10 +58,12 @@ class IsoMap
     {
         var results = new List<Entity>();
 
+        var flatTx = worldPosition.x / TileWidth + worldPosition.y / TileHeight;
+        var flatTy = -worldPosition.x / TileWidth + worldPosition.y / TileHeight;
         for (var tz = mapDepth - 1; tz >= 0; tz--)
         {
-            var tx = (int)(worldPosition.y / TileWidth + tz * TileThickness / TileWidth);
-            var ty = (int)(worldPosition.y / TileWidth - worldPosition.x / TileHeight + tz * TileThickness / TileWidth);
+            var tx = (int)(flatTx + tz * TileThickness / TileHeight);
+            var ty = (int)(flatTy + tz * TileThickness / TileHeight);
 
             // If (tx, ty, tz) exists, add it to the list of possible tiles
             var key = new TileKey(tx, ty, tz);
@@ -81,21 +73,40 @@ class IsoMap
             }
         }
 
+        GD.Print("Done");
         return results;
     }
 
     // Same as Pick, but if a tile has another directly over it, go up until we find an uncovered tile and replace the original with this
     public List<Entity> PickUncovered(Vector2 worldPosition)
     {
-        return Pick(worldPosition).Select(tile =>
+        var possibleTiles = Pick(worldPosition);
+        for (var i = 0; i < possibleTiles.Count - 1; i++)
+        {
+            var firstKey = TileKey.From(possibleTiles[i]);
+            for (var j = i + 1; j < possibleTiles.Count; j++)
+            {
+                var secondKey = TileKey.From(possibleTiles[j]);
+                if (firstKey.x == secondKey.x && firstKey.y == secondKey.y)
+                {
+                    // We assume Pick is returning these sorted highest to lowest
+                    possibleTiles.RemoveAt(j);
+                    j--;
+                }
+            }
+        }
+
+        var uncoveredTiles = possibleTiles.Select(tile =>
         {
             var key = TileKey.From(tile);
-            while (key.z < mapDepth - 1 && tileGridLookup.ContainsKey(new TileKey(key.x, key.y, key.z+1)))
+            while (key.z < mapDepth - 1 && tileGridLookup.ContainsKey(new TileKey(key.x, key.y, key.z + 1)))
             {
                 key.z += 1;
             }
             return Tiles[tileGridLookup[key]];
         }).ToList();
+
+        return uncoveredTiles;
     }
 
     private class TileKey
@@ -134,59 +145,3 @@ class IsoMap
         }
     }
 }
-
-
-
-
-
-//      tx = wy/TW + tzTT/TW
-//      ty = wy/TW - wx/TW + tzTT/TW
-
-
-// assuming TW = 8, some possible values of wp (4, 16) are
-//          2, 1, 0                 2, 1, 0
-//          2.25, 1.25, 1           2, 1, 1
-//          2.5, 1.5, 2             2, 1, 2
-//          2.75, 1.75, 3           2, 1, 3
-//          3, 2, 4                 3, 2, 4
-//          3.25, 2.25, 5           3, 2, 5
-//          3.5, 2.5, 6             3, 2, 6
-
-
-// Where z = 0
-// wx = (tx - ty) * TW
-//      tx = wx/TW + ty
-// wy = (tx + ty) * TW/2
-//      wy = (wx/TW + ty + ty) * TW/2
-//      2wy/TW = wx/TW + 2ty
-//      ty = wy/TW - wx/2TW
-
-// Where z = 1
-// wx = (tx - ty) * TW
-//      tx = wx/TW + ty
-// wy = (tx + ty) * TW/2 - TW/4
-//      wy = (wx/TW + ty + ty) * TW/2 - TT
-//      wy + TT = (wx/TW + ty + ty) * TW/2
-//      2wy/TW + 2TT/TW = wx/TW + 2ty
-//      2ty = 2wy/TW + 2TT/TW - wx/TW
-//      ty = wy/TW + TT/TW - wx/TW
-
-//      tx = wy/TW + TT/TW
-//      ty = wy/TW + TT/TW - wx/TW
-
-
-//      (2wy + TW/2) / TW = wx/TW + 2ty
-//      2wy/TW + 1/2 = wx/TW + 2ty
-//      2wy/TW + 1/2 - wx/TW = 2ty
-//      ty = wy/TW + 1/4 - wx/2TW
-
-// Where z = 2
-// wx = (tx - ty) * TW
-//      tx = wx/TW + ty
-// wy = (tx + ty) * TW/2 - 2TT
-
-
-// Where z = 3
-// wx = (tx - ty) * TW
-//      tx = wx/TW + ty
-// wy = (tx + ty) * TW/2 - 3TT
