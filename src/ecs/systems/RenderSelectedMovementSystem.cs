@@ -34,23 +34,24 @@ public class RenderSelectedMovementSystem : Ecs.System
                 foreach (var spot in travelLocations)
                 {
                     var spotEnt = manager.GetNewEntity();
-                    manager.AddComponentToEntity(spotEnt, new TileLocation() { TilePosition = new Vector3(spot.x, spot.y, spot.z), ZLayer = 1 });
-                    manager.AddComponentToEntity(spotEnt, new SpriteWrap());
-                    manager.AddComponentToEntity(spotEnt, new TravelLocation());
-                    manager.AddComponentToEntity(spotEnt, new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 2.5f });
+                    manager.AddComponentsToEntity(spotEnt, 
+                        new TileLocation() { TilePosition = new Vector3(spot.x, spot.y, spot.z), ZLayer = 1 }, 
+                        new SpriteWrap(), 
+                        new TravelLocation(), 
+                        new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 2.5f });
 
                     Texture tex = null;
                     if (target.HasComponent<PlayerCharacter>())
                     {
-                        tex = GD.Load("res://img/tiles/image_part_029.png") as Texture;
+                        tex = GD.Load<Texture>("res://img/tiles/image_part_029.png");
                     }
                     else if (target.HasComponent<FriendlyNpc>())
                     {
-                        tex = GD.Load("res://img/tiles/image_part_031.png") as Texture;
+                        tex = GD.Load<Texture>("res://img/tiles/image_part_031.png");
                     }
                     else if (target.HasComponent<EnemyNpc>())
                     {
-                        tex = GD.Load("res://img/tiles/image_part_030.png") as Texture;
+                        tex = GD.Load<Texture>("res://img/tiles/image_part_030.png");
                     }
                     var sprite = spotEnt.GetComponent<SpriteWrap>().Sprite;
                     sprite.Modulate = new Color(1, 1, 1, 0.65f);

@@ -24,6 +24,14 @@ namespace Ecs
             component.GrabReferences(this);
         }
 
+        internal void AddComponents(params Component[] components)
+        {
+            foreach (var comp in components)
+            {
+                AddComponent(comp);
+            }
+        }
+
         internal void RemoveComponent<T>() where T : Component
         {
             components.Remove(typeof(T));

@@ -1,12 +1,26 @@
 ﻿Things to figure out next
 =========================
 
-End turn and reset startinglocation values
+Speed based turn order
+	AT (or whatever) to determine the amount of time left until they act
+	Display on screen
+Show actions menu
+	Wait
+	Attack
+	* End turn and reset startinglocation values
+Only able to control current turn character
+Mock/skip enemy and friendly NPC turns
+
+Display stats for character under cursor
+Display stats for terrain under cursor
+
 Undo move
 
 Animate move objects to move locations (animate along path)
 	Sliding
 	Jumping for height deltas
+
+Camera movement
 
 Unit tests
 	All the systems...

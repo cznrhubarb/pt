@@ -9,6 +9,6 @@ public class RenderSelectedStatsSystem : Ecs.System
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        entity.GetComponentOrNull<Speed>();
+        entity.GetComponentOrNull<TurnSpeed>();
     }
 }

@@ -15,6 +15,10 @@ namespace Ecs
             entities = new Dictionary<int, Entity>();
             systems = new Dictionary<Type, System>();
             toDelete = new List<int>();
+
+            var hud = new CanvasLayer();
+            hud.Name = "HUD";
+            AddChild(hud);
         }
 
         public override void _Process(float delta)
@@ -59,6 +63,12 @@ namespace Ecs
         public void AddComponentToEntity(Entity entity, Component component)
         {
             entity.AddComponent(component);
+            UpdateEntityRegistration(entity);
+        }
+
+        public void AddComponentsToEntity(Entity entity, params Component[] components)
+        {
+            entity.AddComponents(components);
             UpdateEntityRegistration(entity);
         }
 
