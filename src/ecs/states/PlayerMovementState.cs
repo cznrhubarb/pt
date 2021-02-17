@@ -2,7 +2,7 @@
 using Godot;
 using System.Collections.Generic;
 
-public class PlayerTurnState : State
+public class PlayerMovementState : State
 {
     private List<Entity> travelLocations = new List<Entity>();
 

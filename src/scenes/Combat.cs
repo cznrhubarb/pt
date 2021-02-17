@@ -9,7 +9,7 @@ public class Combat : Manager
         ApplyState(new CombatStartState());
         CreateSystems();
         BuildMap();
-        BuildReticle();
+        BuildControlElements();
         BuildActors();
 
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
@@ -33,6 +33,7 @@ public class Combat : Manager
 
     private void CreateSystems()
     {
+        AddSystem(new CameraControlSystem());
         AddSystem(new MouseToMapSystem());
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
@@ -44,8 +45,8 @@ public class Combat : Manager
         // Event Handling Systems
         AddSystem(new AdvanceClockEventSystem());
 
-        AddSystem<PlayerTurnState>(new TravelToLocationSystem());
-        AddSystem<PlayerTurnState>(new RenderSelectedMovementSystem());
+        AddSystem<PlayerMovementState>(new TravelToLocationSystem());
+        AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
 
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
@@ -108,16 +109,19 @@ public class Combat : Manager
         mapNode.QueueFree();
     }
 
-    private void BuildReticle()
+    private void BuildControlElements()
     {
-        var camera = FindNode("Camera2D") as Camera2D;
+        var camera = FindNode("Camera") as Entity;
+        RegisterExistingEntity(camera);
+        AddComponentToEntity(camera, new CameraWrap());
+
         var target = FindNode("Target") as Entity;
         RegisterExistingEntity(target);
         AddComponentsToEntity(target,
             new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 5 },
             new SpriteWrap(), 
             new Reticle(), 
-            new CameraRef() { Camera = camera }, 
+            new CameraRef() { Camera = camera.GetComponent<CameraWrap>().Camera }, 
             new TileLocation() { ZLayer = 2 });
     }
 
