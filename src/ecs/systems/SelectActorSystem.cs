@@ -4,9 +4,7 @@ using Godot;
 public class SelectActorSystem : Ecs.System
 {
     private const string SelectableEntityKey = "selectable";
-
-    private bool selectThisFrame;
-    private bool lastSelectThisFrame;
+    private const string SelectedEntityKey = "selected";
 
     public SelectActorSystem()
     {
@@ -14,21 +12,22 @@ public class SelectActorSystem : Ecs.System
         AddRequiredComponent<TileLocation>();
         AddRequiredComponent<Selectable>(SelectableEntityKey);
         AddRequiredComponent<TileLocation>(SelectableEntityKey);
+        AddRequiredComponent<Selected>(SelectedEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
         var selectableEntities = EntitiesFor(SelectableEntityKey);
 
-        if (selectThisFrame && !lastSelectThisFrame)
+        if (Input.IsActionJustPressed("ui_accept"))
         {
             var tileLocationComp = entity.GetComponent<TileLocation>();
-            var reticleComp = entity.GetComponent<Reticle>();
 
-            if (reticleComp.CurrentTarget != null)
+            // TODO: Adding and removing Selected should happen in a new State in Pre/Post
+
+            foreach (var selected in EntitiesFor(SelectedEntityKey))
             {
-                manager.RemoveComponentFromEntity<Selected>(reticleComp.CurrentTarget);
-                reticleComp.CurrentTarget = null;
+                manager.RemoveComponentFromEntity<Selected>(selected);
             }
 
             foreach (var target in selectableEntities)
@@ -37,24 +36,8 @@ public class SelectActorSystem : Ecs.System
                 if (targetLocationComp.TilePosition == tileLocationComp.TilePosition)
                 {
                     manager.AddComponentToEntity(target, new Selected());
-                    reticleComp.CurrentTarget = target;
                 }
             }
-
-            GD.Print(reticleComp.CurrentTarget?.Name);
-        }
-
-        lastSelectThisFrame = selectThisFrame;
-        selectThisFrame = false;
-    }
-
-    public override void _Input(InputEvent inputEvent)
-    {
-        base._Input(inputEvent);
-
-        if (inputEvent is InputEventMouseButton mouseButton && (ButtonList)mouseButton.ButtonIndex == ButtonList.Left && mouseButton.Pressed)
-        {
-            selectThisFrame = true;
         }
     }
 }

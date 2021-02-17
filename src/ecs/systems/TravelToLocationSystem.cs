@@ -4,10 +4,8 @@ using System.Linq;
 
 public class TravelToLocationSystem : Ecs.System
 {
+    private const string SelectedEntityKey = "selected";
     private const string TravelLocationEntityKey = "travelLocation";
-
-    private bool selectThisFrame;
-    private bool lastSelectThisFrame;
 
     public TravelToLocationSystem()
     {
@@ -15,15 +13,23 @@ public class TravelToLocationSystem : Ecs.System
         AddRequiredComponent<TileLocation>();
         AddRequiredComponent<TravelLocation>(TravelLocationEntityKey);
         AddRequiredComponent<TileLocation>(TravelLocationEntityKey);
+        AddRequiredComponent<Selected>(SelectedEntityKey);
     }
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        var potentialLocations = EntitiesFor(TravelLocationEntityKey).Select(ent => ent.GetComponent<TileLocation>());
-        var movingActor = entity.GetComponent<Reticle>().CurrentTarget;
-
-        if (selectThisFrame && !lastSelectThisFrame && movingActor != null)
+        var movingActor = SingleEntityFor(SelectedEntityKey);
+        if (movingActor == null)
         {
+            return;
+        }
+
+        if (Input.IsActionJustPressed("ui_accept"))
+        {
+            var potentialLocations = EntitiesFor(TravelLocationEntityKey)
+                .Where(ent => ent.Visible)
+                .Select(ent => ent.GetComponent<TileLocation>());
+
             var reticleLocationComp = entity.GetComponent<TileLocation>();
             var targetLocation = potentialLocations.FirstOrDefault(
                 location =>
@@ -37,18 +43,16 @@ public class TravelToLocationSystem : Ecs.System
                 actorLocation.TilePosition = reticleLocationComp.TilePosition;
             }
         }
-
-        lastSelectThisFrame = selectThisFrame;
-        selectThisFrame = false;
-    }
-
-    public override void _Input(InputEvent inputEvent)
-    {
-        base._Input(inputEvent);
-
-        if (inputEvent is InputEventMouseButton mouseButton && (ButtonList)mouseButton.ButtonIndex == ButtonList.Left && mouseButton.Pressed)
+        else if (Input.IsActionJustPressed("ui_cancel"))
         {
-            selectThisFrame = true;
+            var actorMovable = movingActor.GetComponent<Movable>();
+
+            if (actorMovable.StartingLocation != null)
+            {
+                var actorLocation = movingActor.GetComponent<TileLocation>();
+                actorLocation.TilePosition = actorMovable.StartingLocation.TilePosition;
+                actorMovable.StartingLocation = null;
+            }
         }
     }
 }

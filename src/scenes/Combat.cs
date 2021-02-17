@@ -6,10 +6,29 @@ public class Combat : Manager
 {
     public override void _Ready()
     {
+        ApplyState(new CombatStartState());
         CreateSystems();
         BuildMap();
         BuildReticle();
         BuildActors();
+
+        AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
+
+        /// Advance the clock to the next time frame
+        ///  Advance clock applies the correct state for the new actor
+        ///  If it's the player, then we have a new playerstateinputsystem??
+        ///  State has a reference to the player character whose turn it is
+        ///  Movement render shows automatically for player whose turn it is
+        ///  Remove current target from reticle component (should be encapsulated in state now)
+        ///  Right click will undo a move if there is one to undo
+        //  Ending the turn*** will
+        //      Update current actors turnspeed timetoact based on actions taken
+        ///      Reset the movement taken
+        //      Advance the clock (which then will update the state)
+        //
+        //  When it is an enemy turn
+        //      Display or print some sort of indicator for testing
+        //      Wait until a callback is fired (use a timer for now)
     }
 
     private void CreateSystems()
@@ -17,17 +36,18 @@ public class Combat : Manager
         AddSystem(new MouseToMapSystem());
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
-        // TTLSystem needs to be before SelectActorSystem
-        AddSystem(new TravelToLocationSystem());
-        AddSystem(new SelectActorSystem());
         AddSystem(new RenderSelectedStatsSystem());
         AddSystem(new RefreshObstaclesSystem());
-        AddSystem(new RenderSelectedMovementSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
 
         // Event Handling Systems
         AddSystem(new AdvanceClockEventSystem());
+
+        AddSystem<PlayerTurnState>(new TravelToLocationSystem());
+        AddSystem<PlayerTurnState>(new RenderSelectedMovementSystem());
+
+        AddSystem<RoamMapState>(new SelectActorSystem());
     }
 
     private void BuildMap()

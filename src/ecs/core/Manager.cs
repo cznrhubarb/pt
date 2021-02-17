@@ -1,19 +1,25 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Ecs
 {
     public class Manager : Node
     {
         private Dictionary<int, Entity> entities;
-        private Dictionary<Type, System> systems;
+        private Dictionary<Type, List<System>> stateSystems;
         private List<int> toDelete;
+
+        private IEnumerable<System> AllSystems { get => stateSystems.Values.SelectMany(s => s); }
+
+        public State CurrentState { get; private set; }
 
         public Manager()
         {
             entities = new Dictionary<int, Entity>();
-            systems = new Dictionary<Type, System>();
+            stateSystems = new Dictionary<Type, List<System>>();
+            stateSystems[typeof(State)] = new List<System>();
             toDelete = new List<int>();
 
             var hud = new CanvasLayer();
@@ -23,7 +29,14 @@ namespace Ecs
 
         public override void _Process(float delta)
         {
-            foreach (System system in systems.Values)
+            if (CurrentState == null)
+            {
+                return;
+            }
+
+            var processSystems = stateSystems[typeof(State)]
+                .Concat(stateSystems[CurrentState.GetType()]);
+            foreach (System system in processSystems)
             {
                 system.UpdateAll(delta);
             }
@@ -50,15 +63,11 @@ namespace Ecs
             toDelete.Add(id);
         }
 
-        public bool EntityExists(int id)
-        {
-            return entities.ContainsKey(id);
-        }
+        public bool EntityExists(int id) =>
+            entities.ContainsKey(id);
 
-        public Entity GetEntityById(int id)
-        {
-            return entities[id];
-        }
+        public Entity GetEntityById(int id) =>
+            entities[id];
 
         public void AddComponentToEntity(Entity entity, Component component)
         {
@@ -78,21 +87,41 @@ namespace Ecs
             UpdateEntityRegistration(entity);
         }
 
-        public void AddSystem(System system)
+        public void ApplyState<T>(T newState) where T : State
         {
-            systems[system.GetType()] = system;
+            GD.Print("Apply");
+            CurrentState?.Post(this);
+
+            GD.Print(newState.GetType());
+            var stateType = newState.GetType();
+            if (!stateSystems.ContainsKey(stateType))
+            {
+                stateSystems[stateType] = new List<System>();
+            }
+
+            newState.Pre(this);
+            CurrentState = newState;
+            GD.Print("Applied");
+        }
+
+        public void AddSystem(System system) =>
+            AddSystem<State>(system);
+
+        public void AddSystem<T>(System system)
+        {
+            var stateType = typeof(T);
+            if (!stateSystems.ContainsKey(stateType))
+            {
+                stateSystems[stateType] = new List<System>();
+            }
+            stateSystems[stateType].Add(system);
             system.BindManager(this);
             AddChild(system);
         }
 
-        public T GetSystem<T>() where T : System
-        {
-            return (T)systems[typeof(T)];
-        }
-
         private void UpdateEntityRegistration(Entity entity)
         {
-            foreach (System system in systems.Values)
+            foreach (var system in AllSystems)
             {
                 system.UpdateEntityRegistration(entity);
             }
@@ -105,7 +134,7 @@ namespace Ecs
                 if (!EntityExists(id))
                     continue;
 
-                foreach (System system in systems.Values)
+                foreach (var system in AllSystems)
                 {
                     system.DeleteEntity(id);
                 }
