@@ -45,6 +45,10 @@ config/name="Pokemon Tactics"
 run/main_scene="res://src/scenes/Combat.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Globals="*res://src/misc/Globals.cs"
+
 [editor_plugins]
 
 enabled=PoolStringArray( "WAT" )

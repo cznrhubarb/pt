@@ -22,14 +22,16 @@ public class AdvanceClockEventSystem : Ecs.System
                 .Select(ent => new SortPair() { entity = ent, turnSpeed = ent.GetComponent<TurnSpeed>() })
                 .OrderBy(sp => sp.turnSpeed.TimeToAct);
 
-            var amountToAdvance = advanceEntities.First().turnSpeed.TimeToAct;
+            var firstAdvanceEntity = advanceEntities.First();
+            var amountToAdvance = firstAdvanceEntity.turnSpeed.TimeToAct;
 
             foreach (var pair in advanceEntities)
             {
                 pair.turnSpeed.TimeToAct -= amountToAdvance;
             }
+            firstAdvanceEntity.turnSpeed.TimeToAct = firstAdvanceEntity.turnSpeed.Speed;
 
-            var nextActor = advanceEntities.First().entity;
+            var nextActor = firstAdvanceEntity.entity;
             if (nextActor?.GetComponentOrNull<PlayerCharacter>() != null)
             {
                 manager.ApplyState(new PlayerMovementState() { Acting = nextActor, Map = SingleEntityFor(MapEntityKey) });

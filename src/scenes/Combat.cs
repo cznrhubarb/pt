@@ -1,6 +1,7 @@
 using Godot;
 using Ecs;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Combat : Manager
 {
@@ -43,10 +44,13 @@ public class Combat : Manager
         AddSystem(new RenderTurnOrderCardsSystem());
 
         // Event Handling Systems
+        AddSystem(new PlayerActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());
 
         AddSystem<PlayerMovementState>(new TravelToLocationSystem());
         AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
+        // This may need to be moved to another state or no state, or a better method of turning these on/off might be necessary
+        AddSystem<PlayerMovementState>(new RenderActionsMenuSystem());
 
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
@@ -123,6 +127,9 @@ public class Combat : Manager
             new Reticle(), 
             new CameraRef() { Camera = camera.GetComponent<CameraWrap>().Camera }, 
             new TileLocation() { ZLayer = 2 });
+
+        var actionMenu = GetNewEntity();
+        AddComponentsToEntity(actionMenu, new ActionMenu());
     }
 
     private void BuildActors()
@@ -152,12 +159,18 @@ public class Combat : Manager
             new Selectable(), 
             new FriendlyNpc(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Mana() { Current = 20, Max = 20 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType }, 
             new TurnSpeed() { Speed = 16, TimeToAct = 16 },
             TurnOrderCard.For("134", Affiliation.Friendly));
 
+        var moveList = new List<Move>()
+            {
+                new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999 },
+                new Move() { Name = "Cut", MaxTP = 10, CurrentTP = 10 },
+                new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8 },
+                new Move() { Name = "Bide", MaxTP = 5, CurrentTP = 5 },
+            };
         actor = FindNode("Scyther") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
@@ -166,11 +179,11 @@ public class Combat : Manager
             new Selectable(), 
             new PlayerCharacter(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Mana() { Current = 20, Max = 20 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2 }, 
             new TurnSpeed() { Speed = 12, TimeToAct = 12 },
-            TurnOrderCard.For("123", Affiliation.Friendly));
+            TurnOrderCard.For("123", Affiliation.Friendly),
+            new MoveSet() { Moves = moveList });
 
         actor = FindNode("Zapdos") as Entity;
         RegisterExistingEntity(actor);
@@ -181,7 +194,6 @@ public class Combat : Manager
             new Selectable(), 
             new EnemyNpc(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Mana() { Current = 20, Max = 20 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType }, 
             new TurnSpeed() { Speed = 14, TimeToAct = 14 },
@@ -195,7 +207,6 @@ public class Combat : Manager
             new Selectable(), 
             new EnemyNpc(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Mana() { Current = 20, Max = 20 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2 }, 
             new TurnSpeed() { Speed = 26, TimeToAct = 26 },

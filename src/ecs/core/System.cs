@@ -40,7 +40,7 @@ namespace Ecs
             entitySelections[selectionKey].Entities;
 
         protected Entity SingleEntityFor(string selectionKey) =>
-            entitySelections[selectionKey].Entities.First();
+            entitySelections[selectionKey].Entities.FirstOrDefault();
 
         public virtual void UpdateEntityRegistration(Entity entity)
         {

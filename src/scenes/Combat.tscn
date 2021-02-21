@@ -17,7 +17,7 @@ script = ExtResource( 1 )
 script = ExtResource( 8 )
 
 [node name="Camera2D" type="Camera2D" parent="Camera"]
-position = Vector2( -123.552, -62.864 )
+position = Vector2( -120.374, -89.3506 )
 anchor_mode = 0
 current = true
 
@@ -68,10 +68,10 @@ script = ExtResource( 8 )
 [node name="Sprite" type="Sprite" parent="Actors/Target"]
 texture = ExtResource( 7 )
 
-[node name="Map" type="Node2D" parent="Actors"]
+[node name="Map" type="Node2D" parent="."]
 script = ExtResource( 8 )
 
-[node name="TileMap" type="TileMap" parent="Actors/Map"]
+[node name="TileMap" type="TileMap" parent="Map"]
 mode = 1
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 96, 48 )
@@ -80,7 +80,7 @@ centered_textures = true
 format = 1
 tile_data = PoolIntArray( -327676, 13, 0, -327675, 13, 0, -327674, 11, 0, -327673, 11, 0, -327672, 6, 0, -327671, 3, 0, -327670, 3, 0, -327669, 5, 0, -327668, 3, 0, -262140, 13, 0, -262139, 13, 0, -262138, 11, 0, -262137, 11, 0, -262136, 6, 0, -262135, 3, 0, -262134, 3, 0, -262133, 3, 0, -262132, 2, 0, -196604, 13, 0, -196603, 13, 0, -196602, 11, 0, -196601, 11, 0, -196600, 6, 0, -196599, 5, 0, -196598, 3, 0, -196597, 2, 0, -196596, 1, 0, -131068, 13, 0, -131067, 13, 0, -131066, 11, 0, -131065, 11, 0, -131064, 6, 0, -131063, 3, 0, -131062, 3, 0, -131061, 2, 0, -131060, 0, 0, -65532, 9, 0, -65531, 9, 0, -65530, 9, 0, -65529, 7, 0, -65528, 18, 0, -65527, 3, 0, -65526, 3, 0, -65525, 3, 0, -65524, 0, 0, 4, 9, 0, 5, 9, 0, 6, 9, 0, 7, 7, 0, 8, 18, 0, 9, 19, 0, 10, 19, 0, 11, 19, 0, 12, 19, 0, 65540, 9, 0, 65541, 9, 0, 65542, 9, 0, 65543, 8, 0, 65544, 18, 0, 65545, 3, 0, 65546, 3, 0, 65547, 2, 0, 65548, 0, 0, 131076, 13, 0, 131077, 13, 0, 131078, 11, 0, 131079, 11, 0, 131080, 6, 0, 131081, 3, 0, 131082, 3, 0, 131083, 3, 0, 131084, 0, 0, 196612, 13, 0, 196613, 13, 0, 196614, 11, 0, 196615, 11, 0, 196616, 6, 0, 196617, 3, 0, 196618, 3, 0, 196619, 5, 0, 196620, 2, 0, 262148, 13, 0, 262149, 13, 0, 262150, 11, 0, 262151, 11, 0, 262152, 6, 0, 262153, 5, 0, 262154, 3, 0, 262155, 3, 0, 262156, 2, 0, 327684, 13, 0, 327685, 13, 0, 327686, 11, 0, 327687, 11, 0, 327688, 6, 0, 327689, 3, 0, 327690, 3, 0, 327691, 3, 0, 327692, 3, 0 )
 
-[node name="TileMap2" type="TileMap" parent="Actors/Map"]
+[node name="TileMap2" type="TileMap" parent="Map"]
 position = Vector2( 0, -24 )
 mode = 1
 tile_set = ExtResource( 2 )
@@ -90,7 +90,7 @@ centered_textures = true
 format = 1
 tile_data = PoolIntArray( -65532, 9, 0, -65531, 9, 0, -65530, 7, 0, 4, 9, 0, 5, 9, 0, 6, 7, 0, 65540, 9, 0, 65541, 9, 0, 65542, 7, 0 )
 
-[node name="TileMap3" type="TileMap" parent="Actors/Map"]
+[node name="TileMap3" type="TileMap" parent="Map"]
 position = Vector2( 0, -48 )
 mode = 1
 tile_set = ExtResource( 2 )
@@ -100,7 +100,7 @@ centered_textures = true
 format = 1
 tile_data = PoolIntArray( -65532, 9, 0, -65531, 7, 0, 4, 9, 0, 5, 7, 0, 65540, 9, 0, 65541, 7, 0 )
 
-[node name="TileMap4" type="TileMap" parent="Actors/Map"]
+[node name="TileMap4" type="TileMap" parent="Map"]
 position = Vector2( 0, -72 )
 mode = 1
 tile_set = ExtResource( 2 )

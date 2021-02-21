@@ -89,10 +89,8 @@ namespace Ecs
 
         public void ApplyState<T>(T newState) where T : State
         {
-            GD.Print("Apply");
             CurrentState?.Post(this);
 
-            GD.Print(newState.GetType());
             var stateType = newState.GetType();
             if (!stateSystems.ContainsKey(stateType))
             {
@@ -101,7 +99,6 @@ namespace Ecs
 
             newState.Pre(this);
             CurrentState = newState;
-            GD.Print("Applied");
         }
 
         public void AddSystem(System system) =>

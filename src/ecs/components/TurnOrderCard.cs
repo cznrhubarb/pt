@@ -3,22 +3,31 @@ using Godot;
 
 public class TurnOrderCard : Component
 {
-    public TurnOrderCardPrefab Card { get; private set; }
+    private TurnOrderCardPrefab card;
 
     private TurnOrderCard() { }
 
     public int RemainingTicks
     {
-        get => int.Parse(Card.ValueLabel.Text);
-        set => Card.ValueLabel.Text = value.ToString();
+        get => int.Parse(card.ValueLabel.Text);
+        set => card.ValueLabel.Text = value.ToString();
+    }
+
+    public Vector2 Position
+    {
+        get => card.Position;
+        set => card.Position = value;
     }
 
     public static TurnOrderCard For(string portrait, Affiliation affiliation)
     {
-        var prefab = (PackedScene)ResourceLoader.Load("res://prefabs/TurnOrderCardPrefab.tscn");
-        var toc = new TurnOrderCard() { Card = (TurnOrderCardPrefab)prefab.Instance() };
-        // TODO: Maybe look at NOTIFICATION_INSTANCED signal to auto add to hud?
-        toc.Card.Init(portrait, affiliation);
+        var prefab = ResourceLoader.Load<PackedScene>("res://prefabs/TurnOrderCardPrefab.tscn");
+        var toc = new TurnOrderCard() { card = (TurnOrderCardPrefab)prefab.Instance() };
+        toc.card.Init(portrait, affiliation);
+
+        var hud = Globals.SceneTree.Root.FindNode("HUD", true, false);
+        hud.AddChild(toc.card);
+
         return toc;
     }
 }
