@@ -19,52 +19,31 @@ public class PlayerMovementState : State
         if (Acting?.GetComponentOrNull<Movable>() != null)
         {
             var map = Map.GetComponent<Map>();
+            MapUtils.RefreshObstacles(map, manager.GetEntitiesWithComponent<TileLocation>());
+
             var moveStats = Acting.GetComponent<Movable>();
-            var tileLocation = Acting.GetComponent<TileLocation>();
 
-            var points = map.AStar.GetPointsInRange(moveStats, tileLocation.TilePosition);
-            // Add back our starting location so we can stay in place if desired
-            points.Add(tileLocation.TilePosition);
-
-            foreach (var point in points)
+            // If we are /returning/ to this state by going backwards, then just use starting location instead of current
+            var startingPosition = Acting.GetComponent<TileLocation>().TilePosition;
+            if (moveStats.StartingLocation != null)
             {
-                var spotEnt = manager.GetNewEntity();
-                manager.AddComponentsToEntity(spotEnt,
-                    new TileLocation() { TilePosition = new Vector3(point.x, point.y, point.z), ZLayer = 1 },
-                    new SpriteWrap(),
-                    new TravelLocation(),
-                    new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 2.5f });
-
-                Texture tex = null;
-                if (Acting.HasComponent<PlayerCharacter>())
-                {
-                    tex = GD.Load<Texture>("res://img/tiles/image_part_029.png");
-                }
-                else if (Acting.HasComponent<FriendlyNpc>())
-                {
-                    tex = GD.Load<Texture>("res://img/tiles/image_part_031.png");
-                }
-                else if (Acting.HasComponent<EnemyNpc>())
-                {
-                    tex = GD.Load<Texture>("res://img/tiles/image_part_030.png");
-                }
-                var sprite = spotEnt.GetComponent<SpriteWrap>().Sprite;
-                sprite.Modulate = new Color(1, 1, 1, 0.65f);
-                sprite.Texture = tex;
-
-                travelLocations.Add(spotEnt);
+                startingPosition = moveStats.StartingLocation.TilePosition;
             }
+
+            var points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+            // Add back our starting location so we can stay in place if desired
+            points.Add(startingPosition);
+            if (moveStats.StartingLocation != null)
+            {
+                points.Add(Acting.GetComponent<TileLocation>().TilePosition);
+            }
+
+            travelLocations = MapUtils.GenerateTravelLocationsForPoints(manager, points, "res://img/tiles/image_part_029.png");
         }
     }
 
     public override void Post(Manager manager)
     {
-        var movableComp = Acting?.GetComponentOrNull<Movable>();
-        if (movableComp != null)
-        {
-            movableComp.StartingLocation = null;
-        }
-
         foreach (var spot in travelLocations)
         {
             manager.DeleteEntity(spot.Id);

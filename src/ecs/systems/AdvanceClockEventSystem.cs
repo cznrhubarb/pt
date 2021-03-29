@@ -29,6 +29,8 @@ public class AdvanceClockEventSystem : Ecs.System
             {
                 pair.turnSpeed.TimeToAct -= amountToAdvance;
             }
+            // TODO: If we want to make speed determined by player action taken, this should move elsewhere
+            //      Could be good if the moves themselves had speed as an attribute?
             firstAdvanceEntity.turnSpeed.TimeToAct = firstAdvanceEntity.turnSpeed.Speed;
 
             var nextActor = firstAdvanceEntity.entity;

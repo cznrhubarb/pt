@@ -1,4 +1,5 @@
 using Ecs;
+using Godot;
 using System.Linq;
 
 public class RenderActionsMenuSystem : Ecs.System
@@ -7,6 +8,7 @@ public class RenderActionsMenuSystem : Ecs.System
 
     public RenderActionsMenuSystem()
     {
+        AddRequiredComponent<Selected>();
         AddRequiredComponent<MoveSet>();
         AddRequiredComponent<ActionMenu>(ActionMenuEntityKey);
     }

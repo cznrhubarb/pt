@@ -49,17 +49,21 @@ public class AStarEx : AStar
         var fromPos = GetPointPosition(fromId);
         var toPos = GetPointPosition(toId);
 
-        var differingObstacleAtLocation = obstacles.ContainsKey(toId)
-            ? obstacles[toId] != mover.Affiliation
-            : false;
+        var differingObstacleAtLocation = 
+            mover != null && 
+            obstacles.ContainsKey(toId) && 
+            obstacles[toId] != mover.Affiliation;
 
-        if (Mathf.Abs(fromPos.z - toPos.z) <= mover.MaxJump && !differingObstacleAtLocation)
+        if (Mathf.Abs(fromPos.z - toPos.z) <= (mover?.MaxJump ?? 99) && !differingObstacleAtLocation)
         {
             var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
             var terrain = terrainTypes[toId];
-            var costModifier = mover.TerrainCostModifiers.ContainsKey(terrain)
-                ? mover.TerrainCostModifiers[terrain]
-                : DefaultCosts[terrain];
+            var costModifier = 
+                mover == null
+                    ? 1
+                    : mover.TerrainCostModifiers.ContainsKey(terrain)
+                        ? mover.TerrainCostModifiers[terrain]
+                        : DefaultCosts[terrain];
             costModifier = Mathf.Pow(costModifier, 2);
             return baseCost * costModifier;
         }
@@ -182,6 +186,50 @@ public class AStarEx : AStar
         pointsInRange.RemoveAt(0);
         return pointsInRange
             .Where(msp => !obstacles.ContainsKey(msp.point))
+            .Select(msp => GetPointPosition(msp.point))
+            .ToList();
+    }
+
+    public List<Vector3> GetPointsBetweenRange(Vector3 startPosition, int minRange, int maxRange)
+    {
+        var results = new List<Vector3>();
+
+        var startingPoint = GetClosestPoint(startPosition);
+        var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, maxRange) };
+
+        mover = null;
+
+        var evalIndex = 0;
+        while (evalIndex < pointsInRange.Count)
+        {
+            var from = pointsInRange[evalIndex];
+            if (Mathf.IsZeroApprox(from.remainingCost))
+            {
+                break;
+            }
+
+            var connections = GetPointConnections(from.point);
+
+            foreach (var connection in connections)
+            {
+                if (!pointsInRange.Any(msp => msp.point == connection))
+                {
+                    var cost = _ComputeCost(from.point, connection);
+                    var newCostAtDest = from.remainingCost - cost;
+                    if (newCostAtDest >= 0)
+                    {
+                        var insertIdx = pointsInRange.FindIndex(msp => newCostAtDest > msp.remainingCost);
+                        insertIdx = insertIdx != -1 ? insertIdx : pointsInRange.Count;
+                        pointsInRange.Insert(insertIdx, new MapSortPoint(connection, newCostAtDest));
+                    }
+                }
+            }
+
+            evalIndex++;
+        }
+
+        return pointsInRange
+            .Where(msp => (maxRange - msp.remainingCost) >= minRange)
             .Select(msp => GetPointPosition(msp.point))
             .ToList();
     }

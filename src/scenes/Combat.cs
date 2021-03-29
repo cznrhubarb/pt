@@ -13,23 +13,53 @@ public class Combat : Manager
         BuildControlElements();
         BuildActors();
 
+        // Display area cursor for targets
+        // Display entity stats on mouse over
+        // Apply damaging actions at least
+
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
 
-        /// Advance the clock to the next time frame
-        ///  Advance clock applies the correct state for the new actor
-        ///  If it's the player, then we have a new playerstateinputsystem??
-        ///  State has a reference to the player character whose turn it is
-        ///  Movement render shows automatically for player whose turn it is
-        ///  Remove current target from reticle component (should be encapsulated in state now)
-        ///  Right click will undo a move if there is one to undo
-        //  Ending the turn*** will
-        //      Update current actors turnspeed timetoact based on actions taken
-        ///      Reset the movement taken
-        //      Advance the clock (which then will update the state)
+
+        // Game State flow
+        //  Player movement
+        //      Selected player
+        //      Potential movement locations
+        //          Render movement location
+        //          Allow clicking of movement locations
+        //  Player action selection
+        //      Selected player
+        //      Selected player's moveset
+        //          Render action menu
+        //          Allow clicking of moveset options
+        //  Player action targeting
+        //      Selected player
+        //      Selected move's range and target area
+        //      Entities within target area
+        //          Render target range
+        //          Render target area
+        //          Click to target
+        //          Confirmation
+        //  Player action execution
+        //      Selected player
+        //      Selected targets
+        //      Selected move
+        //          Render and yield for animations
+        //  NPC AI
+        //      Most of the world state
+        //          Choose an option
+        //  NPC movement, action selection, targeting, execution (maybe can be all one state?)
+        //  
+        //  Player movement, action selection, action targeting could all switch to Free Roam and back
+        //  Or maybe free roam isn't a thing? Maybe if you are in any other state that allow cursor movement we just render state under cursor?
+        //      Previous state
+        //      Entity state
+        //      Terrain state
+        //          Render stats for entity under cursor
+        //          Allow returning to previous state
         //
-        //  When it is an enemy turn
-        //      Display or print some sort of indicator for testing
-        //      Wait until a callback is fired (use a timer for now)
+        //
+        //  In order to go back to movement state for player, we need to store starting location the entire time
+        //      (until the next movement state for that player? or clear it when execution is over?)
     }
 
     private void CreateSystems()
@@ -39,18 +69,22 @@ public class Combat : Manager
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
         AddSystem(new RenderSelectedStatsSystem());
-        AddSystem(new RefreshObstaclesSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
 
         // Event Handling Systems
-        AddSystem(new PlayerActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());
 
         AddSystem<PlayerMovementState>(new TravelToLocationSystem());
         AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
         // This may need to be moved to another state or no state, or a better method of turning these on/off might be necessary
+        //  Because it doesn't hide when you go to an enemy turn.
+        //  Also might not work now that the primary entity is a selected/moveset. Might have to swap the primary/secondary on this
         AddSystem<PlayerMovementState>(new RenderActionsMenuSystem());
+        AddSystem<PlayerMovementState>(new PlayerActionEventSystem());
+
+        AddSystem<PlayerTargetingState>(new SelectActionLocationSystem());
+        AddSystem<PlayerTargetingState>(new RenderTargetIndicatorsSystem());
 
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
@@ -150,6 +184,13 @@ public class Combat : Manager
             { TerrainType.Water, 1 },
             { TerrainType.DeepWater, 1 },
         };
+        var moveList = new List<Move>()
+        {
+            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, AreaOfEffect = 1, MinRange = 1, MaxRange = 1 },
+            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 2, MinRange = 2, MaxRange = 5 },
+            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, AreaOfEffect = 1, MinRange = 0, MaxRange = 0 },
+            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, AreaOfEffect = 1, MinRange = 0, MaxRange = 2 },
+        };
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
@@ -157,20 +198,14 @@ public class Combat : Manager
             new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
-            new FriendlyNpc(), 
+            new PlayerCharacter(), 
             new Health() { Current = 30, Max = 30 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType }, 
             new TurnSpeed() { Speed = 16, TimeToAct = 16 },
-            TurnOrderCard.For("134", Affiliation.Friendly));
+            TurnOrderCard.For("134", Affiliation.Friendly),
+            new MoveSet() { Moves = moveList });
 
-        var moveList = new List<Move>()
-            {
-                new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999 },
-                new Move() { Name = "Cut", MaxTP = 10, CurrentTP = 10 },
-                new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8 },
-                new Move() { Name = "Bide", MaxTP = 5, CurrentTP = 5 },
-            };
         actor = FindNode("Scyther") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
@@ -191,8 +226,8 @@ public class Combat : Manager
             new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 }, 
             new TileLocation() { TilePosition = new Vector3(4, 0, 3), ZLayer = 5 }, 
             new SpriteWrap(), 
-            new Selectable(), 
-            new EnemyNpc(), 
+            new Selectable(),
+            new EnemyNpc(),
             new Health() { Current = 30, Max = 30 }, 
             new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType }, 

@@ -69,6 +69,10 @@ namespace Ecs
         public Entity GetEntityById(int id) =>
             entities[id];
 
+        // Not the fastest or greatest (has to rebuild list each time and only uses one component type)
+        public List<Entity> GetEntitiesWithComponent<T>() where T : Component =>
+            entities.Values.Where(e => e.HasComponent<T>()).ToList();
+
         public void AddComponentToEntity(Entity entity, Component component)
         {
             entity.AddComponent(component);
@@ -90,6 +94,8 @@ namespace Ecs
         public void ApplyState<T>(T newState) where T : State
         {
             CurrentState?.Post(this);
+
+            GD.Print("Entering state " + newState.GetType().Name);
 
             var stateType = newState.GetType();
             if (!stateSystems.ContainsKey(stateType))
