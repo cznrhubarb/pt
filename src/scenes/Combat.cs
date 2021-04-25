@@ -13,7 +13,6 @@ public class Combat : Manager
         BuildControlElements();
         BuildActors();
 
-        // Display area cursor for targets
         // Display entity stats on mouse over
         // Apply damaging actions at least
 
@@ -71,6 +70,8 @@ public class Combat : Manager
         AddSystem(new RenderSelectedStatsSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
+
+        AddSystem(new RenderProfileCardsSystem());
 
         // Event Handling Systems
         AddSystem(new AdvanceClockEventSystem());
@@ -186,15 +187,16 @@ public class Combat : Manager
         };
         var moveList = new List<Move>()
         {
-            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, AreaOfEffect = 1, MinRange = 1, MaxRange = 1 },
-            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 2, MinRange = 2, MaxRange = 5 },
-            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, AreaOfEffect = 1, MinRange = 0, MaxRange = 0 },
-            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, AreaOfEffect = 1, MinRange = 0, MaxRange = 2 },
+            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, AreaOfEffect = 0, MinRange = 1, MaxRange = 1 },
+            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MinRange = 2, MaxRange = 5 },
+            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, AreaOfEffect = 0, MinRange = 0, MaxRange = 0 },
+            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, AreaOfEffect = 0, MinRange = 0, MaxRange = 2 },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
+            new ProfileDetails() { Name = "Vaporeon" },
             new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
@@ -208,7 +210,8 @@ public class Combat : Manager
 
         actor = FindNode("Scyther") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor, 
+        AddComponentsToEntity(actor,
+            new ProfileDetails() { Name = "Scyther" },
             new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
@@ -222,7 +225,8 @@ public class Combat : Manager
 
         actor = FindNode("Zapdos") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor, 
+        AddComponentsToEntity(actor,
+            new ProfileDetails() { Name = "Zapdos" },
             new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 }, 
             new TileLocation() { TilePosition = new Vector3(4, 0, 3), ZLayer = 5 }, 
             new SpriteWrap(), 
@@ -236,7 +240,8 @@ public class Combat : Manager
 
         actor = FindNode("Machamp") as Entity;
         RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor, 
+        AddComponentsToEntity(actor,
+            new ProfileDetails() { Name = "Machamp" },
             new TileLocation() { TilePosition = new Vector3(6, -1, 1), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 

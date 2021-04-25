@@ -16,6 +16,7 @@ public class PlayerMovementState : State
         // TODO: Move this code to a centralized location used by both states
 
         manager.AddComponentsToEntity(Acting, new Selected());
+        manager.AddComponentsToEntity(Acting, ProfileCard.For());
         if (Acting?.GetComponentOrNull<Movable>() != null)
         {
             var map = Map.GetComponent<Map>();

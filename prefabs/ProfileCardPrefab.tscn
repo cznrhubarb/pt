@@ -1,0 +1,61 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://img/portraits/145.png" type="Texture" id=1]
+[ext_resource path="res://img/ui/glassPanel.png" type="Texture" id=2]
+[ext_resource path="res://res/BungeeRegular_14.tres" type="DynamicFont" id=3]
+
+[node name="ProfileCardPrefab" type="Control"]
+margin_left = -119.0
+margin_top = 285.0
+margin_right = 392.0
+margin_bottom = 511.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+margin_left = 17.0
+margin_top = 31.0
+margin_right = 503.0
+margin_bottom = 219.0
+texture = ExtResource( 2 )
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Portrait" type="Sprite" parent="."]
+position = Vector2( 67.7849, 76.1093 )
+scale = Vector2( 3, 3 )
+texture = ExtResource( 1 )
+flip_h = true
+
+[node name="Name" type="Label" parent="."]
+margin_left = 145.083
+margin_top = 46.3791
+margin_right = 191.083
+margin_bottom = 60.3791
+custom_fonts/font = ExtResource( 3 )
+text = "Zapdos"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Health" type="Label" parent="."]
+margin_left = 153.408
+margin_top = 108.218
+margin_right = 218.408
+margin_bottom = 123.218
+custom_fonts/font = ExtResource( 3 )
+text = "Health:"
+
+[node name="HealthAmount" type="Label" parent="."]
+margin_left = 255.68
+margin_top = 107.029
+margin_right = 316.68
+margin_bottom = 122.029
+custom_fonts/font = ExtResource( 3 )
+text = "100/100"

@@ -25,6 +25,7 @@ public class PlayerTargetingState : State
 
             targetLocations = MapUtils.GenerateTravelLocationsForPoints(manager, points, "res://img/tiles/image_part_031.png");
 
+            // BUG: We need to create enough target indicators for the best case scenario. This won't do that currently.
             points = map.AStar.GetPointsBetweenRange(tileLocation.TilePosition, 0, SelectedMove.AreaOfEffect);
             targetIndicators = MapUtils.GenerateTravelLocationsForPoints(manager, points, "res://img/tiles/image_part_030.png");
             foreach (var indicator in targetIndicators)
