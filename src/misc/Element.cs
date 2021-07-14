@@ -6,5 +6,6 @@ public enum Element
     Water,
     Air,
     Earth,
-    Meat,
+    Metal,
+    Neutral,
 }

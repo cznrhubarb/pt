@@ -10,6 +10,7 @@ public class MoveSet : Component
 public class Move : Godot.Object
 {
     public string Name { get; set; }
+    public Element Element { get; set; }
     public int CurrentTP { get; set; }
     public int MaxTP { get; set; }
     public int MinRange { get; set; }

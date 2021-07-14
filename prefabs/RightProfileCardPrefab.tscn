@@ -43,7 +43,7 @@ position = Vector2( 451.31, 79.2876 )
 scale = Vector2( 3, 3 )
 texture = ExtResource( 1 )
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="HealthBar" type="ProgressBar" parent="."]
 margin_left = 194.206
 margin_top = 77.4485
 margin_right = 385.206
@@ -177,29 +177,29 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="element_fire" type="Sprite" parent="."]
+[node name="MonElement" type="Sprite" parent="."]
 position = Vector2( 53.5551, 181.372 )
 texture = ExtResource( 5 )
 
-[node name="element_fire2" type="Sprite" parent="."]
+[node name="MoveElement1" type="Sprite" parent="."]
 position = Vector2( 144.933, 175.28 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
-[node name="element_fire3" type="Sprite" parent="."]
+[node name="MoveElement2" type="Sprite" parent="."]
 position = Vector2( 242.933, 173.161 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
-[node name="element_metal" type="Sprite" parent="."]
-position = Vector2( 419.599, 171.837 )
-scale = Vector2( 0.379221, 0.379221 )
-texture = ExtResource( 6 )
-
-[node name="element_fire4" type="Sprite" parent="."]
+[node name="MoveElement3" type="Sprite" parent="."]
 position = Vector2( 331.928, 171.572 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
+
+[node name="MoveElement4" type="Sprite" parent="."]
+position = Vector2( 419.599, 171.837 )
+scale = Vector2( 0.379221, 0.379221 )
+texture = ExtResource( 6 )
 
 [node name="Strength" type="Label" parent="."]
 margin_left = 37.6105

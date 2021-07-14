@@ -200,10 +200,11 @@ public class Combat : Manager
             new Selectable(), 
             new PlayerCharacter(), 
             new Health() { Current = 30, Max = 30 }, 
-            new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType }, 
             new TurnSpeed() { Speed = 16, TimeToAct = 16 },
             TurnOrderCard.For("134", Affiliation.Friendly),
+            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
+            new Elemental() { Element = Element.Water },
             new MoveSet() { Moves = moveList });
 
         actor = FindNode("Scyther") as Entity;
@@ -214,11 +215,12 @@ public class Combat : Manager
             new SpriteWrap(), 
             new Selectable(), 
             new PlayerCharacter(), 
-            new Health() { Current = 30, Max = 30 }, 
-            new CombatStats() { Attack = 4, Defense = 3 }, 
+            new Health() { Current = 10, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 2 }, 
             new TurnSpeed() { Speed = 12, TimeToAct = 12 },
             TurnOrderCard.For("123", Affiliation.Friendly),
+            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
+            new Elemental() { Element = Element.Earth },
             new MoveSet() { Moves = moveList });
 
         actor = FindNode("Zapdos") as Entity;
@@ -230,10 +232,11 @@ public class Combat : Manager
             new SpriteWrap(), 
             new Selectable(),
             new EnemyNpc(),
-            new Health() { Current = 30, Max = 30 }, 
-            new CombatStats() { Attack = 4, Defense = 3 }, 
+            new Health() { Current = 24, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType }, 
             new TurnSpeed() { Speed = 14, TimeToAct = 14 },
+            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
+            new Elemental() { Element = Element.Fire },
             TurnOrderCard.For("145", Affiliation.Enemy));
 
         actor = FindNode("Machamp") as Entity;
@@ -245,9 +248,10 @@ public class Combat : Manager
             new Selectable(), 
             new EnemyNpc(), 
             new Health() { Current = 30, Max = 30 }, 
-            new CombatStats() { Attack = 4, Defense = 3 }, 
             new Movable() { MaxMove = 4, MaxJump = 2 }, 
             new TurnSpeed() { Speed = 26, TimeToAct = 26 },
+            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
+            new Elemental() { Element = Element.Neutral },
             TurnOrderCard.For("68", Affiliation.Enemy));
 
         actor = FindNode("Rock") as Entity;
@@ -257,8 +261,8 @@ public class Combat : Manager
             new SpriteWrap(), 
             new Obstacle(), 
             new Selectable(), 
-            new Health() { Current = 30, Max = 30 }, 
-            new CombatStats() { Attack = -1, Defense = 99 });
+            new Health() { Current = 30, Max = 30 },
+            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 99 });
     }
 
     public void SetProfile(Direction side, Entity profileEntity)
