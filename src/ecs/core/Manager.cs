@@ -21,10 +21,19 @@ namespace Ecs
             stateSystems = new Dictionary<Type, List<System>>();
             stateSystems[typeof(State)] = new List<System>();
             toDelete = new List<int>();
+        }
 
-            var hud = new CanvasLayer();
-            hud.Name = "HUD";
-            AddChild(hud);
+        public override void _Ready()
+        {
+            base._Ready();
+
+            var hud = FindNode("HUD");
+            if (hud == null)
+            {
+                hud = new CanvasLayer();
+                hud.Name = "HUD";
+                AddChild(hud);
+            }
         }
 
         public override void _Process(float delta)

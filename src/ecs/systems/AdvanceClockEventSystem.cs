@@ -1,5 +1,4 @@
 using Ecs;
-using Godot;
 using System.Linq;
 
 public class AdvanceClockEventSystem : Ecs.System
@@ -14,6 +13,7 @@ public class AdvanceClockEventSystem : Ecs.System
         AddRequiredComponent<Map>(MapEntityKey);
     }
 
+    // TODO: I think I can just use Update instead of having to override UpdateAll
     public override void UpdateAll(float deltaTime)
     {
         if (EntitiesFor(PrimaryEntityKey).Count != 0)

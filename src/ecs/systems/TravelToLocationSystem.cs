@@ -41,6 +41,7 @@ public class TravelToLocationSystem : Ecs.System
                 var actorLocation = movingActor.GetComponent<TileLocation>();
                 actorMovable.StartingLocation = actorLocation.Clone() as TileLocation;
                 actorLocation.TilePosition = reticleLocationComp.TilePosition;
+                manager.AddComponentToEntity(manager.GetNewEntity(), new SetActionsDisplayStateEvent() { Displayed = true });
             }
         }
         else if (Input.IsActionJustPressed("ui_cancel"))
@@ -52,6 +53,7 @@ public class TravelToLocationSystem : Ecs.System
                 var actorLocation = movingActor.GetComponent<TileLocation>();
                 actorLocation.TilePosition = actorMovable.StartingLocation.TilePosition;
                 actorMovable.StartingLocation = null;
+                manager.AddComponentToEntity(manager.GetNewEntity(), new SetActionsDisplayStateEvent() { Displayed = false });
             }
         }
     }

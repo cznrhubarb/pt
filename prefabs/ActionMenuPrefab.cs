@@ -4,46 +4,38 @@ using System.Collections.Generic;
 
 public class ActionMenuPrefab : Control
 {
-    public Label TitleLabel { get; private set; }
+    private List<Button> moveButtons = new List<Button>();
+    private Action<Move> callback;
 
-    private Action<string> callback;
+    public override void _Ready()
+    {
+        moveButtons.Add(GetNode("MoveButton1") as Button);
+        moveButtons.Add(GetNode("MoveButton2") as Button);
+        moveButtons.Add(GetNode("MoveButton3") as Button);
+        moveButtons.Add(GetNode("MoveButton4") as Button);
+        GetNode("WaitButton").Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { null });
+    }
 
-    public void Init(Action<string> buttonCallback)
+    public void SetButtonCallback(Action<Move> buttonCallback)
     {
         callback = buttonCallback;
     }
 
-    public override void _Ready()
+    private void OnButtonPressed(Move action)
     {
-        TitleLabel = FindNode("Title") as Label;
+        callback.Invoke(action);
     }
 
-    private void OnButtonPressed(string actionName)
+    public void RegisterMoveSet(MoveSet moveSet)
     {
-        callback.Invoke(actionName);
-    }
-
-    public void SetButtons(List<string> actions)
-    {
-        var vbox = GetNode("Background/VBoxContainer") as Control;
-        foreach (Node prevBtn in vbox.GetChildren())
+        for (var i = 0; i < moveButtons.Count; i++)
         {
-            prevBtn.QueueFree();
-            vbox.RemoveChild(prevBtn);
+            moveButtons[i].Visible = moveSet?.Moves.Count > i;
+            if (moveButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
+            {
+                moveButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));
+            }
+            moveButtons[i].Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { moveSet?.Moves[i] });
         }
-
-        foreach (var action in actions)
-        {
-            var btn = new Button();
-            btn.Text = action;
-            btn.Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { action });
-            vbox.AddChild(btn);
-        }
-
-        // Hard coding size per button only because the vbox rect size doesn't update immediately upon adding children
-        var menuSize = new Vector2(vbox.RectSize.x + 40, actions.Count * 20 + (actions.Count - 1) * 4 + 40);
-        (GetNode("Background") as Control).RectSize = menuSize;
-
-        RectPosition = this.GetViewport().Size - menuSize - new Vector2(20, 40);
     }
 }

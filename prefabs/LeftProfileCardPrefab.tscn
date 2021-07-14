@@ -1,0 +1,288 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://img/portraits/145.png" type="Texture" id=1]
+[ext_resource path="res://img/ui/glassPanel.png" type="Texture" id=2]
+[ext_resource path="res://res/BungeeRegular_14.tres" type="DynamicFont" id=3]
+[ext_resource path="res://res/BungeeRegular_32.tres" type="DynamicFont" id=4]
+[ext_resource path="res://img/icons/element_fire.png" type="Texture" id=5]
+[ext_resource path="res://img/icons/element_metal.png" type="Texture" id=6]
+[ext_resource path="res://prefabs/ProfileCardPrefab.cs" type="Script" id=7]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.905882, 0.25098, 0.12549, 1 )
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 0.317647, 0.109804, 0.0352941, 1 )
+
+[node name="ProfileCardPrefab" type="Control"]
+margin_left = -119.0
+margin_top = 285.0
+margin_right = 392.0
+margin_bottom = 511.0
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+margin_left = 17.5298
+margin_top = 30.2508
+margin_right = 503.53
+margin_bottom = 218.251
+texture = ExtResource( 2 )
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Portrait" type="Sprite" parent="."]
+position = Vector2( 67.7849, 76.1093 )
+scale = Vector2( 3, 3 )
+texture = ExtResource( 1 )
+flip_h = true
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+margin_left = 146.53
+margin_top = 75.3296
+margin_right = 337.53
+margin_bottom = 92.3296
+custom_styles/fg = SubResource( 1 )
+custom_styles/bg = SubResource( 2 )
+step = 1.0
+value = 42.0
+rounded = true
+percent_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="Label" parent="."]
+margin_left = 143.0
+margin_top = 37.0
+margin_right = 345.0
+margin_bottom = 70.0
+custom_fonts/font = ExtResource( 4 )
+text = "Zapdos"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Health" type="Label" parent="."]
+margin_left = 149.004
+margin_top = 75.2553
+margin_right = 214.004
+margin_bottom = 90.2553
+custom_fonts/font = ExtResource( 3 )
+text = "Health"
+
+[node name="HealthAmount" type="Label" parent="."]
+margin_left = 273.841
+margin_top = 74.5051
+margin_right = 334.841
+margin_bottom = 89.5051
+custom_fonts/font = ExtResource( 3 )
+text = "100/100"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MoveName1" type="Label" parent="."]
+margin_left = 57.211
+margin_top = 161.038
+margin_right = 97.211
+margin_bottom = 175.038
+custom_fonts/font = ExtResource( 3 )
+text = "Move"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MoveName2" type="Label" parent="."]
+margin_left = 154.682
+margin_top = 158.919
+margin_right = 194.682
+margin_bottom = 172.919
+custom_fonts/font = ExtResource( 3 )
+text = "Move"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MoveName3" type="Label" parent="."]
+margin_left = 243.146
+margin_top = 158.919
+margin_right = 283.146
+margin_bottom = 172.919
+custom_fonts/font = ExtResource( 3 )
+text = "Move"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MoveName4" type="Label" parent="."]
+margin_left = 331.083
+margin_top = 157.86
+margin_right = 371.083
+margin_bottom = 171.86
+custom_fonts/font = ExtResource( 3 )
+text = "Move"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TpCount1" type="Label" parent="."]
+margin_left = 57.211
+margin_top = 178.038
+margin_right = 97.211
+margin_bottom = 192.038
+custom_fonts/font = ExtResource( 3 )
+text = "TP/TP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TpCount2" type="Label" parent="."]
+margin_left = 154.682
+margin_top = 175.919
+margin_right = 194.682
+margin_bottom = 189.919
+custom_fonts/font = ExtResource( 3 )
+text = "TP/TP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TpCount3" type="Label" parent="."]
+margin_left = 243.147
+margin_top = 175.919
+margin_right = 283.147
+margin_bottom = 189.919
+custom_fonts/font = ExtResource( 3 )
+text = "TP/TP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TpCount4" type="Label" parent="."]
+margin_left = 331.082
+margin_top = 174.86
+margin_right = 371.082
+margin_bottom = 188.86
+custom_fonts/font = ExtResource( 3 )
+text = "TP/TP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="element_fire" type="Sprite" parent="."]
+position = Vector2( 467.394, 182.08 )
+texture = ExtResource( 5 )
+
+[node name="element_fire2" type="Sprite" parent="."]
+position = Vector2( 39.517, 175.81 )
+scale = Vector2( 0.379221, 0.379221 )
+texture = ExtResource( 5 )
+
+[node name="element_fire3" type="Sprite" parent="."]
+position = Vector2( 137.517, 173.691 )
+scale = Vector2( 0.379221, 0.379221 )
+texture = ExtResource( 5 )
+
+[node name="element_metal" type="Sprite" parent="."]
+position = Vector2( 314.183, 172.367 )
+scale = Vector2( 0.379221, 0.379221 )
+texture = ExtResource( 6 )
+
+[node name="element_fire4" type="Sprite" parent="."]
+position = Vector2( 226.512, 172.102 )
+scale = Vector2( 0.379221, 0.379221 )
+texture = ExtResource( 5 )
+
+[node name="Strength" type="Label" parent="."]
+margin_left = 148.854
+margin_top = 104.357
+margin_right = 190.854
+margin_bottom = 118.357
+custom_fonts/font = ExtResource( 3 )
+text = "STR 99"
+
+[node name="Dexterity" type="Label" parent="."]
+margin_left = 149.914
+margin_top = 127.135
+margin_right = 200.914
+margin_bottom = 142.135
+custom_fonts/font = ExtResource( 3 )
+text = "DEX 99"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Toughness" type="Label" parent="."]
+margin_left = 226.195
+margin_top = 104.357
+margin_right = 277.195
+margin_bottom = 119.357
+custom_fonts/font = ExtResource( 3 )
+text = "TUF 99"
+
+[node name="Magic" type="Label" parent="."]
+margin_left = 225.136
+margin_top = 128.195
+margin_right = 276.136
+margin_bottom = 143.195
+custom_fonts/font = ExtResource( 3 )
+text = "MAG 99"
+
+[node name="Attunement" type="Label" parent="."]
+margin_left = 304.595
+margin_top = 126.076
+margin_right = 355.595
+margin_bottom = 141.076
+custom_fonts/font = ExtResource( 3 )
+text = "ATN 99"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Movement" type="Label" parent="."]
+margin_left = 388.293
+margin_top = 105.417
+margin_right = 439.293
+margin_bottom = 120.417
+custom_fonts/font = ExtResource( 3 )
+text = "MOV 9"
+
+[node name="Jump" type="Label" parent="."]
+margin_left = 387.763
+margin_top = 124.487
+margin_right = 438.763
+margin_bottom = 139.487
+custom_fonts/font = ExtResource( 3 )
+text = "JMP 9"
+
+[node name="Status Effect Placeholder" type="Label" parent="."]
+margin_left = 351.741
+margin_top = 60.3893
+margin_right = 494.741
+margin_bottom = 75.3893
+rect_pivot_offset = Vector2( 91.1657, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "(- Status Effects)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Status Effect Placeholder2" type="Label" parent="."]
+margin_left = 346.974
+margin_top = 40.2596
+margin_right = 493.974
+margin_bottom = 55.2596
+rect_pivot_offset = Vector2( 91.1657, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "(+ Status Effects)"
+__meta__ = {
+"_edit_use_anchors_": false
+}

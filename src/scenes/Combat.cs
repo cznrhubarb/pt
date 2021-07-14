@@ -1,20 +1,25 @@
 using Godot;
 using Ecs;
 using System.Collections.Generic;
-using System.Linq;
 
 public class Combat : Manager
 {
+    private ProfileCardPrefab leftProfileCard;
+    private ProfileCardPrefab rightProfileCard;
+    private ActionMenuPrefab actionMenu;
+
     public override void _Ready()
     {
+        leftProfileCard = GetNode("HUD/LeftProfile") as ProfileCardPrefab;
+        rightProfileCard = GetNode("HUD/RightProfile") as ProfileCardPrefab;
+        actionMenu = GetNode("HUD/LeftProfile/ActionMenu") as ActionMenuPrefab;
+        actionMenu.SetButtonCallback(move => AddComponentToEntity(GetNewEntity(), new SelectActionEvent() { SelectedMove = move }));
+
         ApplyState(new CombatStartState());
         CreateSystems();
         BuildMap();
         BuildControlElements();
         BuildActors();
-
-        // Display entity stats on mouse over
-        // Apply damaging actions at least
 
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
 
@@ -71,21 +76,17 @@ public class Combat : Manager
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
 
-        AddSystem(new RenderProfileCardsSystem());
-
         // Event Handling Systems
+        AddSystem(new SelectActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());
+        AddSystem(new SetActionsDisplayStateEventSystem());
 
         AddSystem<PlayerMovementState>(new TravelToLocationSystem());
         AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
-        // This may need to be moved to another state or no state, or a better method of turning these on/off might be necessary
-        //  Because it doesn't hide when you go to an enemy turn.
-        //  Also might not work now that the primary entity is a selected/moveset. Might have to swap the primary/secondary on this
-        AddSystem<PlayerMovementState>(new RenderActionsMenuSystem());
-        AddSystem<PlayerMovementState>(new PlayerActionEventSystem());
 
         AddSystem<PlayerTargetingState>(new SelectActionLocationSystem());
         AddSystem<PlayerTargetingState>(new RenderTargetIndicatorsSystem());
+        AddSystem<PlayerTargetingState>(new RenderTargetProfileSystem());
 
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
@@ -162,9 +163,6 @@ public class Combat : Manager
             new Reticle(), 
             new CameraRef() { Camera = camera.GetComponent<CameraWrap>().Camera }, 
             new TileLocation() { ZLayer = 2 });
-
-        var actionMenu = GetNewEntity();
-        AddComponentsToEntity(actionMenu, new ActionMenu());
     }
 
     private void BuildActors()
@@ -187,16 +185,16 @@ public class Combat : Manager
         };
         var moveList = new List<Move>()
         {
-            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, AreaOfEffect = 0, MinRange = 1, MaxRange = 1 },
-            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MinRange = 2, MaxRange = 5 },
-            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, AreaOfEffect = 0, MinRange = 0, MaxRange = 0 },
-            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, AreaOfEffect = 0, MinRange = 0, MaxRange = 2 },
+            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1 },
+            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5 },
+            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0 },
+            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2 },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
-            new ProfileDetails() { Name = "Vaporeon" },
+            new ProfileDetails() { Name = "Vaporeon", MonNumber = 134, Affiliation = Affiliation.Friendly },
             new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
@@ -211,7 +209,7 @@ public class Combat : Manager
         actor = FindNode("Scyther") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Scyther" },
+            new ProfileDetails() { Name = "Scyther", MonNumber = 123, Affiliation = Affiliation.Friendly },
             new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
@@ -226,7 +224,7 @@ public class Combat : Manager
         actor = FindNode("Zapdos") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Zapdos" },
+            new ProfileDetails() { Name = "Zapdos", MonNumber = 145, Affiliation = Affiliation.Enemy },
             new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 }, 
             new TileLocation() { TilePosition = new Vector3(4, 0, 3), ZLayer = 5 }, 
             new SpriteWrap(), 
@@ -241,7 +239,7 @@ public class Combat : Manager
         actor = FindNode("Machamp") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Machamp" },
+            new ProfileDetails() { Name = "Machamp", MonNumber = 68, Affiliation = Affiliation.Enemy },
             new TileLocation() { TilePosition = new Vector3(6, -1, 1), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
@@ -261,5 +259,34 @@ public class Combat : Manager
             new Selectable(), 
             new Health() { Current = 30, Max = 30 }, 
             new CombatStats() { Attack = -1, Defense = 99 });
+    }
+
+    public void SetProfile(Direction side, Entity profileEntity)
+    {
+        if (side == Direction.Left)
+        {
+            leftProfileCard.SetProfile(profileEntity);
+        }
+        else if (side == Direction.Right)
+        {
+            rightProfileCard.SetProfile(profileEntity);
+        }
+    }
+
+    public void SetActionMenuDisplayed(bool displayed)
+    {
+        if (displayed)
+        {
+            leftProfileCard.MakeRoomForActionMenu();
+        }
+        else
+        {
+            leftProfileCard.TakeAwayRoomForActionMenu();
+        }
+    }
+
+    public void SetActions(MoveSet moveSet)
+    {
+        actionMenu.RegisterMoveSet(moveSet);
     }
 }

@@ -14,9 +14,11 @@ public class PlayerMovementState : State
     {
         // TODO: Need another state for preview movement of entity
         // TODO: Move this code to a centralized location used by both states
+        (manager as Combat).SetProfile(Direction.Left, Acting);
+        (manager as Combat).SetProfile(Direction.Right, null);
+        (manager as Combat).SetActions(Acting.GetComponentOrNull<MoveSet>());
 
         manager.AddComponentsToEntity(Acting, new Selected());
-        manager.AddComponentsToEntity(Acting, ProfileCard.For());
         if (Acting?.GetComponentOrNull<Movable>() != null)
         {
             var map = Map.GetComponent<Map>();
@@ -39,7 +41,7 @@ public class PlayerMovementState : State
                 points.Add(Acting.GetComponent<TileLocation>().TilePosition);
             }
 
-            travelLocations = MapUtils.GenerateTravelLocationsForPoints(manager, points, "res://img/tiles/image_part_029.png");
+            travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");
         }
     }
 

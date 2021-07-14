@@ -19,6 +19,7 @@ public class TurnOrderCard : Component
         set => card.Position = value;
     }
 
+    // TODO: Don't make me add affiliation twice. We should pass in profile information here instead
     public static TurnOrderCard For(string portrait, Affiliation affiliation)
     {
         var prefab = ResourceLoader.Load<PackedScene>("res://prefabs/TurnOrderCardPrefab.tscn");

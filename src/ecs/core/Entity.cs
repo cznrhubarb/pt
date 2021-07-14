@@ -1,4 +1,5 @@
 using Godot;
+using PokemonTactics.src.ecs.core.exceptions;
 using System;
 using System.Collections.Generic;
 
@@ -57,6 +58,14 @@ namespace Ecs
         public bool HasComponent<T>() where T : Component
         {
             return components.ContainsKey(typeof(T));
+        }
+
+        public void AssertComponentExists<T>() where T : Component
+        {
+            if (!HasComponent<T>())
+            {
+                throw new MissingRequiredComponentException(typeof(T));
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 using Ecs;
 using Godot;
+using System;
 using System.Linq;
 
 public class RenderTargetIndicatorsSystem : Ecs.System
@@ -13,7 +14,7 @@ public class RenderTargetIndicatorsSystem : Ecs.System
         AddRequiredComponent<TargetIndicator>();
         AddRequiredComponent<SpriteWrap>();
         AddRequiredComponent<TileLocation>();
-        AddRequiredComponent<TravelLocation>(ActionLocationEntityKey);
+        AddRequiredComponent<TargetLocation>(ActionLocationEntityKey);
         AddRequiredComponent<TileLocation>(ActionLocationEntityKey);
         AddRequiredComponent<Reticle>(ReticleEntityKey);
         AddRequiredComponent<Map>(MapEntityKey);
@@ -39,12 +40,20 @@ public class RenderTargetIndicatorsSystem : Ecs.System
         {
             // HACK: Strong coupling here.
             var areaRange = ptState.SelectedMove.AreaOfEffect;
+            var maxAoeHeightDelta = ptState.SelectedMove.MaxAoeHeightDelta;
             var points = map.AStar.GetPointsBetweenRange(reticleLocation.TilePosition, 0, areaRange);
 
             for (var i = 0; i < points.Count; i++)
             {
-                indicators[i].GetComponent<SpriteWrap>().Sprite.Visible = true;
-                indicators[i].GetComponent<TileLocation>().TilePosition = points[i];
+                if (Math.Abs(points[i].z - reticleLocation.TilePosition.z) <= maxAoeHeightDelta)
+                {
+                    // TODO: Because the actual sprite positioning doesn't happen until the next render loop,
+                    //  this flashes at the wrong spot :(
+                    //  Fixed by setting a "should be visible next frame" in the sprite wrap and letting the
+                    //  other render system take care of it
+                    indicators[i].GetComponent<TileLocation>().TilePosition = points[i];
+                    indicators[i].GetComponent<SpriteWrap>().Sprite.Visible = true;
+                }
             }
         }
     }

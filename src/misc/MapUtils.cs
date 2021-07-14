@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 public class MapUtils
 {
-    public static List<Entity> GenerateTravelLocationsForPoints(Manager manager, List<Vector3> points, string texturePath)
+    public static List<Entity> GenerateTileLocationsForPoints<T>(Manager manager, List<Vector3> points, string texturePath) where T : Component, new()
     {
-        var travelLocations = new List<Entity>();
+        var tileLocations = new List<Entity>();
 
         foreach (var point in points)
         {
@@ -15,17 +15,17 @@ public class MapUtils
             manager.AddComponentsToEntity(spotEnt,
                 new TileLocation() { TilePosition = new Vector3(point.x, point.y, point.z), ZLayer = 1 },
                 new SpriteWrap(),
-                new TravelLocation(),
+                new T(),
                 new Pulse() { squishAmountX = 0.05f, squishAmountY = 0.05f, squishSpeed = 2.5f });
 
             var sprite = spotEnt.GetComponent<SpriteWrap>().Sprite;
             sprite.Modulate = new Color(1, 1, 1, 0.65f);
             sprite.Texture = GD.Load<Texture>(texturePath);
 
-            travelLocations.Add(spotEnt);
+            tileLocations.Add(spotEnt);
         }
 
-        return travelLocations;
+        return tileLocations;
     }
 
     public static void RefreshObstacles(Map mapComponent, List<Entity> entities)

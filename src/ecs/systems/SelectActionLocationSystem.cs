@@ -12,7 +12,7 @@ public class SelectActionLocationSystem : Ecs.System
     {
         AddRequiredComponent<Reticle>();
         AddRequiredComponent<TileLocation>();
-        AddRequiredComponent<TravelLocation>(ActionLocationEntityKey);
+        AddRequiredComponent<TargetLocation>(ActionLocationEntityKey);
         AddRequiredComponent<TileLocation>(ActionLocationEntityKey);
         AddRequiredComponent<Selected>(SelectedEntityKey);
         AddRequiredComponent<Map>(MapEntityKey);
