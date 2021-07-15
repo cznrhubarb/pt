@@ -20,6 +20,11 @@ public class Move : Godot.Object
     public int AreaOfEffect { get; set; } = 0;
     public int MaxAoeHeightDelta { get; set; } = 0;
 
+    public int Accuracy { get; set; }
+    public int CritModifier { get; set; } = 0;
+
+    public Dictionary<string, int> Effects { get; set; }
+
     ///Special bonus things
     //targeting type (line, etc) if we want something other than the radiate out shape pattern
     //affiliation restriction, if we want to make something only impact one type or another

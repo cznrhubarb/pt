@@ -26,9 +26,9 @@ __meta__ = {
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 margin_left = 17.5298
-margin_top = 30.2508
+margin_top = 29.7211
 margin_right = 503.53
-margin_bottom = 218.251
+margin_bottom = 217.721
 texture = ExtResource( 2 )
 patch_margin_left = 10
 patch_margin_top = 10
@@ -90,54 +90,58 @@ __meta__ = {
 }
 
 [node name="MoveName1" type="Label" parent="."]
-margin_left = 162.627
-margin_top = 160.508
-margin_right = 203.627
-margin_bottom = 175.508
+margin_left = 141.0
+margin_top = 160.0
+margin_right = 206.0
+margin_bottom = 193.0
 custom_fonts/font = ExtResource( 3 )
-text = "Move"
+text = "MoveWW WWWWW"
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="MoveName2" type="Label" parent="."]
-margin_left = 260.098
-margin_top = 158.389
-margin_right = 301.098
-margin_bottom = 173.389
+margin_left = 240.098
+margin_top = 160.389
+margin_right = 305.098
+margin_bottom = 175.389
 custom_fonts/font = ExtResource( 3 )
-text = "Move"
+text = "MoveWW"
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="MoveName3" type="Label" parent="."]
-margin_left = 348.562
-margin_top = 158.389
-margin_right = 389.562
-margin_bottom = 173.389
+margin_left = 338.562
+margin_top = 160.859
+margin_right = 403.562
+margin_bottom = 193.859
 custom_fonts/font = ExtResource( 3 )
-text = "Move"
+text = "MoveWW"
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="MoveName4" type="Label" parent="."]
 margin_left = 436.499
-margin_top = 157.33
-margin_right = 477.499
-margin_bottom = 172.33
+margin_top = 160.33
+margin_right = 495.499
+margin_bottom = 193.33
 custom_fonts/font = ExtResource( 3 )
-text = "Move"
+text = "Moveee"
+autowrap = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="TpCount1" type="Label" parent="."]
-margin_left = 162.627
-margin_top = 177.508
-margin_right = 205.627
-margin_bottom = 192.508
+margin_left = 140.627
+margin_top = 195.508
+margin_right = 183.627
+margin_bottom = 210.508
 custom_fonts/font = ExtResource( 3 )
 text = "TP/TP"
 __meta__ = {
@@ -145,10 +149,10 @@ __meta__ = {
 }
 
 [node name="TpCount2" type="Label" parent="."]
-margin_left = 260.098
-margin_top = 175.389
-margin_right = 303.098
-margin_bottom = 190.389
+margin_left = 240.098
+margin_top = 195.389
+margin_right = 283.098
+margin_bottom = 210.389
 custom_fonts/font = ExtResource( 3 )
 text = "TP/TP"
 __meta__ = {
@@ -156,10 +160,10 @@ __meta__ = {
 }
 
 [node name="TpCount3" type="Label" parent="."]
-margin_left = 348.564
-margin_top = 175.389
-margin_right = 391.564
-margin_bottom = 190.389
+margin_left = 338.564
+margin_top = 195.389
+margin_right = 381.564
+margin_bottom = 210.389
 custom_fonts/font = ExtResource( 3 )
 text = "TP/TP"
 __meta__ = {
@@ -168,9 +172,9 @@ __meta__ = {
 
 [node name="TpCount4" type="Label" parent="."]
 margin_left = 436.499
-margin_top = 174.33
+margin_top = 195.33
 margin_right = 479.499
-margin_bottom = 189.33
+margin_bottom = 210.33
 custom_fonts/font = ExtResource( 3 )
 text = "TP/TP"
 __meta__ = {
@@ -182,17 +186,17 @@ position = Vector2( 53.5551, 181.372 )
 texture = ExtResource( 5 )
 
 [node name="MoveElement1" type="Sprite" parent="."]
-position = Vector2( 144.933, 175.28 )
+position = Vector2( 122.933, 175.28 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
 [node name="MoveElement2" type="Sprite" parent="."]
-position = Vector2( 242.933, 173.161 )
+position = Vector2( 222.933, 173.161 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
 [node name="MoveElement3" type="Sprite" parent="."]
-position = Vector2( 331.928, 171.572 )
+position = Vector2( 321.928, 171.572 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 

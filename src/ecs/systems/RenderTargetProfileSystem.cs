@@ -5,6 +5,7 @@ using System.Linq;
 public class RenderTargetProfileSystem : Ecs.System
 {
     private const string PotentialTargetKey = "potentialTarget";
+    private const string TargetedKey = "targeted";
 
     public RenderTargetProfileSystem()
     {
@@ -13,10 +14,17 @@ public class RenderTargetProfileSystem : Ecs.System
         AddRequiredComponent<TileLocation>(PotentialTargetKey);
         AddRequiredComponent<ProfileDetails>(PotentialTargetKey);
         AddRequiredComponent<Health>(PotentialTargetKey);
+        AddRequiredComponent<Targeted>(TargetedKey);
     }
 
     public override void UpdateAll(float deltaTime)
     {
+        var currentTargets = EntitiesFor(TargetedKey);
+        foreach (var target in currentTargets)
+        {
+            manager.RemoveComponentFromEntity<Targeted>(target);
+        }
+
         var indicators = EntitiesFor(PrimaryEntityKey);
         var potentialTargets = EntitiesFor(PotentialTargetKey);
 
@@ -27,6 +35,13 @@ public class RenderTargetProfileSystem : Ecs.System
             )
         );
 
+        foreach (var target in actualTargets)
+        {
+            manager.AddComponentToEntity(target, new Targeted());
+        }
+
+        // TODO: The actual rendering should probably happen in a system other than the one that sets the targets
+        //  There we can also do accuracy and damage calcs to display
         (manager as Combat).SetProfile(Direction.Right, actualTargets.FirstOrDefault());
         // TODO: Indicate if there are more than one
         // TODO: Deterministic sort by distance from center

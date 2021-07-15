@@ -185,10 +185,10 @@ public class Combat : Manager
         };
         var moveList = new List<Move>()
         {
-            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1 },
-            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5 },
-            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0 },
-            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2 },
+            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
+            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
+            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "StrengthBoost", 3 } } },
+            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
@@ -219,7 +219,7 @@ public class Combat : Manager
             new Movable() { MaxMove = 4, MaxJump = 2 }, 
             new TurnSpeed() { Speed = 12, TimeToAct = 12 },
             TurnOrderCard.For("123", Affiliation.Friendly),
-            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
+            new FightStats() { Atn = 5, Dex = 17, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Earth },
             new MoveSet() { Moves = moveList });
 

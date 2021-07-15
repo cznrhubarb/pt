@@ -93,8 +93,14 @@ public class ProfileCardPrefab : Control
         profileEntity.AssertComponentExists<FightStats>();
     }
 
-    private void ShowNewProfile(string _animationName = "")
+    private void ShowNewProfile(string animationName = "")
     {
+        // Just in case we finish an animation but cleared this out
+        if (currentProfileEntity == null || animationName != "SlideOut")
+        {
+            return;
+        }
+
         var profileDetails = currentProfileEntity.GetComponent<ProfileDetails>();
 
         Color backgroundColor;
