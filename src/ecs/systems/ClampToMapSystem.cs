@@ -13,6 +13,13 @@ public class ClampToMapSystem : Ecs.System
 
     protected override void Update(Entity entity, float deltaTime)
     {
+        // If we're tweening, assume that is handling our positioning.
+        //  In the future, this potentially might change to some sort of "OverrideRender" component.
+        if (entity.HasComponent<Tweening>())
+        {
+            return;
+        }
+
         var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
 
         var tileLocationComp = entity.GetComponent<TileLocation>();

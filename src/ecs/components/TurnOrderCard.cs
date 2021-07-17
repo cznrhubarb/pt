@@ -19,12 +19,11 @@ public class TurnOrderCard : Component
         set => card.Position = value;
     }
 
-    // TODO: Don't make me add affiliation twice. We should pass in profile information here instead
-    public static TurnOrderCard For(string portrait, Affiliation affiliation)
+    public static TurnOrderCard For(ProfileDetails profileDetails)
     {
         var prefab = ResourceLoader.Load<PackedScene>("res://prefabs/TurnOrderCardPrefab.tscn");
         var toc = new TurnOrderCard() { card = (TurnOrderCardPrefab)prefab.Instance() };
-        toc.card.Init(portrait, affiliation);
+        toc.card.Init(profileDetails.MonNumber.ToString(), profileDetails.Affiliation);
 
         var hud = Globals.SceneTree.Root.FindNode("HUD", true, false);
         hud.AddChild(toc.card);

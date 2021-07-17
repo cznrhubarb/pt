@@ -15,6 +15,7 @@ public class DepthSortSystem : Ecs.System
     {
         var locationComp = entity.GetComponent<TileLocation>();
 
+        // TODO: If we're tweening, this is still going based off the destination location's z and not the current tween pos :(
         entity.ZIndex = Convert.ToInt32((locationComp.TilePosition.x + locationComp.TilePosition.y + locationComp.TilePosition.z) * SpaceFactor) + locationComp.ZLayer;
     }
 }
