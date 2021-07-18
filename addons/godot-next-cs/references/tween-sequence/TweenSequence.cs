@@ -195,6 +195,7 @@ public class TweenSequence : Reference
 	private void StepComplete()
 	{
 		EmitSignal("step_finished", this.currentStep);
+		GD.Print("StepComplete");
 		this.currentStep += 1;
 
 		if (this.currentStep == this.tweeners.Count)

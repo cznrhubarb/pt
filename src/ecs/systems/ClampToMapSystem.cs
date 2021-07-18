@@ -17,7 +17,7 @@ public class ClampToMapSystem : Ecs.System
         //  In the future, this potentially might change to some sort of "OverrideRender" component.
         if (entity.HasComponent<Tweening>())
         {
-            return;
+            //return;
         }
 
         var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();

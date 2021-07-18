@@ -59,8 +59,12 @@ public class SelectActionLocationSystem : Ecs.System
         }
         else if (Input.IsActionJustPressed("ui_cancel"))
         {
-            // TODO: Maybe also need to reset that the movement has not been reset yet
-            manager.ApplyState(new PlayerMovementState() { Acting = SingleEntityFor(SelectedEntityKey), Map = SingleEntityFor(MapEntityKey) });
+            if (manager.CurrentState is PlayerTargetingState ptState)
+            {
+                movingActor.GetComponent<TurnSpeed>().TimeToAct -= ptState.SelectedMove.Speed;
+            }
+
+            manager.ApplyState(new PlayerMovementState(movingActor, SingleEntityFor(MapEntityKey)));
         }
     }
 
@@ -81,9 +85,7 @@ public class SelectActionLocationSystem : Ecs.System
                 var chanceToHit = Mathf.Floor(selectedMove.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f));
                 GD.Print("Chance to hit: " + chanceToHit);
 
-                // TODO: This random needs to be moved to a one and done init place
-                var rand = new Random();
-                var roll = rand.Next(100);
+                var roll = Globals.Random.Next(100);
                 if (roll < chanceToHit)
                 {
                     GD.Print("HIT");
@@ -103,7 +105,7 @@ public class SelectActionLocationSystem : Ecs.System
                                     var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
                                     var damage = kvp.Value * statMod * (1 + eleMod);
 
-                                    roll = rand.Next(100);
+                                    roll = Globals.Random.Next(100);
                                     if (roll < critChance)
                                     {
                                         GD.Print("CRIT");

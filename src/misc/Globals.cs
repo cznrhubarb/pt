@@ -1,12 +1,14 @@
 using Godot;
+using System;
 
 public class Globals : Node
 {
-    private static SceneTree sceneTree;
-    public static SceneTree SceneTree { get => sceneTree; }
+    public static SceneTree SceneTree { get; private set; }
+
+    public static Random Random { get; private set; } = new Random();
 
     public override void _Ready()
     {
-        sceneTree = GetTree();
+        SceneTree = GetTree();
     }
 }

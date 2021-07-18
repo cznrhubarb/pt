@@ -67,5 +67,19 @@ namespace Ecs
                 throw new MissingRequiredComponentException(typeof(T));
             }
         }
+
+        // HACK: Can't interpolate the vectors directly, so this is some janky way of doing it using method callback interpolation
+        //  Very shitty coupling
+        private void SetTilePositionXY(Vector3 vec)
+        {
+            var tileLocation = this.GetComponent<TileLocation>();
+            tileLocation.TilePosition = new Vector3(vec.x, vec.y, tileLocation.TilePosition.z);
+        }
+
+        private void SetTilePositionZ(float z)
+        {
+            var tileLocation = this.GetComponent<TileLocation>();
+            tileLocation.TilePosition = new Vector3(tileLocation.TilePosition.x, tileLocation.TilePosition.y, z);
+        }
     }
 }

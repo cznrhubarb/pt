@@ -5,29 +5,30 @@ using System.Collections.Generic;
 public class PlayerMovementState : State
 {
     private List<Entity> travelLocations = new List<Entity>();
+    private Entity acting;
+    private Map map;
 
-    // TODO: These can be private, passed in via constructor
-    public Entity Acting { get; set; }
-    public Entity Map { get; set; }
+    public PlayerMovementState(Entity acting, Entity map)
+    {
+        this.acting = acting;
+        this.map = map.GetComponent<Map>();
+    }
 
     public override void Pre(Manager manager)
     {
-        // TODO: Need another state for preview movement of entity
-        // TODO: Move this code to a centralized location used by both states
-        (manager as Combat).SetProfile(Direction.Left, Acting);
-        (manager as Combat).SetProfile(Direction.Right, null);
-        (manager as Combat).SetActions(Acting.GetComponentOrNull<MoveSet>());
+        manager.PerformHudAction("SetProfile", Direction.Left, acting);
+        manager.PerformHudAction("SetProfile", Direction.Right, null);
+        manager.PerformHudAction("SetActions", acting.GetComponentOrNull<MoveSet>());
 
-        manager.AddComponentsToEntity(Acting, new Selected());
-        if (Acting?.GetComponentOrNull<Movable>() != null)
+        manager.AddComponentsToEntity(acting, new Selected());
+        if (acting?.GetComponentOrNull<Movable>() != null)
         {
-            var map = Map.GetComponent<Map>();
             MapUtils.RefreshObstacles(map, manager.GetEntitiesWithComponent<TileLocation>());
 
-            var moveStats = Acting.GetComponent<Movable>();
+            var moveStats = acting.GetComponent<Movable>();
 
             // If we are /returning/ to this state by going backwards, then just use starting location instead of current
-            var startingPosition = Acting.GetComponent<TileLocation>().TilePosition;
+            var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
             if (moveStats.StartingLocation != null)
             {
                 startingPosition = moveStats.StartingLocation.TilePosition;
@@ -38,7 +39,11 @@ public class PlayerMovementState : State
             points.Add(startingPosition);
             if (moveStats.StartingLocation != null)
             {
-                points.Add(Acting.GetComponent<TileLocation>().TilePosition);
+                points.Add(acting.GetComponent<TileLocation>().TilePosition);
+            }
+            else
+            {
+                acting.GetComponent<TurnSpeed>().TimeToAct = 20;
             }
 
             travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");
@@ -52,6 +57,6 @@ public class PlayerMovementState : State
             manager.DeleteEntity(spot.Id);
         }
 
-        manager.RemoveComponentFromEntity<Selected>(Acting);
+        manager.RemoveComponentFromEntity<Selected>(acting);
     }
 }

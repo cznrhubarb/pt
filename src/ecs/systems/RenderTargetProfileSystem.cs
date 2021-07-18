@@ -42,7 +42,7 @@ public class RenderTargetProfileSystem : Ecs.System
 
         // TODO: The actual rendering should probably happen in a system other than the one that sets the targets
         //  There we can also do accuracy and damage calcs to display
-        (manager as Combat).SetProfile(Direction.Right, actualTargets.FirstOrDefault());
+        manager.PerformHudAction("SetProfile", Direction.Right, actualTargets.FirstOrDefault());
         // TODO: Indicate if there are more than one
         // TODO: Deterministic sort by distance from center
         // TODO: Maybe here, maybe somewhere else, but display an on map indicator of which unit is displaying profile card

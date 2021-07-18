@@ -317,9 +317,10 @@ tile_data = PoolIntArray( -65532, 7, 0, 4, 8, 0, 65540, 7, 0 )
 [node name="HUD" type="CanvasLayer" parent="."]
 
 [node name="LeftProfile" parent="HUD" instance=ExtResource( 10 )]
-margin_left = 2.86728
-margin_top = 374.231
-margin_right = 418.867
+modulate = Color( 1, 1, 1, 0 )
+margin_left = -92.1327
+margin_top = 324.0
+margin_right = 323.0
 margin_bottom = 600.231
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="HUD/LeftProfile"]

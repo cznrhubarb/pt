@@ -19,6 +19,8 @@ public class Move : Godot.Object
     public int MaxHeightRangeDown { get; set; } = 2;
     public int AreaOfEffect { get; set; } = 0;
     public int MaxAoeHeightDelta { get; set; } = 0;
+    // Lower is better
+    public int Speed { get; set; } = 0;
 
     public int Accuracy { get; set; }
     public int CritModifier { get; set; } = 0;

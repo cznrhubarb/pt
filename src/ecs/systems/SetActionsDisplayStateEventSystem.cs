@@ -10,7 +10,7 @@ public class SetActionsDisplayStateEventSystem : Ecs.System
 
     protected override void Update(Entity entity, float deltaTime) 
     {
-        (manager as Combat).SetActionMenuDisplayed(entity.GetComponent<SetActionsDisplayStateEvent>().Displayed);
+        manager.PerformHudAction("SetActionMenuDisplayed", entity.GetComponent<SetActionsDisplayStateEvent>().Displayed);
         manager.DeleteEntity(entity.Id);
     }
 }

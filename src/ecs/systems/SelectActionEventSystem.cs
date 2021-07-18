@@ -19,7 +19,7 @@ public class SelectActionEventSystem : Ecs.System
 
         if (actionEvent.SelectedMove != null)
         {
-            manager.ApplyState(new PlayerTargetingState() { Acting = acting, SelectedMove = actionEvent.SelectedMove, Map = SingleEntityFor(MapEntityKey) });
+            manager.ApplyState(new PlayerTargetingState(acting, SingleEntityFor(MapEntityKey), actionEvent.SelectedMove));
         }
         else
         {

@@ -60,7 +60,7 @@ public class ProfileCardPrefab : Control
             if (currentProfileEntity == null || animationPlayer.IsPlaying())
             {
                 currentProfileEntity = profileEntity;
-                ShowNewProfile();
+                ShowNewProfile("SlideOut");
             }
             else
             {

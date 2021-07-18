@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Ecs
 {
-    public class Manager : Node
+    public abstract class Manager : Node
     {
         private Dictionary<int, Entity> entities;
         private Dictionary<Type, List<System>> stateSystems;
@@ -156,5 +156,7 @@ namespace Ecs
             }
             toDelete.Clear();
         }
+
+        public abstract void PerformHudAction(string actionName, params object[] args);
     }
 }

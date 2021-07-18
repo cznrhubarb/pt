@@ -1,6 +1,7 @@
 using Godot;
 using Ecs;
 using System.Collections.Generic;
+using System;
 
 public class Combat : Manager
 {
@@ -185,23 +186,23 @@ public class Combat : Manager
         };
         var moveList = new List<Move>()
         {
-            new Move() { Name = "Tackle", MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
-            new Move() { Name = "Throw Bomb", MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
-            new Move() { Name = "Double Team", MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "StrengthBoost", 3 } } },
-            new Move() { Name = "Heal", MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
+            new Move() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
+            new Move() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
+            new Move() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "StrengthBoost", 3 } } },
+            new Move() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
             new ProfileDetails() { Name = "Vaporeon", MonNumber = 134, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 5 }, 
+            new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 10 }, 
             new SpriteWrap(), 
             new Selectable(), 
             new PlayerCharacter(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType }, 
-            new TurnSpeed() { Speed = 16, TimeToAct = 16 },
+            new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType, TravelSpeed = 3 }, 
+            new TurnSpeed() { TimeToAct = 16 },
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Water },
             new MoveSet() { Moves = moveList });
@@ -211,13 +212,13 @@ public class Combat : Manager
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
             new ProfileDetails() { Name = "Scyther", MonNumber = 123, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 5 }, 
+            new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 10 }, 
             new SpriteWrap(), 
             new Selectable(), 
             new PlayerCharacter(), 
             new Health() { Current = 10, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2 }, 
-            new TurnSpeed() { Speed = 12, TimeToAct = 12 },
+            new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 2 }, 
+            new TurnSpeed() { TimeToAct = 12 },
             new FightStats() { Atn = 5, Dex = 17, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Earth },
             new MoveSet() { Moves = moveList });
@@ -233,8 +234,8 @@ public class Combat : Manager
             new Selectable(),
             new EnemyNpc(),
             new Health() { Current = 24, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType }, 
-            new TurnSpeed() { Speed = 14, TimeToAct = 14 },
+            new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType, TravelSpeed = 2 }, 
+            new TurnSpeed() { TimeToAct = 14 },
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Fire });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
@@ -248,8 +249,8 @@ public class Combat : Manager
             new Selectable(), 
             new EnemyNpc(), 
             new Health() { Current = 30, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2 }, 
-            new TurnSpeed() { Speed = 26, TimeToAct = 26 },
+            new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 4 }, 
+            new TurnSpeed() { TimeToAct = 26 },
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Neutral });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
@@ -265,32 +266,37 @@ public class Combat : Manager
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 99 });
     }
 
-    public void SetProfile(Direction side, Entity profileEntity)
+    public override void PerformHudAction(string actionName, params object[] args)
     {
-        if (side == Direction.Left)
+        switch (actionName)
         {
-            leftProfileCard.SetProfile(profileEntity);
+            case "SetProfile":
+                var side = (Direction)args[0];
+                var profileEntity = args[1] as Entity;
+                if (side == Direction.Left)
+                {
+                    leftProfileCard.SetProfile(profileEntity);
+                }
+                else if (side == Direction.Right)
+                {
+                    rightProfileCard.SetProfile(profileEntity);
+                }
+                break;
+            case "SetActionMenuDisplayed":
+                if ((bool)args[0])
+                {
+                    leftProfileCard.MakeRoomForActionMenu();
+                }
+                else
+                {
+                    leftProfileCard.TakeAwayRoomForActionMenu();
+                }
+                break;
+            case "SetActions":
+                actionMenu.RegisterMoveSet(args[0] as MoveSet);
+                break;
+            default:
+                throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");
         }
-        else if (side == Direction.Right)
-        {
-            rightProfileCard.SetProfile(profileEntity);
-        }
-    }
-
-    public void SetActionMenuDisplayed(bool displayed)
-    {
-        if (displayed)
-        {
-            leftProfileCard.MakeRoomForActionMenu();
-        }
-        else
-        {
-            leftProfileCard.TakeAwayRoomForActionMenu();
-        }
-    }
-
-    public void SetActions(MoveSet moveSet)
-    {
-        actionMenu.RegisterMoveSet(moveSet);
     }
 }
