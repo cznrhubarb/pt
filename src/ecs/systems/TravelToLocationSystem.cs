@@ -63,7 +63,6 @@ public class TravelToLocationSystem : Ecs.System
                 if (movingActor.HasComponent<Tweening>())
                 {
                     movingActor.GetComponent<Tweening>().TweenSequence.Kill();
-                    manager.RemoveComponentFromEntity<Tweening>(movingActor);
                 }
                 turnSpeed.TimeToAct = 20;
                 var actorLocation = movingActor.GetComponent<TileLocation>();
@@ -96,20 +95,9 @@ public class TravelToLocationSystem : Ecs.System
             else
             {
                 // Walk
-                tweenSeq.AppendMethod(movingActor, "SetTilePositionXY", path[idx - 1], path[idx], 0.3f);
+                tweenSeq.AppendMethod(movingActor, "SetTilePositionXY", path[idx - 1], path[idx], 0.2f);
             }
         }
-        tweenSeq.Connect("finished", this, nameof(CleanUpTween), new Godot.Collections.Array() { movingActor });
         manager.AddComponentToEntity(movingActor, new Tweening() { TweenSequence = tweenSeq });
-    }
-
-    private void CleanUpTween(Entity entity)
-    {
-        manager.RemoveComponentFromEntity<Tweening>(entity);
-    }
-
-    private void UpdateTilePosition(Entity movingEntity, Vector3 position)
-    {
-        movingEntity.GetComponent<TileLocation>().TilePosition = position;
     }
 }

@@ -66,6 +66,7 @@ public class TweenSequence : Reference
 			this._autoStart = value;
 		}
 	}
+	public bool Complete { get; private set; } = false;
 
 	public TweenSequence(SceneTree tree)
 	{
@@ -178,6 +179,7 @@ public class TweenSequence : Reference
 			Pause();
 		}
 		this.tween.QueueFree();
+		this.Complete = true;
 	}
 
 	private void RunNextStep()
@@ -195,7 +197,6 @@ public class TweenSequence : Reference
 	private void StepComplete()
 	{
 		EmitSignal("step_finished", this.currentStep);
-		GD.Print("StepComplete");
 		this.currentStep += 1;
 
 		if (this.currentStep == this.tweeners.Count)

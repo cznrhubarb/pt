@@ -5,15 +5,18 @@ using System.Collections.Generic;
 public class ProfileCardPrefab : Control
 {
     public Label HealthAmountLabel { get; private set; }
+    public string TargetingInfo { set => targetingInfo.Text = value; }
 
     private string lastCompleteAnimation;
 
     private Sprite portraitSprite;
+    private Label targetingInfo;
     private Label nameLabel;
     private NinePatchRect backgroundRect;
     private AnimationPlayer animationPlayer;
 
     private Entity currentProfileEntity;
+    public bool MatchesCurrentEntity(Entity match) => match == currentProfileEntity;
 
     public override void _Ready()
     {
@@ -22,6 +25,7 @@ public class ProfileCardPrefab : Control
         nameLabel = FindNode("Name") as Label;
         HealthAmountLabel = FindNode("HealthAmount") as Label;
         animationPlayer = FindNode("AnimationPlayer") as AnimationPlayer;
+        targetingInfo = FindNode("TargetingInfo") as Label;
         animationPlayer.Connect("animation_finished", this, nameof(SetLastCompleteAnimation));
     }
 
@@ -155,5 +159,32 @@ public class ProfileCardPrefab : Control
 
         var element = currentProfileEntity.GetComponentOrNull<Elemental>()?.Element ?? Element.Neutral;
         (GetNode("MonElement") as Sprite).Texture = GD.Load<Texture>($"res://img/icons/element_{element.ToString().ToLower()}.png");
+    }
+
+    public void SetStatusEffects(StatusBag statusBag)
+    {
+        var positiveStatuses = GetNode("PositiveStatuses") as HBoxContainer;
+        var negativeStatuses = GetNode("NegativeStatuses") as HBoxContainer;
+
+        foreach (var sNode in positiveStatuses.GetChildren()) { (sNode as Node).QueueFree(); }
+        foreach (var sNode in negativeStatuses.GetChildren()) { (sNode as Node).QueueFree(); }
+
+        foreach (var status in statusBag.StatusList)
+        {
+            var sNode = new TextureRect();
+            sNode.Expand = true;
+            sNode.RectSize = new Vector2(24, 24);
+            sNode.RectMinSize = new Vector2(24, 24);
+            sNode.Texture = GD.Load<Texture>($"res://img/icons/status/{status.Name}.png");
+
+            if (status.Positive)
+            {
+                positiveStatuses.AddChild(sNode);
+            }
+            else
+            {
+                negativeStatuses.AddChild(sNode);
+            }
+        }
     }
 }

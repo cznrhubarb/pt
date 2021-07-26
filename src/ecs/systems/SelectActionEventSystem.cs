@@ -23,6 +23,13 @@ public class SelectActionEventSystem : Ecs.System
         }
         else
         {
+            // Little hacky, but we don't want to clear this until they have committed to a turn
+            //  Also duplicated between here and SelectActionLocationSystem
+            var movableComp = acting.GetComponentOrNull<Movable>();
+            if (movableComp != null)
+            {
+                movableComp.StartingLocation = null;
+            }
             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
         }
         manager.DeleteEntity(entity.Id);

@@ -13,7 +13,6 @@ public class NpcTurnState : State
     public override void Pre(Manager manager)
     {
         GD.Print("NPC Acting: " + acting.Name);
-        // TODO: Need another state for preview movement of entity
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
         manager.PerformHudAction("SetProfile", Direction.Right, null);
 

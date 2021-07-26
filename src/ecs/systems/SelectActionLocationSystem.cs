@@ -22,6 +22,7 @@ public class SelectActionLocationSystem : Ecs.System
         AddRequiredComponent<Map>(MapEntityKey);
         AddRequiredComponent<Targeted>(TargetedKey);
         AddRequiredComponent<FightStats>(TargetedKey);
+        AddRequiredComponent<StatusBag>(TargetedKey);
         AddRequiredComponent<Health>(TargetedKey);
         AddRequiredComponent<TileLocation>(TargetedKey);
     }
@@ -47,7 +48,11 @@ public class SelectActionLocationSystem : Ecs.System
 
             if (targetLocation != null && movingActor.HasComponent<PlayerCharacter>())
             {
-                PerformAction();
+                if (manager.CurrentState is PlayerTargetingState ptState)
+                {
+                    ptState.SelectedMove.CurrentTP--;
+                    PerformAction();
+                }
             }
 
             // Little hacky, but we don't want to clear this until they have committed to a turn
@@ -70,85 +75,71 @@ public class SelectActionLocationSystem : Ecs.System
 
     private void PerformAction()
     {
-        // TODO: This could potentially be done somewhere else with an event
-        if (manager.CurrentState is PlayerTargetingState ptState)
-        { 
-            var actingEntity = SingleEntityFor(SelectedEntityKey);
-            var actingFightStats = actingEntity.GetComponent<FightStats>();
+        var targets = EntitiesFor(TargetedKey);
+        foreach (var target in targets)
+        {
+            var targetedComp = target.GetComponent<Targeted>();
 
-            var selectedMove = ptState.SelectedMove;
-            var targets = EntitiesFor(TargetedKey);
-            GD.Print($"In PT State with {targets.Count} targets");
-            foreach (var target in targets)
+            var roll = Globals.Random.Next(100);
+            if (roll < targetedComp.HitChance)
             {
-                var targetFightStats = target.GetComponent<FightStats>();
-                var chanceToHit = Mathf.Floor(selectedMove.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f));
-                GD.Print("Chance to hit: " + chanceToHit);
-
-                var roll = Globals.Random.Next(100);
-                if (roll < chanceToHit)
+                var effects = targetedComp.Effects;
+                foreach (var kvp in effects)
                 {
-                    GD.Print("HIT");
-                    var effects = selectedMove.Effects;
-                    foreach (var kvp in effects)
+                    switch (kvp.Key)
                     {
-                        switch (kvp.Key)
-                        {
-                            case "StrDamage":
+                        case "StrDamage":
+                            {
+                                var damage = (int)kvp.Value;
+                                roll = Globals.Random.Next(100);
+                                if (roll < targetedComp.CritChance)
                                 {
-                                    var heightDelta = actingEntity.GetComponent<TileLocation>().TilePosition.z -
-                                                        target.GetComponent<TileLocation>().TilePosition.z;
-                                    var critChance = actingFightStats.Dex / 2 + Mathf.Clamp(heightDelta, -4, 4) * 5 + selectedMove.CritModifier;
-
-                                    var statMod = Math.Pow(1.25f, (actingFightStats.Str - targetFightStats.Tuf) / 20);
-                                    var baseEleMod = 0; // or whatever
-                                    var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                                    var damage = kvp.Value * statMod * (1 + eleMod);
-
-                                    roll = Globals.Random.Next(100);
-                                    if (roll < critChance)
-                                    {
-                                        GD.Print("CRIT");
-                                        damage *= 2;
-                                    }
-
-                                    GD.Print($"Str Damage: {damage}");
-                                    var healthComp = target.GetComponent<Health>();
-                                    healthComp.Current -= Math.Min(healthComp.Current, (int)Math.Ceiling(damage));
+                                    GD.Print("CRIT");
+                                    damage *= 2;
                                 }
-                                break;
-                            case "MagDamage":
+
+                                var healthComp = target.GetComponent<Health>();
+                                healthComp.Current -= Math.Min(healthComp.Current, damage);
+                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, damage.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                if (healthComp.Current == 0)
                                 {
-                                    var statMod = Math.Pow(1.25f, (actingFightStats.Mag - targetFightStats.Tuf) / 20);
-                                    var baseEleMod = 0; // or whatever
-                                    var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                                    var damage = kvp.Value * statMod * (1 + eleMod);
-                                    GD.Print($"Mag Damage: {damage}");
-                                    var healthComp = target.GetComponent<Health>();
-                                    healthComp.Current -= Math.Min(healthComp.Current, (int)Math.Ceiling(damage));
+                                    manager.AddComponentToEntity(target, new Dying());
                                 }
-                                break;
-                            case "Heal":
+                            }
+                            break;
+                        case "MagDamage":
+                            {
+                                var healthComp = target.GetComponent<Health>();
+                                healthComp.Current -= Math.Min(healthComp.Current, (int)kvp.Value);
+                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                if (healthComp.Current == 0)
                                 {
-                                    var healthComp = target.GetComponent<Health>();
-                                    var heal = (int)(kvp.Value * actingFightStats.Mag / 100f * 4);
-                                    healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + heal);
-                                    GD.Print($"Str Damage: {heal}");
+                                    manager.AddComponentToEntity(target, new Dying());
                                 }
-                                break;
-                            case "BoostStrength":
-                                GD.Print("BoostStrength");
-                                break;
-                            default:
-                                GD.Print("Attempted to apply unknown move effect: " + kvp.Key);
-                                break;
-                        }
+                            }
+                            break;
+                        case "Heal":
+                            {
+                                var healthComp = target.GetComponent<Health>();
+                                healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + (int)kvp.Value);
+                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
+                            }
+                            break;
+                        case "Elated":
+                            {
+                                target.GetComponent<StatusBag>().StatusList.Add(new StatusEffect() { Name = kvp.Key, Count = (int)kvp.Value, Positive = true, Ticks = false });
+                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "+BOOST STR", new Color(0.5f, 0.4f, 1));
+                            }
+                            break;
+                        default:
+                            GD.Print("Attempted to apply unknown move effect: " + kvp.Key);
+                            break;
                     }
                 }
-                else
-                {
-                    GD.Print("MISS");
-                }
+            }
+            else
+            {
+                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "MISS", new Color(0.7f, 0.6f, 0.6f));
             }
         }
 

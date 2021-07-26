@@ -30,7 +30,8 @@ public class AdvanceClockEventSystem : Ecs.System
         var nextActor = firstAdvanceEntity.entity;
         if (nextActor?.GetComponentOrNull<PlayerCharacter>() != null)
         {
-            manager.ApplyState(new PlayerMovementState(nextActor, SingleEntityFor(MapEntityKey)));
+            manager.ApplyState(new PlayerTurnStartState(nextActor, SingleEntityFor(MapEntityKey)));
+            //manager.ApplyState(new PlayerMovementState(nextActor, SingleEntityFor(MapEntityKey)));
         }
         else if (nextActor?.GetComponentOrNull<FriendlyNpc>() != null ||
             nextActor?.GetComponentOrNull<EnemyNpc>() != null)

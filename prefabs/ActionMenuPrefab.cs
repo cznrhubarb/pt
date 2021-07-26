@@ -31,11 +31,15 @@ public class ActionMenuPrefab : Control
         for (var i = 0; i < moveButtons.Count; i++)
         {
             moveButtons[i].Visible = moveSet?.Moves.Count > i;
-            if (moveButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
+            if (moveButtons[i].Visible)
             {
-                moveButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));
+                moveButtons[i].Disabled = moveSet.Moves[i].CurrentTP == 0;
+                if (moveButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
+                {
+                    moveButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));
+                }
+                moveButtons[i].Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { moveSet?.Moves[i] });
             }
-            moveButtons[i].Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { moveSet?.Moves[i] });
         }
     }
 }

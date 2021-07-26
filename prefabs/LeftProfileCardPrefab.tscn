@@ -270,26 +270,16 @@ margin_bottom = 139.487
 custom_fonts/font = ExtResource( 3 )
 text = "JMP 9"
 
-[node name="Status Effect Placeholder" type="Label" parent="."]
-margin_left = 351.741
-margin_top = 60.3893
-margin_right = 494.741
-margin_bottom = 75.3893
-rect_pivot_offset = Vector2( 91.1657, 0 )
-custom_fonts/font = ExtResource( 3 )
-text = "(- Status Effects)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="PositiveStatuses" type="HBoxContainer" parent="."]
+margin_left = 339.0
+margin_top = 35.0
+margin_right = 499.0
+margin_bottom = 58.0
+alignment = 2
 
-[node name="Status Effect Placeholder2" type="Label" parent="."]
-margin_left = 346.974
-margin_top = 40.2596
-margin_right = 493.974
-margin_bottom = 55.2596
-rect_pivot_offset = Vector2( 91.1657, 0 )
-custom_fonts/font = ExtResource( 3 )
-text = "(+ Status Effects)"
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="NegativeStatuses" type="HBoxContainer" parent="."]
+margin_left = 339.0
+margin_top = 65.0
+margin_right = 499.0
+margin_bottom = 88.0
+alignment = 2

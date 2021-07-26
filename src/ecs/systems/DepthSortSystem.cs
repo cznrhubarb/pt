@@ -8,7 +8,6 @@ public class DepthSortSystem : Ecs.System
     public DepthSortSystem()
     {
         AddRequiredComponent<TileLocation>();
-        AddRequiredComponent<SpriteWrap>();
     }
 
     protected override void Update(Entity entity, float deltaTime)

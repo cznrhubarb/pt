@@ -73,14 +73,17 @@ public class Combat : Manager
         AddSystem(new MouseToMapSystem());
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
-        AddSystem(new RenderSelectedStatsSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
+        AddSystem(new RemoveDyingEntitiesSystem());
+        AddSystem(new TweenCleanupSystem());
+        AddSystem(new RenderStatusEffectsSystem());
 
         // Event Handling Systems
         AddSystem(new SelectActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());
         AddSystem(new SetActionsDisplayStateEventSystem());
+        AddSystem(new DeferredEventSystem());
 
         AddSystem<PlayerMovementState>(new TravelToLocationSystem());
         AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
@@ -186,10 +189,10 @@ public class Combat : Manager
         };
         var moveList = new List<Move>()
         {
-            new Move() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 999, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
+            new Move() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 0, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
             new Move() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
-            new Move() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "StrengthBoost", 3 } } },
-            new Move() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
+            new Move() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Elated", 3 } } },
+            //new Move() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
@@ -205,6 +208,7 @@ public class Combat : Manager
             new TurnSpeed() { TimeToAct = 16 },
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Water },
+            new StatusBag(),
             new MoveSet() { Moves = moveList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
@@ -221,6 +225,7 @@ public class Combat : Manager
             new TurnSpeed() { TimeToAct = 12 },
             new FightStats() { Atn = 5, Dex = 17, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Earth },
+            new StatusBag(),
             new MoveSet() { Moves = moveList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
@@ -236,6 +241,7 @@ public class Combat : Manager
             new Health() { Current = 24, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType, TravelSpeed = 2 }, 
             new TurnSpeed() { TimeToAct = 14 },
+            new StatusBag(),
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Fire });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
@@ -251,6 +257,7 @@ public class Combat : Manager
             new Health() { Current = 30, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 4 }, 
             new TurnSpeed() { TimeToAct = 26 },
+            new StatusBag(),
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Neutral });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
@@ -294,6 +301,22 @@ public class Combat : Manager
                 break;
             case "SetActions":
                 actionMenu.RegisterMoveSet(args[0] as MoveSet);
+                break;
+            case "SetTargetingInfo":
+                rightProfileCard.TargetingInfo = args[0] as string;
+                break;
+            case "UpdateStatusEffects":
+                {
+                    var entity = args[0] as Entity;
+                    if (leftProfileCard.MatchesCurrentEntity(entity))
+                    {
+                        leftProfileCard.SetStatusEffects(entity.GetComponent<StatusBag>());
+                    }
+                    else if (rightProfileCard.MatchesCurrentEntity(entity))
+                    {
+                        rightProfileCard.SetStatusEffects(entity.GetComponent<StatusBag>());
+                    }
+                }
                 break;
             default:
                 throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");

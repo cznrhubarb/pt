@@ -30,4 +30,9 @@ public class TurnOrderCard : Component
 
         return toc;
     }
+
+    public void Cleanup()
+    {
+        card.QueueFree();
+    }
 }
