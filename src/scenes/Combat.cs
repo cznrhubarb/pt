@@ -69,7 +69,7 @@ public class Combat : Manager
 
     private void CreateSystems()
     {
-        AddSystem(new CameraControlSystem());
+        AddSystem(new ManualCameraControlSystem());
         AddSystem(new MouseToMapSystem());
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());

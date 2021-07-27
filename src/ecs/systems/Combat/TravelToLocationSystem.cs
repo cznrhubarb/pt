@@ -75,7 +75,6 @@ public class TravelToLocationSystem : Ecs.System
 
     private void BuildTweenForActor(Entity movingActor, Map map, Vector3[] path)
     {
-        var tileLocation = movingActor.GetComponent<TileLocation>();
         var tweenSeq = new TweenSequence(manager.GetTree());
         for (var idx = 1; idx < path.Length; idx++)
         {

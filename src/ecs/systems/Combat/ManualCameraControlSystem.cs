@@ -1,11 +1,11 @@
 using Ecs;
 using Godot;
 
-public class CameraControlSystem : Ecs.System
+public class ManualCameraControlSystem : Ecs.System
 {
     private const float CameraMoveSpeed = 400;
 
-    public CameraControlSystem()
+    public ManualCameraControlSystem()
     {
         AddRequiredComponent<CameraWrap>();
     }

@@ -8,5 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="addons\godot-next-cs\references\" />
+    <Folder Include="src\ecs\components\Exploration\" />
   </ItemGroup>
 </Project>

@@ -244,6 +244,28 @@ public class AStarEx : AStar
         obstacles.Clear();
     }
 
+    public Vector3 GetBestTileMatch(Vector3 position)
+    {
+        var hashId = HashId(position);
+        if (HasPoint(hashId))
+        {
+            return position;
+        }
+        else 
+        {
+            var direction = AnyTileInHeadSpace(position) ? Vector3.Back : Vector3.Forward;
+            var searchPos = position;
+            do
+            {
+                searchPos += direction;
+                hashId = HashId(searchPos);
+            } while (!HasPoint(hashId));
+            return searchPos;
+        }
+        
+        // TODO: Also possible to walk off the map
+    }
+
     private struct TileData
     {
         public Vector3 position;
