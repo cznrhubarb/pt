@@ -9,9 +9,9 @@ public class Exploration : Manager
     {
         ApplyState(new ExplorationRoamState(null));
         CreateSystems();
-        BuildMap();
         BuildControlElements();
         BuildActors();
+        BuildMap();
     }
 
     private void CreateSystems()
@@ -20,6 +20,7 @@ public class Exploration : Manager
         AddSystem(new ClampToMapSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new HandleMovementInputSystem());
+        AddSystem(new HandleInteractionInputSystem());
         AddSystem(new TweenCleanupSystem());
 
         // Event Handling Systems
@@ -79,7 +80,9 @@ public class Exploration : Manager
         }
 
         var mapEnt = GetNewEntity();
-        AddComponentToEntity(mapEnt, new Map(tileEntities));
+        var mapComp = new Map(tileEntities);
+        AddComponentToEntity(mapEnt, mapComp);
+        MapUtils.RefreshObstacles(mapComp, GetEntitiesWithComponent<TileLocation>());
 
         mapNode.QueueFree();
     }
@@ -99,6 +102,13 @@ public class Exploration : Manager
             new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 10 },
             new SpriteWrap(),
             new Selected());
+
+        actor = FindNode("Rock") as Entity;
+        RegisterExistingEntity(actor);
+        AddComponentsToEntity(actor,
+            new TileLocation() { TilePosition = new Vector3(9, 2, 0), ZLayer = 3 },
+            new SpriteWrap(),
+            new Obstacle());
     }
 
     public override void PerformHudAction(string actionName, params object[] args)

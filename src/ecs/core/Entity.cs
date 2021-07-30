@@ -74,6 +74,7 @@ namespace Ecs
         {
             var tileLocation = this.GetComponent<TileLocation>();
             tileLocation.TilePosition = new Vector3(vec.x, vec.y, tileLocation.TilePosition.z);
+            //GD.Print(tileLocation.TilePosition);
         }
 
         private void SetTilePositionZ(float z)

@@ -5,6 +5,8 @@ public class HandleMovementInputSystem : Ecs.System
 {
     private const string MapKey = "map";
 
+    private const int MaxJumpHeight = 2;
+
     public HandleMovementInputSystem()
     {
         AddRequiredComponent<Selected>();
@@ -44,9 +46,13 @@ public class HandleMovementInputSystem : Ecs.System
         var oldPos = movingActor.GetComponent<TileLocation>().TilePosition;
 
         var map = SingleEntityFor(MapKey).GetComponent<Map>();
-        var newPos = map.AStar.GetBestTileMatch(oldPos + direction);
-        // Take into account if the new position is too far away from move height
+        var newPosMaybe = map.AStar.GetBestTileMatch(oldPos + direction, MaxJumpHeight);
+        if (newPosMaybe == null)
+        {
+            return;
+        }
 
+        var newPos = newPosMaybe.Value;
         var tweenSeq = new TweenSequence(manager.GetTree());
         if (newPos.z != oldPos.z)
         {
