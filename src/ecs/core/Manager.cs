@@ -100,7 +100,7 @@ namespace Ecs
             UpdateEntityRegistration(entity);
         }
 
-        public void ApplyState<T>(T newState) where T : State
+        public virtual void ApplyState<T>(T newState) where T : State
         {
             CurrentState?.Post(this);
 

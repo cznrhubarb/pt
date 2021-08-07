@@ -5,6 +5,10 @@ using System;
 
 public class Exploration : Manager
 {
+    private const float DialogDelay = 0.5f;
+
+    private float dialogDelayTimer = 0f;
+
     public override void _Ready()
     {
         ApplyState(new ExplorationRoamState(null));
@@ -19,12 +23,13 @@ public class Exploration : Manager
         AddSystem(new FollowCameraControlSystem());
         AddSystem(new ClampToMapSystem());
         AddSystem(new DepthSortSystem());
-        AddSystem(new HandleMovementInputSystem());
-        AddSystem(new HandleInteractionInputSystem());
         AddSystem(new TweenCleanupSystem());
 
         // Event Handling Systems
         AddSystem(new DeferredEventSystem());
+
+        AddSystem<ExplorationRoamState>(new HandleMovementInputSystem());
+        AddSystem<ExplorationRoamState>(new HandleInteractionInputSystem());
     }
 
     private void BuildMap()
@@ -101,22 +106,62 @@ public class Exploration : Manager
         AddComponentsToEntity(actor,
             new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 10 },
             new SpriteWrap(),
+            new Directionality() { Direction = Direction.Down },
             new Selected());
 
         actor = FindNode("Rock") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = new Vector3(9, 2, 0), ZLayer = 3 },
+            new TileLocation() { TilePosition = new Vector3(5, 1, 2), ZLayer = 3 },
             new SpriteWrap(),
+            new Interactable() { Action = () => PerformHudAction("StartDialogTimeline", "TalkToARock") },
             new Obstacle());
+
+        AddComponentsToEntity(GetNewEntity(),
+            new TileLocation() { TilePosition = new Vector3(8, 2, 0), ZLayer = 5 },
+            new WalkOnTrigger() { Action = () => PerformHudAction("StartDialogTimeline", "NotTheFlowers") });
+        AddComponentsToEntity(GetNewEntity(),
+            new TileLocation() { TilePosition = new Vector3(4, 0, 3), ZLayer = 5 },
+            new WalkOnTrigger() { Action = () => GetTree().ChangeScene("res://src/scenes/Combat.tscn") });
     }
 
     public override void PerformHudAction(string actionName, params object[] args)
     {
         switch (actionName)
         {
+            case "StartDialogTimeline":
+                if (CurrentState is ExplorationRoamState && dialogDelayTimer <= 0)
+                {
+                    ApplyState(new DialogState());
+                    var dialog = DialogicSharp.Start(args[0] as string, false);
+                    AddChild(dialog);
+                    dialog.Connect("timeline_end", this, nameof(DialogFinished));
+                }
+                break;
             default:
                 throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");
         }
+    }
+
+    private void DialogFinished(string _timelineName)
+    {
+        ApplyState(new ExplorationRoamState(null));
+    }
+
+    public override void _Process(float delta)
+    {
+        dialogDelayTimer -= delta;
+
+        base._Process(delta);
+    }
+
+    public override void ApplyState<T>(T newState)
+    {
+        if (CurrentState is DialogState)
+        {
+            dialogDelayTimer = DialogDelay;
+        }
+
+        base.ApplyState(newState);
     }
 }

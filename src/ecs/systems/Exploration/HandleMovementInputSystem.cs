@@ -1,17 +1,25 @@
 using Ecs;
 using Godot;
+using System.Collections.Generic;
 
 public class HandleMovementInputSystem : Ecs.System
 {
     private const string MapKey = "map";
+    private const string WalkOnTriggerKey = "walkOnTrigger";
 
     private const int MaxJumpHeight = 2;
+    private HashSet<TerrainType> impassableTerrain;
 
     public HandleMovementInputSystem()
     {
         AddRequiredComponent<Selected>();
         AddRequiredComponent<TileLocation>();
+        AddRequiredComponent<Directionality>();
         AddRequiredComponent<Map>(MapKey);
+        AddRequiredComponent<TileLocation>(WalkOnTriggerKey);
+        AddRequiredComponent<WalkOnTrigger>(WalkOnTriggerKey);
+
+        impassableTerrain = new HashSet<TerrainType>() { TerrainType.DeepWater, TerrainType.Water };
     }
 
     protected override void Update(Entity entity, float deltaTime)
@@ -24,20 +32,24 @@ public class HandleMovementInputSystem : Ecs.System
         if (Input.IsActionPressed("walk_right"))
         {
             BuildTween(entity, Vector3.Right);
+            entity.GetComponent<Directionality>().Direction = Direction.Right;
         }
         else if (Input.IsActionPressed("walk_left"))
         {
             BuildTween(entity, Vector3.Left);
+            entity.GetComponent<Directionality>().Direction = Direction.Left;
         }
         else if (Input.IsActionPressed("walk_down"))
         {
-            // Inverted intentionally
+            // Inverted intentionally due to camera coordinate system
             BuildTween(entity, Vector3.Up);
+            entity.GetComponent<Directionality>().Direction = Direction.Down;
         }
         else if (Input.IsActionPressed("walk_up"))
         {
-            // Inverted intentionally
+            // Inverted intentionally due to camera coordinate system
             BuildTween(entity, Vector3.Down);
+            entity.GetComponent<Directionality>().Direction = Direction.Up;
         }
     }
 
@@ -46,7 +58,7 @@ public class HandleMovementInputSystem : Ecs.System
         var oldPos = movingActor.GetComponent<TileLocation>().TilePosition;
 
         var map = SingleEntityFor(MapKey).GetComponent<Map>();
-        var newPosMaybe = map.AStar.GetBestTileMatch(oldPos + direction, MaxJumpHeight);
+        var newPosMaybe = map.AStar.GetBestTileMatch(oldPos + direction, MaxJumpHeight, impassableTerrain);
         if (newPosMaybe == null)
         {
             return;
@@ -72,5 +84,15 @@ public class HandleMovementInputSystem : Ecs.System
             tweenSeq.AppendMethod(movingActor, "SetTilePositionXY", oldPos, newPos, 0.2f);
         }
         manager.AddComponentToEntity(movingActor, new Tweening() { TweenSequence = tweenSeq });
+
+        var potentialTriggers = EntitiesFor(WalkOnTriggerKey);
+        foreach (var trigger in potentialTriggers)
+        {
+            if (trigger.GetComponent<TileLocation>().TilePosition == newPos)
+            {
+                trigger.GetComponent<WalkOnTrigger>().Action.Invoke();
+                break;
+            }
+        }
     }
 }

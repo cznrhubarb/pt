@@ -244,12 +244,17 @@ public class AStarEx : AStar
         obstacles.Clear();
     }
 
-    public Vector3? GetBestTileMatch(Vector3 position, int maxJump)
+    public Vector3? GetBestTileMatch(Vector3 position, int maxJump) =>
+        GetBestTileMatch(position, maxJump, new HashSet<TerrainType>());
+
+    public Vector3? GetBestTileMatch(Vector3 position, int maxJump, HashSet<TerrainType> impassableTerrains)
     {
+        bool isViableTerrain(int hId) => !obstacles.ContainsKey(hId) && !impassableTerrains.Contains(terrainTypes[hId]);
+
         var hashId = HashId(position);
         if (HasPoint(hashId))
         {
-            if (!obstacles.ContainsKey(hashId))
+            if (isViableTerrain(hashId))
             {
                 return position;
             }
@@ -270,7 +275,7 @@ public class AStarEx : AStar
                 jumpDifference++;
             } while (!HasPoint(hashId) && jumpDifference < maxJump);
 
-            if (HasPoint(hashId) && !obstacles.ContainsKey(hashId))
+            if (HasPoint(hashId) && isViableTerrain(hashId))
             {
                 return searchPos;
             }
