@@ -36,7 +36,7 @@ public class AdvanceClockEventSystem : Ecs.System
         else if (nextActor?.GetComponentOrNull<FriendlyNpc>() != null ||
             nextActor?.GetComponentOrNull<EnemyNpc>() != null)
         {
-            manager.ApplyState(new NpcTurnState(nextActor));
+            manager.ApplyState(new NpcPlanningState(nextActor, SingleEntityFor(MapEntityKey)));
         }
 
         manager.DeleteEntity(entity.Id);

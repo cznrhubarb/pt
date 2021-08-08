@@ -1,13 +1,13 @@
 ﻿using Ecs;
 using System.Collections.Generic;
 
-public class MoveSet : Component
+public class SkillSet : Component
 {
-    public List<Move> Moves { get; set; }
+    public List<Skill> Skills { get; set; }
 }
 
-// Subclass Godot.Object so that Move objects are marshallable for signals
-public class Move : Godot.Object
+// Subclass Godot.Object so that Skill objects are marshallable for signals
+public class Skill : Godot.Object
 {
     public string Name { get; set; }
     public Element Element { get; set; }

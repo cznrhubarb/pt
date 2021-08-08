@@ -18,7 +18,7 @@ public class PlayerMovementState : State
     {
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
         manager.PerformHudAction("SetProfile", Direction.Right, null);
-        manager.PerformHudAction("SetActions", acting.GetComponentOrNull<MoveSet>());
+        manager.PerformHudAction("SetActions", acting.GetComponentOrNull<SkillSet>());
 
         manager.AddComponentsToEntity(acting, new Selected());
         if (acting?.GetComponentOrNull<Movable>() != null)

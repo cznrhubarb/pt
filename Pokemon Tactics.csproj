@@ -4,9 +4,6 @@
     <RootNamespace>PokemonTactics</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="notes.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="addons\godot-next-cs\references\" />
   </ItemGroup>
 </Project>

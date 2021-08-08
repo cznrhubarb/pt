@@ -9,7 +9,12 @@ public class DeferredEventSystem : Ecs.System
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        entity.GetComponent<DeferredEvent>().Callback.Invoke();
-        manager.DeleteEntity(entity.Id);
+        var deferredEvent = entity.GetComponent<DeferredEvent>();
+        deferredEvent.Delay -= deltaTime;
+        if (deferredEvent.Delay <= 0)
+        {
+            deferredEvent.Callback.Invoke();
+            manager.DeleteEntity(entity.Id);
+        }
     }
 }

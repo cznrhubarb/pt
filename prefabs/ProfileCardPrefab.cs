@@ -89,7 +89,7 @@ public class ProfileCardPrefab : Control
         //  FightStats: Other stats
         // Optional:
         //  Movable: Move/Jump
-        //  MoveSet: Moves
+        //  SkillSet: Skills
         //  StatusBag: Status Effects
         //  Elemental: Element
         profileEntity.AssertComponentExists<ProfileDetails>();
@@ -149,12 +149,22 @@ public class ProfileCardPrefab : Control
 
         var statusList = currentProfileEntity.GetComponentOrNull<StatusBag>()?.StatusList ?? new List<StatusEffect>();
 
-        var moves = currentProfileEntity.GetComponentOrNull<MoveSet>()?.Moves ?? new List<Move>();
-        for (var i = 0; i < moves.Count; i++)
+        // TODO: Cache these nodes
+        var skills = currentProfileEntity.GetComponentOrNull<SkillSet>()?.Skills ?? new List<Skill>();
+        for (var i = 0; i < skills.Count; i++)
         {
-            (GetNode($"MoveElement{i+1}") as Sprite).Texture = GD.Load<Texture>($"res://img/icons/element_{moves[i].Element.ToString().ToLower()}.png");
-            (GetNode($"MoveName{i+1}") as Label).Text = moves[i].Name;
-            (GetNode($"TpCount{i+1}") as Label).Text = $"{moves[i].CurrentTP} / {moves[i].MaxTP}";
+            (GetNode($"SkillElement{i+1}") as Sprite).Texture = GD.Load<Texture>($"res://img/icons/element_{skills[i].Element.ToString().ToLower()}.png");
+            (GetNode($"SkillName{i+1}") as Label).Text = skills[i].Name;
+            (GetNode($"TpCount{i+1}") as Label).Text = $"{skills[i].CurrentTP} / {skills[i].MaxTP}";
+            (GetNode($"SkillElement{i + 1}") as Sprite).Visible = true;
+            (GetNode($"SkillName{i + 1}") as Label).Visible = true;
+            (GetNode($"TpCount{i + 1}") as Label).Visible = true;
+        }
+        for (var i = skills.Count; i < 4; i++)
+        {
+            (GetNode($"SkillElement{i + 1}") as Sprite).Visible = false;
+            (GetNode($"SkillName{i + 1}") as Label).Visible = false;
+            (GetNode($"TpCount{i + 1}") as Label).Visible = false;
         }
 
         var element = currentProfileEntity.GetComponentOrNull<Elemental>()?.Element ?? Element.Neutral;

@@ -14,7 +14,7 @@ public class Combat : Manager
         leftProfileCard = GetNode("HUD/LeftProfile") as ProfileCardPrefab;
         rightProfileCard = GetNode("HUD/RightProfile") as ProfileCardPrefab;
         actionMenu = GetNode("HUD/LeftProfile/ActionMenu") as ActionMenuPrefab;
-        actionMenu.SetButtonCallback(move => AddComponentToEntity(GetNewEntity(), new SelectActionEvent() { SelectedMove = move }));
+        actionMenu.SetButtonCallback(skill => AddComponentToEntity(GetNewEntity(), new SelectActionEvent() { SelectedSkill = skill }));
 
         ApplyState(new CombatStartState());
         CreateSystems();
@@ -23,48 +23,6 @@ public class Combat : Manager
         BuildActors();
 
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
-
-
-        // Game State flow
-        //  Player movement
-        //      Selected player
-        //      Potential movement locations
-        //          Render movement location
-        //          Allow clicking of movement locations
-        //  Player action selection
-        //      Selected player
-        //      Selected player's moveset
-        //          Render action menu
-        //          Allow clicking of moveset options
-        //  Player action targeting
-        //      Selected player
-        //      Selected move's range and target area
-        //      Entities within target area
-        //          Render target range
-        //          Render target area
-        //          Click to target
-        //          Confirmation
-        //  Player action execution
-        //      Selected player
-        //      Selected targets
-        //      Selected move
-        //          Render and yield for animations
-        //  NPC AI
-        //      Most of the world state
-        //          Choose an option
-        //  NPC movement, action selection, targeting, execution (maybe can be all one state?)
-        //  
-        //  Player movement, action selection, action targeting could all switch to Free Roam and back
-        //  Or maybe free roam isn't a thing? Maybe if you are in any other state that allow cursor movement we just render state under cursor?
-        //      Previous state
-        //      Entity state
-        //      Terrain state
-        //          Render stats for entity under cursor
-        //          Allow returning to previous state
-        //
-        //
-        //  In order to go back to movement state for player, we need to store starting location the entire time
-        //      (until the next movement state for that player? or clear it when execution is over?)
     }
 
     private void CreateSystems()
@@ -187,12 +145,12 @@ public class Combat : Manager
             { TerrainType.Water, 1 },
             { TerrainType.DeepWater, 1 },
         };
-        var moveList = new List<Move>()
+        var skillList = new List<Skill>()
         {
-            new Move() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 0, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
-            new Move() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
-            new Move() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Elated", 3 } } },
-            //new Move() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
+            new Skill() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 500, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
+            new Skill() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
+            new Skill() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Elated", 3 } } },
+            //new Skill() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
         };
 
         var actor = FindNode("Vaporeon") as Entity;
@@ -205,11 +163,11 @@ public class Combat : Manager
             new PlayerCharacter(), 
             new Health() { Current = 30, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType, TravelSpeed = 3 }, 
-            new TurnSpeed() { TimeToAct = 16 },
+            new TurnSpeed() { TimeToAct = 12 },
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Water },
             new StatusBag(),
-            new MoveSet() { Moves = moveList });
+            new SkillSet() { Skills = skillList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
         actor = FindNode("Scyther") as Entity;
@@ -222,11 +180,11 @@ public class Combat : Manager
             new PlayerCharacter(), 
             new Health() { Current = 10, Max = 30 }, 
             new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 2 }, 
-            new TurnSpeed() { TimeToAct = 12 },
+            new TurnSpeed() { TimeToAct = 16 },
             new FightStats() { Atn = 5, Dex = 17, Mag = 8, Str = 6, Tuf = 9 },
             new Elemental() { Element = Element.Earth },
             new StatusBag(),
-            new MoveSet() { Moves = moveList });
+            new SkillSet() { Skills = skillList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
         actor = FindNode("Zapdos") as Entity;
@@ -243,7 +201,8 @@ public class Combat : Manager
             new TurnSpeed() { TimeToAct = 14 },
             new StatusBag(),
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Fire });
+            new Elemental() { Element = Element.Fire },
+            new SkillSet() { Skills = skillList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
         actor = FindNode("Machamp") as Entity;
@@ -259,7 +218,8 @@ public class Combat : Manager
             new TurnSpeed() { TimeToAct = 26 },
             new StatusBag(),
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Neutral });
+            new Elemental() { Element = Element.Neutral },
+            new SkillSet() { Skills = skillList });
         AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
 
         actor = FindNode("Rock") as Entity;
@@ -300,7 +260,7 @@ public class Combat : Manager
                 }
                 break;
             case "SetActions":
-                actionMenu.RegisterMoveSet(args[0] as MoveSet);
+                actionMenu.RegisterSkillSet(args[0] as SkillSet);
                 break;
             case "SetTargetingInfo":
                 rightProfileCard.TargetingInfo = args[0] as string;

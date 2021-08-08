@@ -91,7 +91,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MoveName1" type="Label" parent="."]
+[node name="SkillName1" type="Label" parent="."]
 margin_left = 141.0
 margin_top = 160.0
 margin_right = 206.0
@@ -103,7 +103,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MoveName2" type="Label" parent="."]
+[node name="SkillName2" type="Label" parent="."]
 margin_left = 240.098
 margin_top = 160.389
 margin_right = 305.098
@@ -115,7 +115,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MoveName3" type="Label" parent="."]
+[node name="SkillName3" type="Label" parent="."]
 margin_left = 338.562
 margin_top = 160.859
 margin_right = 403.562
@@ -127,7 +127,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="MoveName4" type="Label" parent="."]
+[node name="SkillName4" type="Label" parent="."]
 margin_left = 436.499
 margin_top = 160.33
 margin_right = 495.499
@@ -187,22 +187,22 @@ __meta__ = {
 position = Vector2( 53.5551, 181.372 )
 texture = ExtResource( 5 )
 
-[node name="MoveElement1" type="Sprite" parent="."]
+[node name="SkillElement1" type="Sprite" parent="."]
 position = Vector2( 122.933, 175.28 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
-[node name="MoveElement2" type="Sprite" parent="."]
+[node name="SkillElement2" type="Sprite" parent="."]
 position = Vector2( 222.933, 173.161 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
-[node name="MoveElement3" type="Sprite" parent="."]
+[node name="SkillElement3" type="Sprite" parent="."]
 position = Vector2( 321.928, 171.572 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 5 )
 
-[node name="MoveElement4" type="Sprite" parent="."]
+[node name="SkillElement4" type="Sprite" parent="."]
 position = Vector2( 419.599, 171.837 )
 scale = Vector2( 0.379221, 0.379221 )
 texture = ExtResource( 6 )

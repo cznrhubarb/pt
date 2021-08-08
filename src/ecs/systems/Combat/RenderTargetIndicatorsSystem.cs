@@ -38,22 +38,16 @@ public class RenderTargetIndicatorsSystem : Ecs.System
 
         if (targetLocation != null && manager.CurrentState is PlayerTargetingState ptState)
         {
-            // HACK: Strong coupling here.
-            var areaRange = ptState.SelectedMove.AreaOfEffect;
-            var maxAoeHeightDelta = ptState.SelectedMove.MaxAoeHeightDelta;
-            var points = map.AStar.GetPointsBetweenRange(reticleLocation.TilePosition, 0, areaRange);
+            var points = TargetUtils.GetTargetLocations(ptState.SelectedSkill, map, reticleLocation.TilePosition);
 
             for (var i = 0; i < points.Count; i++)
             {
-                if (Math.Abs(points[i].z - reticleLocation.TilePosition.z) <= maxAoeHeightDelta)
-                {
-                    // TODO: Because the actual sprite positioning doesn't happen until the next render loop,
-                    //  this flashes at the wrong spot :(
-                    //  Fixed by setting a "should be visible next frame" in the sprite wrap and letting the
-                    //  other render system take care of it
-                    indicators[i].GetComponent<TileLocation>().TilePosition = points[i];
-                    indicators[i].GetComponent<SpriteWrap>().Sprite.Visible = true;
-                }
+                // TODO: Because the actual sprite positioning doesn't happen until the next render loop,
+                //  this flashes at the wrong spot :(
+                //  Fixed by setting a "should be visible next frame" in the sprite wrap and letting the
+                //  other render system take care of it
+                indicators[i].GetComponent<TileLocation>().TilePosition = points[i];
+                indicators[i].GetComponent<SpriteWrap>().Sprite.Visible = true;
             }
         }
     }

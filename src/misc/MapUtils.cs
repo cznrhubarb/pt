@@ -50,4 +50,33 @@ public class MapUtils
             }
         }
     }
+
+    public static TweenSequence BuildTweenForActor(Manager manager, Entity movingActor, Vector3[] path)
+    {
+        var tweenSeq = new TweenSequence(manager.GetTree());
+        for (var idx = 1; idx < path.Length; idx++)
+        {
+            // TODO: Slightly roundabout way of tweening our actors, primarily for the benefit of z sorting, and it still isn't perfect :(
+            if (path[idx].z != path[idx - 1].z)
+            {
+                // Jump
+                var ease = path[idx].z > path[idx - 1].z ? Tween.EaseType.Out : Tween.EaseType.In;
+                tweenSeq.AppendInterval(0.1f);
+                tweenSeq.AppendMethod(movingActor, "SetTilePositionXY", path[idx - 1], path[idx], 0.2f);
+                tweenSeq.Join();
+                tweenSeq.AppendMethod(movingActor, "SetTilePositionZ", path[idx - 1].z, path[idx].z, 0.2f)
+                    .SetTransition(Tween.TransitionType.Back)
+                    .SetEase(ease);
+                tweenSeq.AppendInterval(0.1f);
+            }
+            else
+            {
+                // Walk
+                tweenSeq.AppendMethod(movingActor, "SetTilePositionXY", path[idx - 1], path[idx], 0.2f);
+            }
+        }
+        manager.AddComponentToEntity(movingActor, new Tweening() { TweenSequence = tweenSeq });
+
+        return tweenSeq;
+    }
 }

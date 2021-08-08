@@ -2,5 +2,5 @@ using Ecs;
 
 public class SelectActionEvent : Component
 {
-    public Move SelectedMove { get; set; }
+    public Skill SelectedSkill { get; set; }
 }

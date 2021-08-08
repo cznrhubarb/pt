@@ -10,13 +10,13 @@ public class PlayerTargetingState : State
     private Entity acting;
     private Map map;
 
-    public Move SelectedMove { get; private set; }
+    public Skill SelectedSkill { get; private set; }
 
-    public PlayerTargetingState(Entity acting, Entity map, Move selectedMove)
+    public PlayerTargetingState(Entity acting, Entity map, Skill selectedSkill)
     {
         this.acting = acting;
         this.map = map.GetComponent<Map>();
-        this.SelectedMove = selectedMove;
+        this.SelectedSkill = selectedSkill;
     }
 
     public override void Pre(Manager manager)
@@ -26,8 +26,8 @@ public class PlayerTargetingState : State
         {
             var tilePosition = acting.GetComponent<TileLocation>().TilePosition;
 
-            var points = map.AStar.GetPointsBetweenRange(tilePosition, SelectedMove.MinRange, SelectedMove.MaxRange)
-                .Where(pt => tilePosition.z - pt.z <= SelectedMove.MaxHeightRangeDown && pt.z - tilePosition.z <= SelectedMove.MaxHeightRangeUp)
+            var points = map.AStar.GetPointsBetweenRange(tilePosition, SelectedSkill.MinRange, SelectedSkill.MaxRange)
+                .Where(pt => tilePosition.z - pt.z <= SelectedSkill.MaxHeightRangeDown && pt.z - tilePosition.z <= SelectedSkill.MaxHeightRangeUp)
                 .ToList();
 
             targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, points, "res://img/tiles/image_part_031.png");
@@ -35,7 +35,7 @@ public class PlayerTargetingState : State
             // Max number of indicators we need is defined by [x = maxRange, y = minRange, n = numNeeded]
             //  n = x * (x + 1) * 2 - y * (y - 1) * 2 (+1 if y = 0)
             var minAreaOfEffect = 0;
-            var maxPoints = SelectedMove.AreaOfEffect * (SelectedMove.AreaOfEffect + 1) * 2 
+            var maxPoints = SelectedSkill.AreaOfEffect * (SelectedSkill.AreaOfEffect + 1) * 2 
                             - minAreaOfEffect * (minAreaOfEffect - 1) * 2 
                             + 1;
             points = Enumerable.Range(1, maxPoints).Select(_i => new Vector3(tilePosition)).ToList();
@@ -46,7 +46,7 @@ public class PlayerTargetingState : State
             }
 
             var turnSpeed = acting.GetComponent<TurnSpeed>();
-            turnSpeed.TimeToAct += SelectedMove.Speed;
+            turnSpeed.TimeToAct += SelectedSkill.Speed;
         }
     }
 

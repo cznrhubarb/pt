@@ -4,41 +4,41 @@ using System.Collections.Generic;
 
 public class ActionMenuPrefab : Control
 {
-    private List<Button> moveButtons = new List<Button>();
-    private Action<Move> callback;
+    private List<Button> skillButtons = new List<Button>();
+    private Action<Skill> callback;
 
     public override void _Ready()
     {
-        moveButtons.Add(GetNode("MoveButton1") as Button);
-        moveButtons.Add(GetNode("MoveButton2") as Button);
-        moveButtons.Add(GetNode("MoveButton3") as Button);
-        moveButtons.Add(GetNode("MoveButton4") as Button);
+        skillButtons.Add(GetNode("SkillButton1") as Button);
+        skillButtons.Add(GetNode("SkillButton2") as Button);
+        skillButtons.Add(GetNode("SkillButton3") as Button);
+        skillButtons.Add(GetNode("SkillButton4") as Button);
         GetNode("WaitButton").Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { null });
     }
 
-    public void SetButtonCallback(Action<Move> buttonCallback)
+    public void SetButtonCallback(Action<Skill> buttonCallback)
     {
         callback = buttonCallback;
     }
 
-    private void OnButtonPressed(Move action)
+    private void OnButtonPressed(Skill action)
     {
         callback.Invoke(action);
     }
 
-    public void RegisterMoveSet(MoveSet moveSet)
+    public void RegisterSkillSet(SkillSet skillSet)
     {
-        for (var i = 0; i < moveButtons.Count; i++)
+        for (var i = 0; i < skillButtons.Count; i++)
         {
-            moveButtons[i].Visible = moveSet?.Moves.Count > i;
-            if (moveButtons[i].Visible)
+            skillButtons[i].Visible = skillSet?.Skills.Count > i;
+            if (skillButtons[i].Visible)
             {
-                moveButtons[i].Disabled = moveSet.Moves[i].CurrentTP == 0;
-                if (moveButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
+                skillButtons[i].Disabled = skillSet.Skills[i].CurrentTP == 0;
+                if (skillButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
                 {
-                    moveButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));
+                    skillButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));
                 }
-                moveButtons[i].Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { moveSet?.Moves[i] });
+                skillButtons[i].Connect("pressed", this, nameof(OnButtonPressed), new Godot.Collections.Array() { skillSet?.Skills[i] });
             }
         }
     }
