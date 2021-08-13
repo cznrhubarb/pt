@@ -183,7 +183,6 @@ public class AStarEx : AStar
             evalIndex++;
         }
 
-        pointsInRange.RemoveAt(0);
         return pointsInRange
             .Where(msp => !obstacles.ContainsKey(msp.point))
             .Select(msp => GetPointPosition(msp.point))

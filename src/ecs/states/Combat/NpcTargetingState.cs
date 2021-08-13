@@ -30,6 +30,7 @@ public class NpcTargetingState : State
 
             targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_031.png");
 
+            // TODO: If we put the targeteds in the tactical plan somehow, we can avoid doing a lot of the stuff in here
             // Kinda dumb way to do this because we're not in a system
             var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
                 .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());

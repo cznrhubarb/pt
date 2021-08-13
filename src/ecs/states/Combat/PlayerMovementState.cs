@@ -35,8 +35,6 @@ public class PlayerMovementState : State
             }
 
             var points = map.AStar.GetPointsInRange(moveStats, startingPosition);
-            // Add back our starting location so we can stay in place if desired
-            points.Add(startingPosition);
             if (moveStats.StartingLocation != null)
             {
                 points.Add(acting.GetComponent<TileLocation>().TilePosition);

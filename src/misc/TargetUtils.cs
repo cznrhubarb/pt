@@ -16,6 +16,72 @@ public class TargetUtils
             .ToList();
     }
 
+    // TODO: Obviously this is a massive amount of duplicated code with the method below
+    // TODO: Also the name is terrible
+    // TODO: Also I don't like returning a tuple if I can avoid it
+    public static IEnumerable<(Entity, Targeted)> GetTargeteds(
+        Skill selectedSkill,
+        Entity actingEntity,
+        IEnumerable<Entity> potentialTargets,
+        IEnumerable<Vector3> skillTargetLocations)
+    {
+        var actualTargets = potentialTargets.Where(target =>
+            skillTargetLocations.Any(stl => target.GetComponent<TileLocation>().TilePosition == stl)
+        );
+
+        var actingFightStats = actingEntity.GetComponent<FightStats>();
+
+        return actualTargets.Select(target =>
+        {
+            var targetedComp = new Targeted();
+            var targetFightStats = target.GetComponent<FightStats>();
+            targetedComp.HitChance = Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f));
+
+            foreach (var kvp in selectedSkill.Effects)
+            {
+                switch (kvp.Key)
+                {
+                    case "StrDamage":
+                        {
+                            var heightDelta = actingEntity.GetComponent<TileLocation>().TilePosition.z -
+                                                target.GetComponent<TileLocation>().TilePosition.z;
+                            targetedComp.CritChance = actingFightStats.Dex / 2 + Mathf.Clamp(heightDelta, -4, 4) * 5 + selectedSkill.CritModifier;
+
+                            var statMod = Math.Pow(1.25f, (actingFightStats.Str - targetFightStats.Tuf) / 20);
+                            var baseEleMod = 0; // TODO: Calculate
+                            var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
+                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                        }
+                        break;
+                    case "MagDamage":
+                        {
+                            var statMod = Math.Pow(1.25f, (actingFightStats.Mag - targetFightStats.Tuf) / 20);
+                            var baseEleMod = 0; // TODO: Calculate
+                            var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
+                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                        }
+                        break;
+                    case "Heal":
+                        {
+                            var healthComp = target.GetComponent<Health>();
+                            var heal = Math.Ceiling(kvp.Value * actingFightStats.Mag / 100d * 4);
+                            targetedComp.Effects.Add(kvp.Key, (int)heal);
+                        }
+                        break;
+                    case "Elated":
+                        targetedComp.Effects.Add(kvp.Key, 1);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return (target, targetedComp);
+        });
+    }
+
     public static IEnumerable<Entity> MarkTargets(
         Manager manager, 
         Skill selectedSkill,

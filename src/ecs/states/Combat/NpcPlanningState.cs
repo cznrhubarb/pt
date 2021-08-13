@@ -1,5 +1,6 @@
 ﻿using Ecs;
 using Godot;
+using System.Linq;
 
 public class NpcPlanningState : State
 {
@@ -22,8 +23,10 @@ public class NpcPlanningState : State
 
         // TODO: If planning takes any reasonable amount of time, show a "thinking" animation
 
-        // Currently returning a MOCK
-        var plan = Tactician.GetTurnPlan(acting);
+        // Kinda dumb way to do this because we're not in a system
+        var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
+            .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
+        var plan = Tactician.GetTurnPlan(acting, map, potentialTargets);
 
         manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
         {

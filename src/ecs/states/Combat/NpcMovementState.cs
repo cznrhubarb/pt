@@ -18,6 +18,9 @@ public class NpcMovementState : State
     {
         GD.Print("NPC moving: " + acting.Name);
         var actorLocation = acting.GetComponent<TileLocation>();
+
+        // TODO: Display the potential move locations for the NPC for a second before actually moving
+
         if (actorLocation.TilePosition != plan.MoveTargetLocation)
         {
             var actorMovable = acting.GetComponent<Movable>();
