@@ -20,4 +20,6 @@ public class Strategist
     //  Concentration of enemies/allies on the map
     //  Choke points
     //  Height
+    //  More willing to sacrifice team mates if it will end a match or something?
+    //      (could be done by weighting enemies more highly as number reduces?)
 }

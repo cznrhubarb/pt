@@ -9,6 +9,7 @@ public class NpcTargetingState : State
     private Map map;
     private TacticalPlan plan;
 
+    private List<Entity> targetRangeLocations;
     private List<Entity> targetLocations;
 
     public NpcTargetingState(Entity acting, Map map, TacticalPlan plan)
@@ -24,28 +25,48 @@ public class NpcTargetingState : State
 
         if (plan.SelectedSkill != null)
         {
-            plan.SelectedSkill.CurrentTP--;
-            
-            var skillTargetPoints = TargetUtils.GetTargetLocations(plan.SelectedSkill, map, plan.SkillTargetLocation);
+            manager.PerformHudAction("FlashMove", acting.GetComponent<SkillSet>().Skills.IndexOf(plan.SelectedSkill));
 
-            targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_031.png");
+            var tilePosition = acting.GetComponent<TileLocation>().TilePosition;
 
-            // TODO: If we put the targeteds in the tactical plan somehow, we can avoid doing a lot of the stuff in here
-            // Kinda dumb way to do this because we're not in a system
-            var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
-                .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
+            var points = map.AStar.GetPointsBetweenRange(tilePosition, plan.SelectedSkill.MinRange, plan.SelectedSkill.MaxRange)
+                .Where(pt => tilePosition.z - pt.z <= plan.SelectedSkill.MaxHeightRangeDown && pt.z - tilePosition.z <= plan.SelectedSkill.MaxHeightRangeUp)
+                .ToList();
 
-            var actualTargets = TargetUtils.MarkTargets(manager, plan.SelectedSkill, acting, potentialTargets, skillTargetPoints);
-
-            // TODO: Need to somehow highlight what the selected skill is that the NPC is using
+            targetRangeLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, points, "res://img/tiles/image_part_031.png");
 
             manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
             {
                 Callback = () =>
                 {
-                    acting.GetComponent<TurnSpeed>().TimeToAct += plan.SelectedSkill.Speed;
-                    TargetUtils.PerformAction(manager, actualTargets);
-                    manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
+                    foreach (var spot in targetRangeLocations)
+                    {
+                        manager.DeleteEntity(spot.Id);
+                    }
+
+                    plan.SelectedSkill.CurrentTP--;
+
+                    var skillTargetPoints = TargetUtils.GetTargetLocations(plan.SelectedSkill, map, plan.SkillTargetLocation);
+
+                    targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_030.png");
+
+                    // TODO: If we put the targeteds in the tactical plan somehow, we can avoid doing a lot of the stuff in here
+                    // Kinda dumb way to do this because we're not in a system
+                    var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
+                        .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
+
+                    var actualTargets = TargetUtils.MarkTargets(manager, plan.SelectedSkill, acting, potentialTargets, skillTargetPoints);
+
+                    manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
+                    {
+                        Callback = () =>
+                        {
+                            acting.GetComponent<TurnSpeed>().TimeToAct += plan.SelectedSkill.Speed;
+                            TargetUtils.PerformAction(manager, actualTargets);
+                            manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
+                        },
+                        Delay = 1.5f
+                    });
                 },
                 Delay = 1.5f
             });
@@ -62,9 +83,12 @@ public class NpcTargetingState : State
     public override void Post(Manager manager)
     {
         GD.Print("NPC done acting: " + acting.Name);
-        foreach (var spot in targetLocations)
+        if (targetLocations != null)
         {
-            manager.DeleteEntity(spot.Id);
+            foreach (var spot in targetLocations)
+            {
+                manager.DeleteEntity(spot.Id);
+            }
         }
     }
 }

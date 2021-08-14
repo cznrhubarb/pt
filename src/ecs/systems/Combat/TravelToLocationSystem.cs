@@ -45,7 +45,12 @@ public class TravelToLocationSystem : Ecs.System
                 var actorLocation = movingActor.GetComponent<TileLocation>();
                 var path = map.AStar.GetPath(actorMovable, actorLocation.TilePosition, reticleLocationComp.TilePosition);
 
-                MapUtils.BuildTweenForActor(manager, movingActor, path);
+                // TODO: Maybe handle this a different way. If we have an "on end tween" trigger at some point, this won't work.
+                if (path.Length > 1)
+                {
+                    foreach (var p in path) { GD.Print(p); }
+                    MapUtils.BuildTweenForActor(manager, movingActor, path);
+                }
 
                 turnSpeed.TimeToAct = 20 + (path.Length - 1) * actorMovable.TravelSpeed;
 

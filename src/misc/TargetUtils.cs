@@ -19,7 +19,7 @@ public class TargetUtils
     // TODO: Obviously this is a massive amount of duplicated code with the method below
     // TODO: Also the name is terrible
     // TODO: Also I don't like returning a tuple if I can avoid it
-    public static IEnumerable<(Entity, Targeted)> GetTargeteds(
+    public static List<(Entity, Targeted)> GetTargeteds(
         Skill selectedSkill,
         Entity actingEntity,
         IEnumerable<Entity> potentialTargets,
@@ -35,7 +35,7 @@ public class TargetUtils
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
-            targetedComp.HitChance = Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f));
+            targetedComp.HitChance = Mathf.Min(100, Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f)));
 
             foreach (var kvp in selectedSkill.Effects)
             {
@@ -79,10 +79,10 @@ public class TargetUtils
             }
 
             return (target, targetedComp);
-        });
+        }).ToList();
     }
 
-    public static IEnumerable<Entity> MarkTargets(
+    public static List<Entity> MarkTargets(
         Manager manager, 
         Skill selectedSkill,
         Entity actingEntity,
@@ -99,7 +99,7 @@ public class TargetUtils
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
-            targetedComp.HitChance = Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f));
+            targetedComp.HitChance = Mathf.Min(100, Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f)));
 
             foreach (var kvp in selectedSkill.Effects)
             {
@@ -151,7 +151,7 @@ public class TargetUtils
         // TODO: Deterministic sort by distance from center
         // TODO: Maybe here, maybe somewhere else, but display an on map indicator of which unit is displaying profile card
 
-        return actualTargets;
+        return actualTargets.ToList();
     }
 
     public static void PerformAction(Manager manager, IEnumerable<Entity> targets)

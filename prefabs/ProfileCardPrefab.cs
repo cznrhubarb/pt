@@ -14,6 +14,9 @@ public class ProfileCardPrefab : Control
     private Label nameLabel;
     private NinePatchRect backgroundRect;
     private AnimationPlayer animationPlayer;
+    private Sprite[] skillElementSprites;
+    private Label[] skillNameLabels;
+    private Label[] skillTpLabels;
 
     private Entity currentProfileEntity;
     public bool MatchesCurrentEntity(Entity match) => match == currentProfileEntity;
@@ -27,6 +30,28 @@ public class ProfileCardPrefab : Control
         animationPlayer = FindNode("AnimationPlayer") as AnimationPlayer;
         targetingInfo = FindNode("TargetingInfo") as Label;
         animationPlayer.Connect("animation_finished", this, nameof(SetLastCompleteAnimation));
+
+        skillElementSprites = new Sprite[]
+        {
+            GetNode("SkillElement1") as Sprite,
+            GetNode("SkillElement2") as Sprite,
+            GetNode("SkillElement3") as Sprite,
+            GetNode("SkillElement4") as Sprite
+        };
+        skillNameLabels = new Label[] 
+        {
+            GetNode("SkillName1") as Label,
+            GetNode("SkillName2") as Label,
+            GetNode("SkillName3") as Label,
+            GetNode("SkillName4") as Label
+        };
+        skillTpLabels = new Label[]
+        {
+            GetNode("TpCount1") as Label,
+            GetNode("TpCount2") as Label,
+            GetNode("TpCount3") as Label,
+            GetNode("TpCount4") as Label
+        };
     }
 
     private void SetLastCompleteAnimation(string animationName)
@@ -149,22 +174,21 @@ public class ProfileCardPrefab : Control
 
         var statusList = currentProfileEntity.GetComponentOrNull<StatusBag>()?.StatusList ?? new List<StatusEffect>();
 
-        // TODO: Cache these nodes
         var skills = currentProfileEntity.GetComponentOrNull<SkillSet>()?.Skills ?? new List<Skill>();
         for (var i = 0; i < skills.Count; i++)
         {
-            (GetNode($"SkillElement{i+1}") as Sprite).Texture = GD.Load<Texture>($"res://img/icons/element_{skills[i].Element.ToString().ToLower()}.png");
-            (GetNode($"SkillName{i+1}") as Label).Text = skills[i].Name;
-            (GetNode($"TpCount{i+1}") as Label).Text = $"{skills[i].CurrentTP} / {skills[i].MaxTP}";
-            (GetNode($"SkillElement{i + 1}") as Sprite).Visible = true;
-            (GetNode($"SkillName{i + 1}") as Label).Visible = true;
-            (GetNode($"TpCount{i + 1}") as Label).Visible = true;
+            skillElementSprites[i].Texture = GD.Load<Texture>($"res://img/icons/element_{skills[i].Element.ToString().ToLower()}.png");
+            skillNameLabels[i].Text = skills[i].Name;
+            skillTpLabels[i].Text = $"{skills[i].CurrentTP} / {skills[i].MaxTP}";
+            skillElementSprites[i].Visible = true;
+            skillNameLabels[i].Visible = true;
+            skillTpLabels[i].Visible = true;
         }
         for (var i = skills.Count; i < 4; i++)
         {
-            (GetNode($"SkillElement{i + 1}") as Sprite).Visible = false;
-            (GetNode($"SkillName{i + 1}") as Label).Visible = false;
-            (GetNode($"TpCount{i + 1}") as Label).Visible = false;
+            skillElementSprites[i].Visible = false;
+            skillNameLabels[i].Visible = false;
+            skillTpLabels[i].Visible = false;
         }
 
         var element = currentProfileEntity.GetComponentOrNull<Elemental>()?.Element ?? Element.Neutral;
@@ -196,5 +220,26 @@ public class ProfileCardPrefab : Control
                 negativeStatuses.AddChild(sNode);
             }
         }
+    }
+
+    public void FlashMove(int moveNumber)
+    {
+        skillTpLabels[i]
+        var eleSprite = GetNode($"SkillElement{moveNumber}") as Sprite;
+        var nameLabel = GetNode($"SkillName{moveNumber}") as Label;
+        var tpLabel = GetNode($"TpCount{moveNumber}") as Label;
+
+        var count = 10;
+        var timer = new System.Timers.Timer(150);
+        timer.Elapsed += (o,e) =>
+        {
+            skillElementSprites[moveNumber].Visible = !skillElementSprites[moveNumber].Visible;
+            skillNameLabels[moveNumber].Visible = !skillNameLabels[moveNumber].Visible;
+            skillTpLabels[moveNumber].Visible = !skillTpLabels[moveNumber].Visible;
+            count--;
+            if (count <= 0) { timer.Enabled = false; }
+        };
+        timer.AutoReset = true;
+        timer.Enabled = true;
     }
 }

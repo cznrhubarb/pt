@@ -148,8 +148,8 @@ public class Combat : Manager
         var skillList = new List<Skill>()
         {
             new Skill() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 500, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
-            new Skill() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
-            new Skill() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Elated", 3 } } },
+            //new Skill() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
+            //new Skill() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Elated", 3 } } },
             //new Skill() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
         };
 
@@ -197,7 +197,7 @@ public class Combat : Manager
             new Selectable(),
             new EnemyNpc(),
             new Health() { Current = 24, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 10, TerrainCostModifiers = flyingMoveType, TravelSpeed = 2 }, 
+            new Movable() { MaxMove = 2, MaxJump = 1, TerrainCostModifiers = flyingMoveType, TravelSpeed = 2 }, 
             new TurnSpeed() { TimeToAct = 14 },
             new StatusBag(),
             new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
@@ -277,6 +277,9 @@ public class Combat : Manager
                         rightProfileCard.SetStatusEffects(entity.GetComponent<StatusBag>());
                     }
                 }
+                break;
+            case "FlashMove":
+                leftProfileCard.FlashMove((int)args[0]);
                 break;
             default:
                 throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");

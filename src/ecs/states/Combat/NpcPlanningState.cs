@@ -26,6 +26,8 @@ public class NpcPlanningState : State
         // Kinda dumb way to do this because we're not in a system
         var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
             .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
+
+        MapUtils.RefreshObstacles(map, manager.GetEntitiesWithComponent<TileLocation>());
         var plan = Tactician.GetTurnPlan(acting, map, potentialTargets);
 
         manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()

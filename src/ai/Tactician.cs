@@ -16,24 +16,44 @@ public class Tactician
 {
     public static TacticalPlan GetTurnPlan(Entity acting, Map map, IEnumerable<Entity> potentialTargets)
     {
-        // TODO: Handle no skills
-        // TODO: Handle no skills with a valid target/score (planning over multiple turns)
-        // TODO: Don't use a skill with a negative score even if it's the "highest"
-        return acting.GetComponent<SkillSet>().Skills
-            .Where(skill => skill.CurrentTP > 0)
-            .Select(skill => SelectBestPlanForSkill(skill, acting, map, potentialTargets))
-            .Aggregate((planOne, planTwo) => planOne.Value >= planTwo.Value ? planOne : planTwo);
-    }
-
-    private static TacticalPlan SelectBestPlanForSkill(Skill skill, Entity acting, Map map, IEnumerable<Entity> potentialTargets)
-    {
-        GD.Print($"Selecting best plan for {skill.Name}");
-        var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
-        var movable = acting.GetComponent<Movable>();
+        // Wait and do nothing
+        var defaultPlan = new TacticalPlan()
+        {
+            MoveTargetLocation = acting.GetComponent<TileLocation>().TilePosition,
+            SelectedSkill = null,
+            SkillTargetLocation = Vector3.Zero,
+            Value = 0
+        };
 
         // Get all the places the acting entity could potentially spend their turn in
-        // TODO: This can be moved outside of this method to optimize it
-        var placesToStand = map.AStar.GetPointsInRange(movable, startingPosition);
+        var placesToStand = map.AStar.GetPointsInRange(acting.GetComponent<Movable>(), acting.GetComponent<TileLocation>().TilePosition);
+
+        var bestPlan = acting.GetComponent<SkillSet>().Skills
+            .Where(skill => skill.CurrentTP > 0)
+            .Select(skill => SelectBestSingleTurnPlanForSkill(skill, acting, placesToStand, map, potentialTargets))
+            .Where(plan => plan != null)
+            .Where(plan => plan.Value > 0)
+            .Aggregate(defaultPlan, (planOne, planTwo) => planOne.Value >= planTwo.Value ? planOne : planTwo);
+
+        if (bestPlan == defaultPlan)
+        {
+            bestPlan = acting.GetComponent<SkillSet>().Skills
+                .Where(skill => skill.CurrentTP > 0)
+                .Select(skill => SelectBestMultiTurnPlanForSkill(skill, acting, map, potentialTargets))
+                .Where(plan => plan != null)
+                .Where(plan => plan.Value > 0)
+                .Aggregate(defaultPlan, (planOne, planTwo) => planOne.Value >= planTwo.Value ? planOne : planTwo);
+         }
+
+        return bestPlan;
+    }
+
+    private static TacticalPlan SelectBestSingleTurnPlanForSkill(Skill skill, Entity acting, List<Vector3> placesToStand, Map map, IEnumerable<Entity> potentialTargets)
+    {
+        GD.Print($"Selecting best plan for {skill.Name}");
+        var actingLocationComp = acting.GetComponent<TileLocation>();
+        var startingPosition = actingLocationComp.TilePosition;
+        var movable = acting.GetComponent<Movable>();
 
         GD.Print($"Evaluating skill throwing from {placesToStand.Count} points");
 
@@ -58,6 +78,8 @@ public class Tactician
         // For each unique place a skill could land, find the shortest distance the acting entity would have to travel to in order to throw it
         //  TODO: for now we'll prefer high ground in case of path length ties, but it could play a larger part since it can affect
         //      both damage output for crits and damage taken from other people critting
+        //  TODO: BUG: Small bug at least, but because we don't take into account the move distance in valuation, we can do a suboptimal
+        //      play for AOE. Ex. To avoid hitting self, move one space and throw bomb, instead of just throwing the bomb further away
         var targetStandPairs = standPointsByTarget.Select(kvp =>
         {
             var paths = kvp.Value.Select(newPosition => (newPosition, map.AStar.GetPath(movable, startingPosition, newPosition).Length));
@@ -73,33 +95,48 @@ public class Tactician
                 }
             });
             return (targetPosition: kvp.Key, standPosition: closest.newPosition);
-        });
+        }).ToList();
 
         GD.Print($"Narrowed it down to the best places to stand for each of those skill landing spots");
         GD.Print($"There are a total of {targetStandPairs.Count()} pairs of places you could stand and throw now");
 
         // For each unique place a skill could land, create a list of lists of targeteds using targetutils
         //  potential optimization if we do this first but filter out any complete misses?
-        // TODO: BUG: Doesn't treat the new potential standing spot as though it was holding the acting entity
-        //      (and likewise it always treats the acting entity like it hasn't moved)
+        // TODO: BUG: If a move can self target and has a range more than 0, the option to move and use it on self will
+        //      never appear, because with a range of 1+, it could be used from somewhere closer. But since we are evaluating
+        //      above based on locations and not targets, it doesn't evaluate "logically"
+        //      The way to fix it is to look at targets earlier (but it's gonna be less efficient)
+        //      Wait until we Strategist is implemented, since this wouldn't be an "optimal" move in the current simplified logic anyway
         var effectsOfSkillAtTargets = targetStandPairs.Select(tsp =>
         {
+            // Temporarily set the actors tile position to the theoretical standing position
+            actingLocationComp.TilePosition = tsp.standPosition;
+
             var targetLocations = TargetUtils.GetTargetLocations(skill, map, tsp.targetPosition);
             var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
+
+            // Revert the actors tile position to the original
+            actingLocationComp.TilePosition = startingPosition;
+
             return (tsp.targetPosition, tsp.standPosition, effects);
-        });
+        })
+            // TODO: This isn't really NECESSARY I think? See if it's faster to do it or not when optimizing.
+            .Where(est => est.effects.Count() > 0)
+            .ToList();
 
-        GD.Print($"Created all the targeted components to evaluate skills");
-
-        // TODO: This isn't really NECESSARY I think? See if it's faster to do it or not when optimizing.
-        effectsOfSkillAtTargets = effectsOfSkillAtTargets.Where(est => est.effects.Count() > 0);
+        if (effectsOfSkillAtTargets.Count() == 0)
+        {
+            GD.Print($"No valid skill targets");
+            return null;
+        }
 
         GD.Print($"Narrowed it down to {effectsOfSkillAtTargets.Count()} locations where the skill actually does SOMETHING");
 
         // For each list of targeteds, determine the Value of that
         //  For now, don't take path distance into account when scoring (but we could later)
         var effectValues = effectsOfSkillAtTargets.Select(est => 
-            (est.targetPosition, est.standPosition, est.effects, value: est.effects.Sum(fx => DetermineValue(acting, fx))));
+            (est.targetPosition, est.standPosition, est.effects, value: est.effects.Sum(fx => DetermineValue(acting, fx))))
+            .ToList();
 
         GD.Print($"Calculated the total values of throwing each skill at each location");
 
@@ -127,27 +164,85 @@ public class Tactician
             SkillTargetLocation = highestValue.targetPosition,
             Value = highestValue.value
         };
+    }
 
-        // TODO: BUG: It's somewhere in this method, but Double Team isn't targeting correctly.
-        //      The score is way off, it's targeting an enemy, the move target location is invalid
-        /*
-        Selecting best plan for Double Team
-        Evaluating skill throwing from 23 points
-        There are a total of 23 points that this skill could land
-        There are a total of 23 pairs of places you could stand and throw
-        Narrowed it down to the best places to stand for each of those skill landing spots
-        There are a total of 23 pairs of places you could stand and throw now
-        Created all the targeted components to evaluate skills
-        Narrowed it down to 1 locations where the skill actually does SOMETHING
-        Calculated the total values of throwing each skill at each location
-        Evaluated the highest value:
-            MoveTarget Location (5, 1, 2)
-            SkillTarget Location (5, 1, 2)
-            Value -499.95
-            Targets:
-                Vaporeon
-                    Elated: 1
-        */
+    // This might even be able to replace the current system? Except it doesn't do AOEs as well
+    private static TacticalPlan SelectBestMultiTurnPlanForSkill(Skill skill, Entity acting, Map map, IEnumerable<Entity> potentialTargets)
+    {
+        GD.Print($"Looking for a multi turn plan for {skill.Name}");
+        var actingLocationComp = acting.GetComponent<TileLocation>();
+        var startingPosition = actingLocationComp.TilePosition;
+        var movable = acting.GetComponent<Movable>();
+
+        // For each skill, find the value of dropping it dead center on each potential target
+        var effectsOfSkillAtTargets = potentialTargets.Select(target =>
+        {
+            // Not updating the acting unit's stand position as presumably we are over a turn away when doing this
+            var targetPosition = target.GetComponent<TileLocation>().TilePosition;
+            var targetLocations = TargetUtils.GetTargetLocations(skill, map, targetPosition);
+            var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
+
+            return (name: target.GetComponent<ProfileDetails>().Name, targetPosition, effects);
+        }).ToList();
+
+        GD.Print($"Got a list of {effectsOfSkillAtTargets.Count()} places to use this skill");
+
+        // Just get a walking path to the target position and assume we'd stop when we're close enough
+        //  instead of having to figure out where we can throw from
+        var travelAndEffects = effectsOfSkillAtTargets.Select(target =>
+        {
+            // QQ? Does this work? Since the target position will be an obstacle in pathfinding
+            var path = map.AStar.GetPath(movable, startingPosition, target.targetPosition);
+            // Very imperfect because it doesn't take into account skills with more vertical range than
+            //  our jump heights. This might incorrectly assume it would take longer than needed to
+            //  use the skill, but it's all approximations anyway.
+            var walkingDistance = path.Length - skill.AreaOfEffect - skill.MaxRange - 1;
+            // Doesn't take into account terrain difficulty either :p
+            // Integer math on purpose to get a whole number of turns
+            var additionalTurnsNeeded = walkingDistance / movable.MaxMove;
+            return (path, walkingDistance, additionalTurnsNeeded, target.effects);
+        })
+            // If turns == 0, that means that we are too close and can't get far enough away to use this skill
+            //  (like if we're blocked into a corner or something)
+            .Where(tae => tae.additionalTurnsNeeded > 0)
+            .ToList();
+
+        GD.Print($"Narrowed it down to { travelAndEffects.Count()} viable places with paths");
+
+        // Value is (normal value / number of turns it would take to get there and do it)
+        var effectValues = travelAndEffects.Select(tae =>
+            (tae.path, tae.walkingDistance, tae.additionalTurnsNeeded, tae.effects, value: tae.effects.Sum(fx => DetermineValue(acting, fx) / tae.additionalTurnsNeeded)))
+            .ToList();
+
+        var highestValue = effectValues.Aggregate((evOne, evTwo) => evOne.value >= evTwo.value ? evOne : evTwo);
+
+        GD.Print($"Calculated scores");
+
+        // If additionalTurnsNeeded == 1, we should travel the minimum distance we need to get there next turn
+        //  If additionalTurnsNeeded > 1, travel as far as we can to give us more options next turn
+        // This only works if the terrain is all even cost :(
+        Vector3 moveTarget;
+        if (highestValue.additionalTurnsNeeded == 1)
+        {
+            moveTarget = highestValue.path[highestValue.walkingDistance - movable.MaxMove];
+        }
+        else
+        {
+            moveTarget = highestValue.path[movable.MaxMove];
+        }
+
+        GD.Print($"Evaluated the highest value:");
+        GD.Print($"Turns to get there {highestValue.additionalTurnsNeeded}");
+        GD.Print($"Intermediate move location {moveTarget}");
+        GD.Print($"Value {highestValue.value}");
+        // Tactical plan is no skill, but move to the spot that sets us up best for a later turn
+        return new TacticalPlan()
+        {
+            MoveTargetLocation = moveTarget,
+            SelectedSkill = null,
+            SkillTargetLocation = Vector3.Zero,
+            Value = highestValue.value
+        };
     }
 
     private static float DetermineValue(Entity acting, (Entity, Targeted) effect)
@@ -156,19 +251,9 @@ public class Tactician
         var target = effect.Item1;
         var skillEffects = effect.Item2;
 
-        // Ex. Tackle:
-        //  Value of hitting that target would be (Damage * ChanceToHit)
-
-        // Ex. Bomb Toss:
-        //  Value of hitting would be sum of enemy targets (Damage * ChanceToHit) - sum of friendly targets (Damage * ChanceToHit)
-        //      (potentially weight hurting friendly targets at 2x?)
-
-        // Ex. Double Team:
-        //  If you don't already have the buff, this has a static value. If you have the buff, it's zero.
-
         foreach (var kvp in skillEffects.Effects)
         {
-            // All values in here we assume are targeting ourselves
+            // All values in here we assume are targeting enemies, so positive effects are negative
             var amount = 0f;
             switch (kvp.Key)
             {

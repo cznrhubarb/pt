@@ -5,6 +5,7 @@ using System.Linq;
 
 public class AStarEx : AStar
 {
+    private const float ArbitraryLargeValue = 999999;
     private const int MinimumHeadRoom = 5;
     private const int MaxWidth = 100;
     private const int MaxLayers = 100;
@@ -41,36 +42,42 @@ public class AStarEx : AStar
 
     public override float _ComputeCost(int fromId, int toId)
     {
-        return Mathf.Sqrt(_EstimateCost(fromId, toId));
+        var fromPos = GetPointPosition(fromId);
+        var toPos = GetPointPosition(toId);
+
+        var differingObstacleAtLocation =
+            mover != null &&
+            obstacles.ContainsKey(toId) &&
+            obstacles[toId] != mover.Affiliation;
+
+        var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
+        // TODO: I disabled cost modifiers. See if it's even worth it. Seems more like it might just be unnecessary complexity.
+        var terrain = terrainTypes[toId];
+        var costModifier =
+            mover == null
+                ? 1
+                : mover.TerrainCostModifiers.ContainsKey(terrain)
+                    ? mover.TerrainCostModifiers[terrain]
+                    : DefaultCosts[terrain];
+        costModifier = Mathf.Pow(costModifier, 2);
+
+        // TODO: Not sure if there is a better way to block off these paths?
+        //  Maybe some use of DisconnectPoints/ConnectPoints to block off height deltas
+        //  and SetPointDisabled to block off obstacles
+        //  And do all of that in the one calling method (when mover is set), and then I don't need to keep mover as a local variable
+        if (Mathf.Abs(fromPos.z - toPos.z) > (mover?.MaxJump ?? 99) || differingObstacleAtLocation)
+        {
+            baseCost += ArbitraryLargeValue;
+        }
+
+        return Mathf.Sqrt(baseCost * costModifier);
     }
 
     public override float _EstimateCost(int fromId, int toId)
     {
-        var fromPos = GetPointPosition(fromId);
-        var toPos = GetPointPosition(toId);
-
-        var differingObstacleAtLocation = 
-            mover != null && 
-            obstacles.ContainsKey(toId) && 
-            obstacles[toId] != mover.Affiliation;
-
-        if (Mathf.Abs(fromPos.z - toPos.z) <= (mover?.MaxJump ?? 99) && !differingObstacleAtLocation)
-        {
-            var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
-            var terrain = terrainTypes[toId];
-            var costModifier = 
-                mover == null
-                    ? 1
-                    : mover.TerrainCostModifiers.ContainsKey(terrain)
-                        ? mover.TerrainCostModifiers[terrain]
-                        : DefaultCosts[terrain];
-            costModifier = Mathf.Pow(costModifier, 2);
-            return baseCost * costModifier;
-        }
-        else
-        {
-            return float.MaxValue;
-        }
+        // No savings to be had (or at least I don't know what is safe to consider a saving)
+        // TODO: Might be able ot optimize here by moving estimate cost into calculate and then
+        return _ComputeCost(fromId, toId);
     }
 
     private int HashId(Vector3 position) =>
@@ -144,6 +151,9 @@ public class AStarEx : AStar
     public Vector3[] GetPath(Movable moveStats, Vector3 startPosition, Vector3 endPosition)
     {
         mover = moveStats;
+
+        // GetPoints / GetPointConnections
+
         return GetPointPath(GetClosestPoint(startPosition), GetClosestPoint(endPosition));
     }
 
@@ -183,10 +193,16 @@ public class AStarEx : AStar
             evalIndex++;
         }
 
-        return pointsInRange
+        var retPoints = pointsInRange
             .Where(msp => !obstacles.ContainsKey(msp.point))
             .Select(msp => GetPointPosition(msp.point))
             .ToList();
+        // Re-add start position if it gets dropped as an obstacle
+        if (!retPoints.Contains(startPosition))
+        {
+            retPoints.Add(startPosition);
+        }
+        return retPoints;
     }
 
     public List<Vector3> GetPointsBetweenRange(Vector3 startPosition, int minRange, int maxRange)
