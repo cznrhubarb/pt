@@ -216,6 +216,17 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Level" type="Label" parent="."]
+margin_left = 143.854
+margin_top = 19.357
+margin_right = 196.854
+margin_bottom = 33.357
+custom_fonts/font = ExtResource( 3 )
+text = "Lvl 99"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="Dexterity" type="Label" parent="."]
 margin_left = 149.914
 margin_top = 127.135

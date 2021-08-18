@@ -5,5 +5,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="addons\godot-next-cs\references\" />
+    <Folder Include="res\" />
   </ItemGroup>
 </Project>

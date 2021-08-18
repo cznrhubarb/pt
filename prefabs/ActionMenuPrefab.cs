@@ -26,14 +26,14 @@ public class ActionMenuPrefab : Control
         callback.Invoke(action);
     }
 
-    public void RegisterSkillSet(SkillSet skillSet)
+    public void RegisterSkillSet(SkillSet skillSet, bool silenced)
     {
         for (var i = 0; i < skillButtons.Count; i++)
         {
             skillButtons[i].Visible = skillSet?.Skills.Count > i;
             if (skillButtons[i].Visible)
             {
-                skillButtons[i].Disabled = skillSet.Skills[i].CurrentTP == 0;
+                skillButtons[i].Disabled = skillSet.Skills[i].CurrentTP == 0 || (!skillSet.Skills[i].Physical && silenced);
                 if (skillButtons[i].IsConnected("pressed", this, nameof(OnButtonPressed)))
                 {
                     skillButtons[i].Disconnect("pressed", this, nameof(OnButtonPressed));

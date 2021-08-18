@@ -16,32 +16,38 @@ public class PlayerMovementState : State
 
     public override void Pre(Manager manager)
     {
-        manager.PerformHudAction("SetProfile", Direction.Left, acting);
-        manager.PerformHudAction("SetProfile", Direction.Right, null);
-        manager.PerformHudAction("SetActions", acting.GetComponentOrNull<SkillSet>());
+        manager.PerformHudAction("SetActions", acting.GetComponentOrNull<SkillSet>(), acting.GetComponent<StatusBag>().Statuses.ContainsKey("Silence"));
 
         manager.AddComponentsToEntity(acting, new Selected());
         if (acting?.GetComponentOrNull<Movable>() != null)
         {
             MapUtils.RefreshObstacles(map, manager.GetEntitiesWithComponent<TileLocation>());
 
-            var moveStats = acting.GetComponent<Movable>();
-
-            // If we are /returning/ to this state by going backwards, then just use starting location instead of current
-            var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
-            if (moveStats.StartingLocation != null)
+            List<Vector3> points;
+            if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Immobilize"))
             {
-                startingPosition = moveStats.StartingLocation.TilePosition;
-            }
-
-            var points = map.AStar.GetPointsInRange(moveStats, startingPosition);
-            if (moveStats.StartingLocation != null)
-            {
-                points.Add(acting.GetComponent<TileLocation>().TilePosition);
+                points = new List<Vector3>() { acting.GetComponent<TileLocation>().TilePosition };
             }
             else
             {
-                acting.GetComponent<TurnSpeed>().TimeToAct = 20;
+                var moveStats = acting.GetComponent<Movable>();
+
+                // If we are /returning/ to this state by going backwards, then just use starting location instead of current
+                var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
+                if (moveStats.StartingLocation != null)
+                {
+                    startingPosition = moveStats.StartingLocation.TilePosition;
+                }
+
+                points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+                if (moveStats.StartingLocation != null)
+                {
+                    points.Add(acting.GetComponent<TileLocation>().TilePosition);
+                }
+                else
+                {
+                    acting.GetComponent<TurnSpeed>().TimeToAct = 20;
+                }
             }
 
             travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");

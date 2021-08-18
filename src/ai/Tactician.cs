@@ -25,20 +25,36 @@ public class Tactician
             Value = 0
         };
 
+        var statuses = acting.GetComponent<StatusBag>().Statuses;
+        var immobilized = statuses.ContainsKey("Immobilize");
+        var silenced = statuses.ContainsKey("Silence");
+
         // Get all the places the acting entity could potentially spend their turn in
-        var placesToStand = map.AStar.GetPointsInRange(acting.GetComponent<Movable>(), acting.GetComponent<TileLocation>().TilePosition);
+        // TODO: Bit of code duplication with this immobilize status. Not sure where else to put it for now though
+        List<Vector3> placesToStand;
+        if (immobilized)
+        {
+            placesToStand = new List<Vector3>() { acting.GetComponent<TileLocation>().TilePosition };
+        }
+        else
+        {
+            placesToStand = map.AStar.GetPointsInRange(acting.GetComponent<Movable>(), acting.GetComponent<TileLocation>().TilePosition);
+        }
 
         var bestPlan = acting.GetComponent<SkillSet>().Skills
             .Where(skill => skill.CurrentTP > 0)
+            .Where(skill => silenced ? skill.Physical : true)
             .Select(skill => SelectBestSingleTurnPlanForSkill(skill, acting, placesToStand, map, potentialTargets))
             .Where(plan => plan != null)
             .Where(plan => plan.Value > 0)
             .Aggregate(defaultPlan, (planOne, planTwo) => planOne.Value >= planTwo.Value ? planOne : planTwo);
 
-        if (bestPlan == defaultPlan)
+        if (bestPlan == defaultPlan && !immobilized)
         {
             bestPlan = acting.GetComponent<SkillSet>().Skills
                 .Where(skill => skill.CurrentTP > 0)
+                //  Just pretend like we're silenced forever for now
+                .Where(skill => silenced ? skill.Physical : true)
                 .Select(skill => SelectBestMultiTurnPlanForSkill(skill, acting, map, potentialTargets))
                 .Where(plan => plan != null)
                 .Where(plan => plan.Value > 0)
@@ -78,8 +94,6 @@ public class Tactician
         // For each unique place a skill could land, find the shortest distance the acting entity would have to travel to in order to throw it
         //  TODO: for now we'll prefer high ground in case of path length ties, but it could play a larger part since it can affect
         //      both damage output for crits and damage taken from other people critting
-        //  TODO: BUG: Small bug at least, but because we don't take into account the move distance in valuation, we can do a suboptimal
-        //      play for AOE. Ex. To avoid hitting self, move one space and throw bomb, instead of just throwing the bomb further away
         var targetStandPairs = standPointsByTarget.Select(kvp =>
         {
             var paths = kvp.Value.Select(newPosition => (newPosition, map.AStar.GetPath(movable, startingPosition, newPosition).Length));
@@ -94,7 +108,8 @@ public class Tactician
                     return pathOne.Length <= pathTwo.Length ? pathOne : pathTwo;
                 }
             });
-            return (targetPosition: kvp.Key, standPosition: closest.newPosition);
+            // Distance cost is a little "cheat" to make it so that two equally valuable targets will use shortest distance as a tiebreaker
+            return (targetPosition: kvp.Key, standPosition: closest.newPosition, distanceCost: closest.Length * -0.01f);
         }).ToList();
 
         GD.Print($"Narrowed it down to the best places to stand for each of those skill landing spots");
@@ -118,7 +133,7 @@ public class Tactician
             // Revert the actors tile position to the original
             actingLocationComp.TilePosition = startingPosition;
 
-            return (tsp.targetPosition, tsp.standPosition, effects);
+            return (tsp.targetPosition, tsp.standPosition, tsp.distanceCost, effects);
         })
             // TODO: This isn't really NECESSARY I think? See if it's faster to do it or not when optimizing.
             .Where(est => est.effects.Count() > 0)
@@ -135,7 +150,7 @@ public class Tactician
         // For each list of targeteds, determine the Value of that
         //  For now, don't take path distance into account when scoring (but we could later)
         var effectValues = effectsOfSkillAtTargets.Select(est => 
-            (est.targetPosition, est.standPosition, est.effects, value: est.effects.Sum(fx => DetermineValue(acting, fx))))
+            (est.targetPosition, est.standPosition, est.effects, value: est.effects.Sum(fx => DetermineValue(acting, fx)) + est.distanceCost))
             .ToList();
 
         GD.Print($"Calculated the total values of throwing each skill at each location");
@@ -250,6 +265,9 @@ public class Tactician
         var value = 0f;
         var target = effect.Item1;
         var skillEffects = effect.Item2;
+        var targetStatuses = target.GetComponent<StatusBag>().Statuses;
+        var targetHealthComp = target.GetComponent<Health>();
+        var targetProfile = target.GetComponent<ProfileDetails>();
 
         foreach (var kvp in skillEffects.Effects)
         {
@@ -259,36 +277,123 @@ public class Tactician
             {
                 case "StrDamage":
                     {
-                        var healthComp = target.GetComponent<Health>();
                         amount = (int)kvp.Value;
                         amount += skillEffects.CritChance / 100f * amount;
-                        amount = Math.Min(healthComp.Current, amount);
+                        amount = Math.Min(targetHealthComp.Current, amount);
                         // TODO: Weight death blows a bit higher, and weight crit a bit less on deathblows since it's less certain
                     }
                     break;
                 case "MagDamage":
                     {
-                        var healthComp = target.GetComponent<Health>();
                         amount = (int)kvp.Value;
-                        amount = Math.Min(healthComp.Current, amount);
+                        amount = Math.Min(targetHealthComp.Current, amount);
                         // TODO: Weight death blows a bit higher
                     }
                     break;
                 case "Heal":
                     {
-                        var healthComp = target.GetComponent<Health>();
                         amount = (int)kvp.Value;
-                        amount = Math.Min(healthComp.Max - healthComp.Current, amount);
+                        amount = Math.Min(targetHealthComp.Max - targetHealthComp.Current, amount);
                         // Invert positive effects
                         amount = -amount;
                     }
                     break;
-                case "Elated":
+                // Value of applying a status effect the target already has is 0
+                case "Protect":
+                case "Shell":
                     {
-                        // TODO: Flat amount, though it really should be based on whether it's relevant
-                        //  (IE. don't buff str damage for someone with all mag attacks)
-                        // Invert positive effects
-                        amount = -5;
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            // TODO: Strategist: Should be based off the number of physical/magical skills the opponent has
+                            // The healthier they are, the more value it is to keep it that way? Scaled on health
+                            // TODESIGN: Maybe scaled based on missing health (keep alive) or max health (protect weaker targets)?
+                            amount = targetHealthComp.Current * 0.1f * Mathf.Sqrt((int)kvp.Value);
+                            // Invert positive effects
+                            amount = -amount;
+                        }
+                    }
+                    break;
+                case "Haste":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            amount = targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                            // Invert positive effects
+                            amount = -amount;
+                        }
+                    }
+                    break;
+                case "Slow":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            amount = targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                        }
+                    }
+                    break;
+                case "Regen":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            // Want some sort of logarithmic scale based on tick counts being applied,
+                            //  with the cap being limited by current missing HP
+                            var tickCount = (int)kvp.Value;
+                            var singleTurnValue = Math.Min(targetHealthComp.Max - targetHealthComp.Current, targetHealthComp.Max * StatusEffect.RegenHealPortion);
+                            amount = (float)((Math.Log(tickCount, singleTurnValue) + 1) * singleTurnValue);
+                            // Invert positive effects
+                            amount = -amount;
+                        }
+                    }
+                    break;
+                case "Poison":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            // Want some sort of logarithmic scale based on tick counts being applied,
+                            //  with the total being limited by remaining HP
+                            var tickCount = (int)kvp.Value;
+                            var singleTurnValue = targetHealthComp.Max * StatusEffect.PoisonDamagePortion;
+                            amount = (float)((Math.Log(tickCount, singleTurnValue) + 1) * singleTurnValue);
+                            // With poison assume the target will not get healed,
+                            //  as opposed to regen which assumes target will probably still take damage.
+                            amount = Math.Min(amount, targetHealthComp.Current);
+                        }
+                    }
+                    break;
+                case "Sleep":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            amount = targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                        }
+                    }
+                    break;
+                case "Blind":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            var skills = target.GetComponent<SkillSet>().Skills;
+                            var physicalSkillCount = skills.Count(s => s.Physical);
+                            amount = (skills.Count - physicalSkillCount) * targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                        }
+                    }
+                    break;
+                case "Silence":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            var skills = target.GetComponent<SkillSet>().Skills;
+                            var magicalSkillCount = skills.Count(s => !s.Physical);
+                            amount = (skills.Count - magicalSkillCount) * targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                        }
+                    }
+                    break;
+                case "Immobilize":
+                    {
+                        if (!targetStatuses.ContainsKey(kvp.Key))
+                        {
+                            amount = (float)Math.Log(target.GetComponent<Movable>().MaxMove, targetProfile.Level) * targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
+                        }
                     }
                     break;
                 default:

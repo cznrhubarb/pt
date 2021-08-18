@@ -35,7 +35,12 @@ public class TargetUtils
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
+            var targetStatuses = target.GetComponent<StatusBag>().Statuses;
             targetedComp.HitChance = Mathf.Min(100, Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f)));
+            if (targetStatuses.ContainsKey("Blind") && selectedSkill.Physical)
+            {
+                targetedComp.HitChance *= StatusEffect.BlindAccuracyModifier;
+            }
 
             foreach (var kvp in selectedSkill.Effects)
             {
@@ -51,6 +56,10 @@ public class TargetUtils
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
                             var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            if (targetStatuses.ContainsKey("Protect"))
+                            {
+                                damage *= StatusEffect.ProtectDamageModifier;
+                            }
                             targetedComp.Effects.Add(kvp.Key, (int)damage);
                         }
                         break;
@@ -60,6 +69,10 @@ public class TargetUtils
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
                             var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            if (targetStatuses.ContainsKey("Shell"))
+                            {
+                                damage *= StatusEffect.ShellDamageModifier;
+                            }
                             targetedComp.Effects.Add(kvp.Key, (int)damage);
                         }
                         break;
@@ -70,10 +83,9 @@ public class TargetUtils
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
                         }
                         break;
-                    case "Elated":
-                        targetedComp.Effects.Add(kvp.Key, 1);
-                        break;
                     default:
+                        // Assume anything not explicitly listed is a status effect
+                        targetedComp.Effects.Add(kvp.Key, kvp.Value);
                         break;
                 }
             }
@@ -99,7 +111,12 @@ public class TargetUtils
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
+            var targetStatuses = target.GetComponent<StatusBag>().Statuses;
             targetedComp.HitChance = Mathf.Min(100, Mathf.Floor(selectedSkill.Accuracy * Mathf.Pow(2, (actingFightStats.Dex - targetFightStats.Dex) / 20f)));
+            if (targetStatuses.ContainsKey("Blind") && selectedSkill.Physical)
+            {
+                targetedComp.HitChance *= StatusEffect.BlindAccuracyModifier;
+            }
 
             foreach (var kvp in selectedSkill.Effects)
             {
@@ -115,6 +132,10 @@ public class TargetUtils
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
                             var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            if (targetStatuses.ContainsKey("Protect"))
+                            {
+                                damage *= StatusEffect.ProtectDamageModifier;
+                            }
                             targetedComp.Effects.Add(kvp.Key, (int)damage);
                         }
                         break;
@@ -124,6 +145,10 @@ public class TargetUtils
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
                             var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            if (targetStatuses.ContainsKey("Shell"))
+                            {
+                                damage *= StatusEffect.ShellDamageModifier;
+                            }
                             targetedComp.Effects.Add(kvp.Key, (int)damage);
                         }
                         break;
@@ -134,10 +159,9 @@ public class TargetUtils
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
                         }
                         break;
-                    case "Elated":
-                        targetedComp.Effects.Add(kvp.Key, 1);
-                        break;
                     default:
+                        // Assume anything not explicitly listed is a status effect
+                        targetedComp.Effects.Add(kvp.Key, kvp.Value);
                         break;
                 }
             }
@@ -159,6 +183,7 @@ public class TargetUtils
         foreach (var target in targets)
         {
             var targetedComp = target.GetComponent<Targeted>();
+            var targetStatuses = target.GetComponent<StatusBag>().Statuses;
 
             var roll = Globals.Random.Next(100);
             if (roll < targetedComp.HitChance)
@@ -181,6 +206,7 @@ public class TargetUtils
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current -= Math.Min(healthComp.Current, damage);
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, damage.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                targetStatuses.Remove("Sleep");
                                 if (healthComp.Current == 0)
                                 {
                                     manager.AddComponentToEntity(target, new Dying());
@@ -192,6 +218,7 @@ public class TargetUtils
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current -= Math.Min(healthComp.Current, (int)kvp.Value);
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                targetStatuses.Remove("Sleep");
                                 if (healthComp.Current == 0)
                                 {
                                     manager.AddComponentToEntity(target, new Dying());
@@ -205,14 +232,11 @@ public class TargetUtils
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
                             }
                             break;
-                        case "Elated":
-                            {
-                                target.GetComponent<StatusBag>().StatusList.Add(new StatusEffect() { Name = kvp.Key, Count = (int)kvp.Value, Positive = true, Ticks = false });
-                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "+BOOST STR", new Color(0.5f, 0.4f, 1));
-                            }
-                            break;
                         default:
-                            GD.Print("Attempted to apply unknown skill effect: " + kvp.Key);
+                            // Assume anything not explicitly listed is a status effect
+                            // TODO: Apply these better depending on the type. Some stack, some don't
+                            target.GetComponent<StatusBag>().Statuses.Add(kvp.Key, StatusFactory.BuildStatusEffect(kvp.Key, (int)kvp.Value));
+                            FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Key, new Color(0.5f, 0.4f, 1));
                             break;
                     }
                 }

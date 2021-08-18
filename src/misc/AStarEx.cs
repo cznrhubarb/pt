@@ -51,7 +51,6 @@ public class AStarEx : AStar
             obstacles[toId] != mover.Affiliation;
 
         var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
-        // TODO: I disabled cost modifiers. See if it's even worth it. Seems more like it might just be unnecessary complexity.
         var terrain = terrainTypes[toId];
         var costModifier =
             mover == null

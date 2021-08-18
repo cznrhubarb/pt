@@ -21,6 +21,7 @@ public class Skill : Godot.Object
     public int MaxAoeHeightDelta { get; set; } = 0;
     // Lower is better
     public int Speed { get; set; } = 0;
+    public bool Physical { get; set; } = true;
 
     public int Accuracy { get; set; }
     public int CritModifier { get; set; } = 0;

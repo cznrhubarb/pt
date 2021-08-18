@@ -15,7 +15,15 @@ public class PlayerTurnStartState : State
 
     public override void Pre(Manager manager)
     {
-        StatusEffectUpkeep();
+        manager.PerformHudAction("SetProfile", Direction.Left, acting);
+        manager.PerformHudAction("SetProfile", Direction.Right, null);
+
+        if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Sleep"))
+        {
+            acting.GetComponent<TurnSpeed>().TimeToAct = 40;
+            manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
+            return;
+        }
 
         manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
         {
@@ -25,23 +33,5 @@ public class PlayerTurnStartState : State
 
     public override void Post(Manager manager)
     {
-    }
-
-    private void StatusEffectUpkeep()
-    {
-        if (acting.HasComponent<StatusBag>())
-        {
-            var statusBag = acting.GetComponent<StatusBag>();
-            statusBag.StatusList = statusBag.StatusList.Select(status =>
-            {
-                if (status.Ticks)
-                {
-                    status.Count--;
-                }
-                return status;
-            })
-                .Where(status => !status.Ticks || status.Count > 0)
-                .ToList();
-        }
     }
 }

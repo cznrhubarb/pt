@@ -51,7 +51,19 @@ public class SelectActionLocationSystem : Ecs.System
                 if (manager.CurrentState is PlayerTargetingState ptState)
                 {
                     ptState.SelectedSkill.CurrentTP--;
+                    // TODO: Would be better if we could apply these along the way instead of all at once
+                    //  that way if we are displaying it, it updates correctly.
+                    var statuses = movingActor.GetComponent<StatusBag>().Statuses;
+                    if (statuses.ContainsKey("Haste"))
+                    {
+                        movingActor.GetComponent<TurnSpeed>().TimeToAct /= 2;
+                    }
+                    else if (statuses.ContainsKey("Slow"))
+                    {
+                        movingActor.GetComponent<TurnSpeed>().TimeToAct *= 2;
+                    }
                     TargetUtils.PerformAction(manager, EntitiesFor(TargetedKey));
+                    manager.AddComponentToEntity(manager.GetNewEntity(), new StatusTickEvent() { TickingEntity = movingActor });
                     manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
                 }
             }

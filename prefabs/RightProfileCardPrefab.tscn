@@ -267,8 +267,22 @@ margin_left = 277.049
 margin_top = 105.947
 margin_right = 328.049
 margin_bottom = 120.947
+rect_pivot_offset = Vector2( 25.5, 13.94 )
 custom_fonts/font = ExtResource( 3 )
 text = "MOV 9"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Level" type="Label" parent="."]
+margin_left = 334.049
+margin_top = 18.447
+margin_right = 385.049
+margin_bottom = 33.447
+rect_pivot_offset = Vector2( 25.5, 13.94 )
+custom_fonts/font = ExtResource( 3 )
+text = "Lvl 99"
+align = 2
 __meta__ = {
 "_edit_use_anchors_": false
 }

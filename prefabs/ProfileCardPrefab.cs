@@ -150,6 +150,7 @@ public class ProfileCardPrefab : Control
         backgroundRect.Modulate = backgroundColor;
         portraitSprite.Texture = GD.Load<Texture>($"res://img/portraits/{profileDetails.MonNumber}.png");
         nameLabel.Text = profileDetails.Name;
+        (GetNode("Level") as Label).Text = $"Lvl {profileDetails.Level}";
 
         animationPlayer.Play("SlideIn");
         if (animationPlayer.IsConnected("animation_finished", this, nameof(ShowNewProfile)))
@@ -172,7 +173,8 @@ public class ProfileCardPrefab : Control
         (GetNode("Movement") as Label).Text = $"MOV {movable?.MaxMove ?? 0}";
         (GetNode("Jump") as Label).Text = $"JMP {movable?.MaxJump ?? 0}";
 
-        var statusList = currentProfileEntity.GetComponentOrNull<StatusBag>()?.StatusList ?? new List<StatusEffect>();
+        // TODO: Should show status effect be in here, and the application of it call update?
+        var silenced = currentProfileEntity.GetComponent<StatusBag>().Statuses.ContainsKey("Silence");
 
         var skills = currentProfileEntity.GetComponentOrNull<SkillSet>()?.Skills ?? new List<Skill>();
         for (var i = 0; i < skills.Count; i++)
@@ -180,6 +182,8 @@ public class ProfileCardPrefab : Control
             skillElementSprites[i].Texture = GD.Load<Texture>($"res://img/icons/element_{skills[i].Element.ToString().ToLower()}.png");
             skillNameLabels[i].Text = skills[i].Name;
             skillTpLabels[i].Text = $"{skills[i].CurrentTP} / {skills[i].MaxTP}";
+            // TODO: If the entity is silenced, show these as "disabled"
+            //skillElementSprites[i]. = skills[i].CurrentTP == 0 || (!skills[i].Physical && silenced);
             skillElementSprites[i].Visible = true;
             skillNameLabels[i].Visible = true;
             skillTpLabels[i].Visible = true;
@@ -203,15 +207,15 @@ public class ProfileCardPrefab : Control
         foreach (var sNode in positiveStatuses.GetChildren()) { (sNode as Node).QueueFree(); }
         foreach (var sNode in negativeStatuses.GetChildren()) { (sNode as Node).QueueFree(); }
 
-        foreach (var status in statusBag.StatusList)
+        foreach (var status in statusBag.Statuses)
         {
             var sNode = new TextureRect();
             sNode.Expand = true;
             sNode.RectSize = new Vector2(24, 24);
             sNode.RectMinSize = new Vector2(24, 24);
-            sNode.Texture = GD.Load<Texture>($"res://img/icons/status/{status.Name}.png");
+            sNode.Texture = status.Value.Icon;
 
-            if (status.Positive)
+            if (status.Value.Positive)
             {
                 positiveStatuses.AddChild(sNode);
             }
@@ -224,11 +228,6 @@ public class ProfileCardPrefab : Control
 
     public void FlashMove(int moveNumber)
     {
-        skillTpLabels[i]
-        var eleSprite = GetNode($"SkillElement{moveNumber}") as Sprite;
-        var nameLabel = GetNode($"SkillName{moveNumber}") as Label;
-        var tpLabel = GetNode($"TpCount{moveNumber}") as Label;
-
         var count = 10;
         var timer = new System.Timers.Timer(150);
         timer.Elapsed += (o,e) =>

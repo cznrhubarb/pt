@@ -19,9 +19,14 @@ public class NpcPlanningState : State
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
         manager.PerformHudAction("SetProfile", Direction.Right, null);
 
-        acting.GetComponent<TurnSpeed>().TimeToAct = 20;
+        if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Sleep"))
+        {
+            acting.GetComponent<TurnSpeed>().TimeToAct = 40;
+            manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
+            return;
+        }
 
-        // TODO: If planning takes any reasonable amount of time, show a "thinking" animation
+        acting.GetComponent<TurnSpeed>().TimeToAct = 20;
 
         // Kinda dumb way to do this because we're not in a system
         var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()

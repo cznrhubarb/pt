@@ -21,9 +21,17 @@ public class NpcMovementState : State
         GD.Print("NPC moving: " + acting.Name);
         var actorLocation = acting.GetComponent<TileLocation>();
 
-        var moveStats = acting.GetComponent<Movable>();
-        var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
-        var points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+        List<Vector3> points;
+        if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Immobilize"))
+        {
+            points = new List<Vector3>() { acting.GetComponent<TileLocation>().TilePosition };
+        }
+        else
+        {
+            var moveStats = acting.GetComponent<Movable>();
+            var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
+            points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+        }
         travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");
 
         manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()

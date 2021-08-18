@@ -30,6 +30,19 @@ public class SelectActionEventSystem : Ecs.System
             {
                 movableComp.StartingLocation = null;
             }
+
+            // TODO: Would be better if we could apply these along the way instead of all at once
+            //  that way if we are displaying it, it updates correctly.
+            var statuses = acting.GetComponent<StatusBag>().Statuses;
+            if (statuses.ContainsKey("Haste"))
+            {
+                acting.GetComponent<TurnSpeed>().TimeToAct /= 2;
+            }
+            else if (statuses.ContainsKey("Slow"))
+            {
+                acting.GetComponent<TurnSpeed>().TimeToAct *= 2;
+            }
+            manager.AddComponentToEntity(manager.GetNewEntity(), new StatusTickEvent() { TickingEntity = acting });
             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
         }
         manager.DeleteEntity(entity.Id);
