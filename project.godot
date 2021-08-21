@@ -72,7 +72,7 @@ Display=8
 [application]
 
 config/name="Pokemon Tactics"
-run/main_scene="res://src/scenes/Combat.tscn"
+run/main_scene="res://src/scenes/Exploration.tscn"
 config/icon="res://icon.png"
 
 [autoload]

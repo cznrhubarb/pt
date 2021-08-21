@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://src/scenes/Exploration.cs" type="Script" id=1]
 [ext_resource path="res://res/field_tileset.tres" type="TileSet" id=2]
-[ext_resource path="res://img/actors/123.png" type="Texture" id=4]
+[ext_resource path="res://img/actors/watrainer.png" type="Texture" id=3]
+[ext_resource path="res://img/actors/trainer.png" type="Texture" id=4]
+[ext_resource path="res://img/actors/grunkle.png" type="Texture" id=5]
 [ext_resource path="res://src/ecs/core/Entity.cs" type="Script" id=8]
-[ext_resource path="res://img/tiles/image_part_026.png" type="Texture" id=9]
 
 [node name="Exploration" type="Node2D"]
 script = ExtResource( 1 )
@@ -15,22 +16,6 @@ script = ExtResource( 8 )
 [node name="Camera2D" type="Camera2D" parent="Camera"]
 position = Vector2( -120, -90 )
 current = true
-
-[node name="Actors" type="Node2D" parent="."]
-
-[node name="Scyther" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="123" type="Sprite" parent="Actors/Scyther"]
-position = Vector2( 0, -23 )
-texture = ExtResource( 4 )
-
-[node name="Rock" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="Sprite" type="Sprite" parent="Actors/Rock"]
-position = Vector2( 0, -24 )
-texture = ExtResource( 9 )
 
 [node name="Map" type="Node2D" parent="."]
 script = ExtResource( 8 )
@@ -73,5 +58,40 @@ cell_quadrant_size = 48
 centered_textures = true
 format = 1
 tile_data = PoolIntArray( -65532, 7, 0, 4, 8, 0, 65540, 7, 0 )
+
+[node name="Actors" type="Node2D" parent="."]
+
+[node name="Trainer" type="Node2D" parent="Actors"]
+position = Vector2( 575.823, 315.412 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="123" type="Sprite" parent="Actors/Trainer"]
+position = Vector2( 0, -23 )
+texture = ExtResource( 4 )
+
+[node name="WaTrainer" type="Node2D" parent="Actors"]
+position = Vector2( 429.903, 342.351 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="123" type="Sprite" parent="Actors/WaTrainer"]
+position = Vector2( 0, -23 )
+texture = ExtResource( 3 )
+
+[node name="Grunkle" type="Node2D" parent="Actors"]
+position = Vector2( 336.636, 195.308 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="123" type="Sprite" parent="Actors/Grunkle"]
+position = Vector2( 0, -23 )
+texture = ExtResource( 5 )
 
 [node name="HUD" type="CanvasLayer" parent="."]

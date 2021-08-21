@@ -14,8 +14,9 @@ public class Exploration : Manager
         ApplyState(new ExplorationRoamState(null));
         CreateSystems();
         BuildControlElements();
-        BuildActors();
-        BuildMap();
+        var mapComp = BuildMap();
+        BuildActors(mapComp);
+        MapUtils.RefreshObstacles(mapComp, GetEntitiesWithComponent<TileLocation>());
     }
 
     private void CreateSystems()
@@ -32,7 +33,7 @@ public class Exploration : Manager
         AddSystem<ExplorationRoamState>(new HandleInteractionInputSystem());
     }
 
-    private void BuildMap()
+    private Map BuildMap()
     {
         var mapNode = FindNode("Map");
         var tileToTerrain = new Dictionary<int, TerrainType>()
@@ -87,9 +88,10 @@ public class Exploration : Manager
         var mapEnt = GetNewEntity();
         var mapComp = new Map(tileEntities);
         AddComponentToEntity(mapEnt, mapComp);
-        MapUtils.RefreshObstacles(mapComp, GetEntitiesWithComponent<TileLocation>());
 
         mapNode.QueueFree();
+
+        return mapComp;
     }
 
     private void BuildControlElements()
@@ -99,24 +101,36 @@ public class Exploration : Manager
         AddComponentToEntity(camera, new CameraWrap());
     }
 
-    private void BuildActors()
+    private Vector3 TilePositionFromActor(Entity actor, Map map) =>
+        map.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
+
+    private void BuildActors(Map map)
     {
-        var actor = FindNode("Scyther") as Entity;
+        var actor = FindNode("Trainer") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 10 },
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 },
             new SpriteWrap(),
             new Directionality() { Direction = Direction.Down },
             new Selected());
 
-        actor = FindNode("Rock") as Entity;
+        actor = FindNode("WaTrainer") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = new Vector3(5, 1, 2), ZLayer = 3 },
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 },
+            new SpriteWrap(),
+            new Directionality() { Direction = Direction.Down },
+            new Obstacle());
+
+        actor = FindNode("Grunkle") as Entity;
+        RegisterExistingEntity(actor);
+        AddComponentsToEntity(actor,
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 3 },
             new SpriteWrap(),
             new Interactable() { Action = () => PerformHudAction("StartDialogTimeline", "TalkToARock") },
             new Obstacle());
 
+        // TODO: Make a "trigger" object that I can visually place in the editor, but deletes the sprite during this step
         AddComponentsToEntity(GetNewEntity(),
             new TileLocation() { TilePosition = new Vector3(8, 2, 0), ZLayer = 5 },
             new WalkOnTrigger() { Action = () => PerformHudAction("StartDialogTimeline", "NotTheFlowers") });

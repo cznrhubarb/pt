@@ -225,53 +225,6 @@ position = Vector2( -120, -90 )
 anchor_mode = 0
 current = true
 
-[node name="Actors" type="Node2D" parent="."]
-
-[node name="Rock" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="Sprite" type="Sprite" parent="Actors/Rock"]
-position = Vector2( 0, -24 )
-texture = ExtResource( 9 )
-
-[node name="Vaporeon" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="134" type="Sprite" parent="Actors/Vaporeon"]
-position = Vector2( 0, -18 )
-texture = ExtResource( 6 )
-
-[node name="Scyther" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="123" type="Sprite" parent="Actors/Scyther"]
-position = Vector2( 0, -23 )
-texture = ExtResource( 4 )
-
-[node name="Zapdos" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="145" type="Sprite" parent="Actors/Zapdos"]
-position = Vector2( 0, -40 )
-rotation = 3.14159
-scale = Vector2( 1, -1 )
-texture = ExtResource( 3 )
-
-[node name="Machamp" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="68" type="Sprite" parent="Actors/Machamp"]
-position = Vector2( 0, -29 )
-rotation = 3.14159
-scale = Vector2( 1, -1 )
-texture = ExtResource( 5 )
-
-[node name="Target" type="Node2D" parent="Actors"]
-script = ExtResource( 8 )
-
-[node name="Sprite" type="Sprite" parent="Actors/Target"]
-texture = ExtResource( 7 )
-
 [node name="Map" type="Node2D" parent="."]
 script = ExtResource( 8 )
 
@@ -313,6 +266,77 @@ cell_quadrant_size = 48
 centered_textures = true
 format = 1
 tile_data = PoolIntArray( -65532, 7, 0, 4, 8, 0, 65540, 7, 0 )
+
+[node name="Actors" type="Node2D" parent="."]
+
+[node name="Rock" type="Node2D" parent="Actors"]
+position = Vector2( 337.969, 288.174 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Actors/Rock"]
+position = Vector2( 0, -24 )
+texture = ExtResource( 9 )
+
+[node name="Vaporeon" type="Node2D" parent="Actors"]
+position = Vector2( 139.849, 289.233 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="134" type="Sprite" parent="Actors/Vaporeon"]
+position = Vector2( 0, -18 )
+texture = ExtResource( 6 )
+
+[node name="Scyther" type="Node2D" parent="Actors"]
+position = Vector2( 527.613, 286.055 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="123" type="Sprite" parent="Actors/Scyther"]
+position = Vector2( 0, -23 )
+texture = ExtResource( 4 )
+
+[node name="Zapdos" type="Node2D" parent="Actors"]
+position = Vector2( 240.498, 93.2327 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="145" type="Sprite" parent="Actors/Zapdos"]
+position = Vector2( 0, -40 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 3 )
+
+[node name="Machamp" type="Node2D" parent="Actors"]
+position = Vector2( 384.585, 218.249 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="68" type="Sprite" parent="Actors/Machamp"]
+position = Vector2( 0, -29 )
+rotation = 3.14159
+scale = Vector2( 1, -1 )
+texture = ExtResource( 5 )
+
+[node name="Target" type="Node2D" parent="Actors"]
+position = Vector2( 525.494, 191.763 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Actors/Target"]
+texture = ExtResource( 7 )
 
 [node name="HUD" type="CanvasLayer" parent="."]
 

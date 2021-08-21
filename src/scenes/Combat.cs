@@ -18,9 +18,9 @@ public class Combat : Manager
 
         ApplyState(new CombatStartState());
         CreateSystems();
-        BuildMap();
+        var mapComp = BuildMap();
         BuildControlElements();
-        BuildActors();
+        BuildActors(mapComp);
 
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
     }
@@ -53,7 +53,7 @@ public class Combat : Manager
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
 
-    private void BuildMap()
+    private Map BuildMap()
     {
         var mapNode = FindNode("Map");
         var tileToTerrain = new Dictionary<int, TerrainType>()
@@ -106,9 +106,12 @@ public class Combat : Manager
         }
 
         var mapEnt = GetNewEntity();
-        AddComponentToEntity(mapEnt, new Map(tileEntities));
+        var mapComp = new Map(tileEntities);
+        AddComponentToEntity(mapEnt, mapComp);
 
         mapNode.QueueFree();
+
+        return mapComp;
     }
 
     private void BuildControlElements()
@@ -127,7 +130,10 @@ public class Combat : Manager
             new TileLocation() { ZLayer = 2 });
     }
 
-    private void BuildActors()
+    private Vector3 TilePositionFromActor(Entity actor, Map map) =>
+        map.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
+
+    private void BuildActors(Map map)
     {
         var flyingMoveType = new Dictionary<TerrainType, float>
         {
@@ -157,7 +163,7 @@ public class Combat : Manager
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
             new ProfileDetails() { Name = "Vaporeon", MonNumber = 134, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = new Vector3(6, 3, 0), ZLayer = 10 }, 
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 }, 
             new SpriteWrap(), 
             new Selectable(), 
             new PlayerCharacter(), 
@@ -174,7 +180,7 @@ public class Combat : Manager
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
             new ProfileDetails() { Name = "Scyther", MonNumber = 123, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = new Vector3(12, -2, 0), ZLayer = 10 }, 
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 }, 
             new SpriteWrap(), 
             new Selectable(), 
             new PlayerCharacter(), 
@@ -192,7 +198,7 @@ public class Combat : Manager
         AddComponentsToEntity(actor,
             new ProfileDetails() { Name = "Zapdos", MonNumber = 145, Affiliation = Affiliation.Enemy },
             new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 }, 
-            new TileLocation() { TilePosition = new Vector3(5, 0, 2), ZLayer = 5 }, 
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(),
             new EnemyNpc(),
@@ -209,7 +215,7 @@ public class Combat : Manager
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
             new ProfileDetails() { Name = "Machamp", MonNumber = 68, Affiliation = Affiliation.Enemy },
-            new TileLocation() { TilePosition = new Vector3(6, -1, 1), ZLayer = 5 }, 
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 }, 
             new SpriteWrap(), 
             new Selectable(), 
             new EnemyNpc(), 
@@ -225,7 +231,7 @@ public class Combat : Manager
         actor = FindNode("Rock") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor, 
-            new TileLocation() { TilePosition = new Vector3(9, 2, 0), ZLayer = 3 }, 
+            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 3 }, 
             new SpriteWrap(), 
             new Obstacle(), 
             new Selectable(), 
