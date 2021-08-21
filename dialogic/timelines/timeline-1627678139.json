@@ -1,10 +1,38 @@
 {
 	"events": [
 		{
-			"character": "",
+			"action": "join",
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_002",
+			"mirror": false,
+			"portrait": "",
+			"position": {
+				"0": true,
+				"1": false,
+				"2": false,
+				"3": false,
+				"4": false
+			}
+		},
+		{
+			"action": "join",
+			"character": "character-1629554482.json",
+			"event_id": "dialogic_002",
+			"mirror": false,
+			"portrait": "",
+			"position": {
+				"0": false,
+				"1": false,
+				"2": false,
+				"3": false,
+				"4": true
+			}
+		},
+		{
+			"character": "character-1629554437.json",
 			"event_id": "dialogic_001",
 			"portrait": "",
-			"text": "It's just a rock."
+			"text": "Hey kid."
 		}
 	],
 	"metadata": {

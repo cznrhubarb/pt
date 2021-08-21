@@ -101,7 +101,7 @@ public class Exploration : Manager
         AddComponentToEntity(camera, new CameraWrap());
     }
 
-    private Vector3 TilePositionFromActor(Entity actor, Map map) =>
+    private Vector3 TilePositionFromActor(Node2D actor, Map map) =>
         map.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
 
     private void BuildActors(Map map)
@@ -131,12 +131,30 @@ public class Exploration : Manager
             new Obstacle());
 
         // TODO: Make a "trigger" object that I can visually place in the editor, but deletes the sprite during this step
-        AddComponentsToEntity(GetNewEntity(),
-            new TileLocation() { TilePosition = new Vector3(8, 2, 0), ZLayer = 5 },
-            new WalkOnTrigger() { Action = () => PerformHudAction("StartDialogTimeline", "NotTheFlowers") });
-        AddComponentsToEntity(GetNewEntity(),
-            new TileLocation() { TilePosition = new Vector3(4, 0, 3), ZLayer = 5 },
-            new WalkOnTrigger() { Action = () => GetTree().ChangeScene("res://src/scenes/Combat.tscn") });
+        var triggers = FindNode("Triggers").GetChildren();
+        foreach (var triggerObj in triggers)
+        {
+            var trigger = triggerObj as Trigger;
+            trigger.GetChild<Sprite>(0).QueueFree();
+            AddComponentsToEntity(GetNewEntity(),
+                new TileLocation() { TilePosition = TilePositionFromActor(trigger, map), ZLayer = 5 },
+                new WalkOnTrigger() { Action = () => TriggerCue(trigger.Cue, trigger.Params) });
+        }
+    }
+
+    public void TriggerCue(CueType cueType, string[] parameters)
+    {
+        switch (cueType)
+        {
+            case CueType.StartDialog:
+                StartDialog(parameters[0]);
+                break;
+            case CueType.ChangeScene:
+                GetTree().ChangeScene($"res://src/scenes/{parameters[0]}.tscn");
+                break;
+            default:
+                throw new ArgumentException($"Attempting to trigger unknown cue: {cueType}");
+        }
     }
 
     public override void PerformHudAction(string actionName, params object[] args)
@@ -144,16 +162,21 @@ public class Exploration : Manager
         switch (actionName)
         {
             case "StartDialogTimeline":
-                if (CurrentState is ExplorationRoamState && dialogDelayTimer <= 0)
-                {
-                    ApplyState(new DialogState());
-                    var dialog = DialogicSharp.Start(args[0] as string, false);
-                    AddChild(dialog);
-                    dialog.Connect("timeline_end", this, nameof(DialogFinished));
-                }
+                StartDialog(args[0] as string);
                 break;
             default:
                 throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");
+        }
+    }
+
+    private void StartDialog(string dialogName)
+    {
+        if (CurrentState is ExplorationRoamState && dialogDelayTimer <= 0)
+        {
+            ApplyState(new DialogState());
+            var dialog = DialogicSharp.Start(dialogName, false);
+            AddChild(dialog);
+            dialog.Connect("timeline_end", this, nameof(DialogFinished));
         }
     }
 

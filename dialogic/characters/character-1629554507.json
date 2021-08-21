@@ -1,0 +1,20 @@
+{
+	"color": "#ff580078",
+	"description": "",
+	"display_name": "",
+	"display_name_bool": false,
+	"id": "character-1629554507.json",
+	"mirror_portraits": false,
+	"name": "WaTrainer",
+	"nickname": "",
+	"nickname_bool": false,
+	"offset_x": 0,
+	"offset_y": 0,
+	"portraits": [
+		{
+			"name": "Default",
+			"path": "res://img/dialog_portraits/watrainer.png"
+		}
+	],
+	"scale": 50
+}
