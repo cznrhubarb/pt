@@ -10,7 +10,7 @@ public class HandleInteractionInputSystem : Ecs.System
         AddRequiredComponent<Selected>();
         AddRequiredComponent<TileLocation>();
         AddRequiredComponent<Directionality>();
-        AddRequiredComponent<Interactable>(InteractableKey);
+        AddRequiredComponent<InteractTrigger>(InteractableKey);
         AddRequiredComponent<TileLocation>(InteractableKey);
     }
 
@@ -31,7 +31,7 @@ public class HandleInteractionInputSystem : Ecs.System
             {
                 if (WithinInteractionRange(testLocation, target.GetComponent<TileLocation>().TilePosition))
                 {
-                    target.GetComponent<Interactable>().Action.Invoke();
+                    target.GetComponent<InteractTrigger>().Action.Invoke();
                     break;
                 }
             }

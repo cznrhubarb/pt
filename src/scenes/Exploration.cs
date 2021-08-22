@@ -17,6 +17,11 @@ public class Exploration : Manager
         var mapComp = BuildMap();
         BuildActors(mapComp);
         MapUtils.RefreshObstacles(mapComp, GetEntitiesWithComponent<TileLocation>());
+
+        foreach (var entity in GetEntitiesWithComponent<AutorunTrigger>())
+        {
+            entity.GetComponent<AutorunTrigger>().Action();
+        }
     }
 
     private void CreateSystems()
@@ -106,6 +111,7 @@ public class Exploration : Manager
 
     private void BuildActors(Map map)
     {
+        GD.Print("Build actors");
         var actor = FindNode("Trainer") as Entity;
         RegisterExistingEntity(actor);
         AddComponentsToEntity(actor,
@@ -127,19 +133,30 @@ public class Exploration : Manager
         AddComponentsToEntity(actor,
             new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 3 },
             new SpriteWrap(),
-            new Interactable() { Action = () => PerformHudAction("StartDialogTimeline", "TalkToARock") },
+            new InteractTrigger() { Action = () => TriggerCue(CueType.StartDialog, new string[] { "TalkToARock" }) },
             new Obstacle());
 
-        // TODO: Make a "trigger" object that I can visually place in the editor, but deletes the sprite during this step
-        var triggers = FindNode("Triggers").GetChildren();
-        foreach (var triggerObj in triggers)
-        {
-            var trigger = triggerObj as Trigger;
-            trigger.GetChild<Sprite>(0).QueueFree();
-            AddComponentsToEntity(GetNewEntity(),
-                new TileLocation() { TilePosition = TilePositionFromActor(trigger, map), ZLayer = 5 },
-                new WalkOnTrigger() { Action = () => TriggerCue(trigger.Cue, trigger.Params) });
-        }
+        actor = FindNode("StartCombat") as Entity;
+        RegisterExistingEntity(actor);
+        AddComponentsToEntity(actor,
+                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 },
+                new WalkOnTrigger() { Action = () => TriggerCue(CueType.ChangeScene, new string[] { "Combat" }) });
+
+        actor = FindNode("FlowerDialog") as Entity;
+        RegisterExistingEntity(actor);
+        AddComponentsToEntity(actor,
+                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 },
+                new WalkOnTrigger() { Action = () => TriggerCue(CueType.StartDialog, new string[] { "NotTheFlowers" }) });
+
+        actor = FindNode("E1") as Entity;
+        RegisterExistingEntity(actor);
+        AddComponentsToEntity(actor,
+                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 });
+
+        // TODO: Should be an entity, once I get the Component as Resource system in place
+        GD.Print("creating autorun trigger");
+        AddComponentToEntity(GetNewEntity(),
+            new AutorunTrigger() { Action = () => TriggerCue(CueType.StartCutScene, new string[] { "GameIntro" }) });
     }
 
     public void TriggerCue(CueType cueType, string[] parameters)
@@ -151,6 +168,10 @@ public class Exploration : Manager
                 break;
             case CueType.ChangeScene:
                 GetTree().ChangeScene($"res://src/scenes/{parameters[0]}.tscn");
+                break;
+            case CueType.StartCutScene:
+                GD.Print("Start cut scene cue");
+                ApplyState(new CutSceneState(parameters[0]));
                 break;
             default:
                 throw new ArgumentException($"Attempting to trigger unknown cue: {cueType}");

@@ -1,7 +1,7 @@
 using Ecs;
 using System;
 
-public class Interactable : Component
+public class AutorunTrigger : Component
 {
     public Action Action { get; set; }
 }

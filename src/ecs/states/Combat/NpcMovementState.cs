@@ -24,12 +24,12 @@ public class NpcMovementState : State
         List<Vector3> points;
         if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Immobilize"))
         {
-            points = new List<Vector3>() { acting.GetComponent<TileLocation>().TilePosition };
+            points = new List<Vector3>() { actorLocation.TilePosition };
         }
         else
         {
             var moveStats = acting.GetComponent<Movable>();
-            var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
+            var startingPosition = actorLocation.TilePosition;
             points = map.AStar.GetPointsInRange(moveStats, startingPosition);
         }
         travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");
