@@ -103,13 +103,8 @@ public class Exploration : Manager
 
     private void BuildControlElements()
     {
-        var camera = FindNode("Camera") as Entity;
-        RegisterExistingEntity(camera);
-        AddComponentToEntity(camera, new CameraWrap());
+        RegisterExistingEntity(FindNode("Camera") as Entity);
     }
-
-    private Vector3 TilePositionFromActor(Node2D actor, Map map) =>
-        map.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
 
     private void BuildActors(Map map)
     {

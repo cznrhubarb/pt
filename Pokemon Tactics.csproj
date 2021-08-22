@@ -7,4 +7,7 @@
     <Folder Include="addons\godot-next-cs\references\" />
     <Folder Include="res\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LiteDB" Version="5.0.11" />
+  </ItemGroup>
 </Project>
