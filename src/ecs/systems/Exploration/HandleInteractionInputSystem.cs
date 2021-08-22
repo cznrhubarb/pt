@@ -31,7 +31,12 @@ public class HandleInteractionInputSystem : Ecs.System
             {
                 if (WithinInteractionRange(testLocation, target.GetComponent<TileLocation>().TilePosition))
                 {
-                    target.GetComponent<InteractTrigger>().Action.Invoke();
+                    var triggerComp = target.GetComponent<InteractTrigger>();
+                    // TODO: HACK: Strong coupling
+                    if (manager is Exploration ex)
+                    {
+                        ex.TriggerCue(triggerComp.Cue, triggerComp.CueParam);
+                    }
                     break;
                 }
             }

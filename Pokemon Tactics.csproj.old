@@ -1,0 +1,10 @@
+<Project Sdk="Godot.NET.Sdk/3.2.3">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>PokemonTactics</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="addons\godot-next-cs\references\" />
+    <Folder Include="res\" />
+  </ItemGroup>
+</Project>

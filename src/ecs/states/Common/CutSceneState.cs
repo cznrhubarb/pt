@@ -10,9 +10,7 @@ public class CutSceneState : State
 
     public CutSceneState(string cutSceneName)
     {
-        GD.Print("Starting scene");
         cutScene = GD.Load<CutScene>($"res://res/cutscenes/{cutSceneName}.tres");
-        GD.Print("Scene loaded");
     }
 
     public override void Pre(Manager manager)

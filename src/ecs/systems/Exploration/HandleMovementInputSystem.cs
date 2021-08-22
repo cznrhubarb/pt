@@ -90,7 +90,12 @@ public class HandleMovementInputSystem : Ecs.System
         {
             if (trigger.GetComponent<TileLocation>().TilePosition == newPos)
             {
-                trigger.GetComponent<WalkOnTrigger>().Action.Invoke();
+                var triggerComp = trigger.GetComponent<WalkOnTrigger>();
+                // TODO: HACK: Strong coupling
+                if (manager is Exploration ex)
+                {
+                    ex.TriggerCue(triggerComp.Cue, triggerComp.CueParam);
+                }
                 break;
             }
         }

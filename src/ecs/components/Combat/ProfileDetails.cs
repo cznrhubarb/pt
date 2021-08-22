@@ -1,5 +1,8 @@
 using Ecs;
+using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(ProfileDetails), "res://editoricons/Component.svg", nameof(Resource))]
 public class ProfileDetails : Component
 {
     public string Name { get; set; }

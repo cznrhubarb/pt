@@ -1,6 +1,10 @@
 using Ecs;
+using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(Directionality), "res://editoricons/Component.svg", nameof(Resource))]
 public class Directionality : Component
 {
-    public Direction Direction { get; set; }
+    [Export]
+    public Direction Direction { get; set; } = Direction.Down;
 }

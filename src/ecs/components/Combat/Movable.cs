@@ -1,6 +1,9 @@
 using Ecs;
 using System.Collections.Generic;
+using MonoCustomResourceRegistry;
+using Godot;
 
+[RegisteredType(nameof(Movable), "res://editoricons/Component.svg", nameof(Resource))]
 public class Movable : Component
 {
     public int MaxMove { get; set; }

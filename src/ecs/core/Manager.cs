@@ -65,6 +65,7 @@ namespace Ecs
         public void RegisterExistingEntity(Entity entity)
         {
             entities[entity.Id] = entity;
+            entity.RegisterExistingComponents(this);
         }
 
         public void DeleteEntity(int id)
@@ -158,5 +159,18 @@ namespace Ecs
         }
 
         public abstract void PerformHudAction(string actionName, params object[] args);
+
+        // HACK: Strongly coupled hack
+        internal Vector3 TilePositionFromActor(Node2D actor)
+        {
+            var map = GetEntitiesWithComponent<Map>();
+            if (map.Count == 0)
+            {
+                throw new Exception("Oops! You probably loaded actors before the map was ready. Don't do that.");
+            }
+            var mapComp = map[0].GetComponent<Map>();
+
+            return mapComp.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
+        }
     }
 }

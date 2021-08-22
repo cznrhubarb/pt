@@ -1,5 +1,8 @@
 using Ecs;
+using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(Pulse), "res://editoricons/Component.svg", nameof(Resource))]
 public class Pulse : Component
 {
     public float squishSpeed { get; set; }

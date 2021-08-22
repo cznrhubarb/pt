@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Godot;
+using System;
 
 namespace Ecs
 {
-    public class Component : ICloneable
+    public class Component : Resource, ICloneable
     {
         public virtual void GrabReferences(Entity owner)
         {

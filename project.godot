@@ -54,6 +54,12 @@ _global_script_class_icons={
 "WATTest": ""
 }
 
+[MonoCustomResourceRegistry]
+
+ClassPrefix="-"
+SearchType=0
+ResourceScriptDirectories=[ "res://" ]
+
 [WAT]
 
 Test_Directory="res://tests"
@@ -82,7 +88,7 @@ DialogicSingleton="*res://addons/dialogic/Other/DialogicSingleton.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "WAT", "dialogic" )
+enabled=PoolStringArray( "res://addons/MonoCustomResourceRegistry/plugin.cfg", "res://addons/WAT/plugin.cfg", "res://addons/dialogic/plugin.cfg" )
 
 [input]
 
@@ -155,5 +161,6 @@ tab_right={
 
 [rendering]
 
-quality/2d/use_pixel_snap=true
+2d/snapping/use_gpu_pixel_snap=true
 environment/default_environment="res://default_env.tres"
+quality/2d/use_pixel_snap=true

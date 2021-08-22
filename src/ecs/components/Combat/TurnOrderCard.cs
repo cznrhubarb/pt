@@ -1,6 +1,8 @@
 using Ecs;
 using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(TurnOrderCard), "res://editoricons/Component.svg", nameof(Resource))]
 public class TurnOrderCard : Component
 {
     private TurnOrderCardPrefab card;

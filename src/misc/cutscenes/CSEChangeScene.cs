@@ -1,6 +1,8 @@
 ﻿using Ecs;
 using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(CSEChangeScene), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEChangeScene : CutSceneEvent
 {
     [Export]

@@ -1,7 +1,9 @@
 ﻿using Ecs;
 using Godot;
 using System.Linq;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(CSEMoveActorToTarget), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEMoveActorToTarget : CutSceneEvent
 {
     [Export]

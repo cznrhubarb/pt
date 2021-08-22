@@ -1,9 +1,18 @@
-[gd_resource type="Resource" load_steps=4 format=2]
+[gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://src/misc/cutscenes/CutScene.cs" type="Script" id=1]
-[ext_resource path="res://res/cutscenes/WalkEvent.tres" type="Resource" id=2]
-[ext_resource path="res://res/cutscenes/TalkEvent.tres" type="Resource" id=3]
+[ext_resource path="res://src/misc/cutscenes/CSEStartDialog.cs" type="Script" id=2]
+[ext_resource path="res://src/misc/cutscenes/CSEMoveActorToTarget.cs" type="Script" id=3]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 3 )
+ActorPath = NodePath("Actors/Trainer")
+TargetPath = NodePath("Actors/E1")
+
+[sub_resource type="Resource" id=2]
+script = ExtResource( 2 )
+DialogName = "TalkToARock"
 
 [resource]
 script = ExtResource( 1 )
-Events = [ ExtResource( 2 ), ExtResource( 3 ) ]
+Events = [ SubResource( 1 ), SubResource( 2 ) ]

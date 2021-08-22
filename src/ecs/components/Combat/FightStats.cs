@@ -1,5 +1,8 @@
 using Ecs;
+using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(FightStats), "res://editoricons/Component.svg", nameof(Resource))]
 public class FightStats : Component
 {
     public int Str { get; set; }

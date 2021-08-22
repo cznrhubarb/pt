@@ -1,12 +1,89 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=33 format=2]
 
 [ext_resource path="res://src/scenes/Exploration.cs" type="Script" id=1]
 [ext_resource path="res://res/field_tileset.tres" type="TileSet" id=2]
 [ext_resource path="res://img/actors/watrainer.png" type="Texture" id=3]
 [ext_resource path="res://img/actors/trainer.png" type="Texture" id=4]
 [ext_resource path="res://img/actors/grunkle.png" type="Texture" id=5]
+[ext_resource path="res://src/ecs/components/Common/Selected.cs" type="Script" id=6]
+[ext_resource path="res://src/ecs/components/Common/SpriteWrap.cs" type="Script" id=7]
 [ext_resource path="res://src/ecs/core/Entity.cs" type="Script" id=8]
 [ext_resource path="res://prefabs/AutoHideSprite.tscn" type="PackedScene" id=9]
+[ext_resource path="res://src/ecs/components/Common/Obstacle.cs" type="Script" id=10]
+[ext_resource path="res://src/ecs/components/Exploration/Directionality.cs" type="Script" id=11]
+[ext_resource path="res://src/ecs/components/Common/TileLocation.cs" type="Script" id=12]
+[ext_resource path="res://src/ecs/components/Exploration/AutorunTrigger.cs" type="Script" id=13]
+[ext_resource path="res://src/ecs/components/Exploration/InteractTrigger.cs" type="Script" id=14]
+[ext_resource path="res://src/ecs/components/Exploration/WalkOnTrigger.cs" type="Script" id=15]
+
+[sub_resource type="Resource" id=6]
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=15]
+script = ExtResource( 15 )
+Cue = 1
+CueParam = "Combat"
+
+[sub_resource type="Resource" id=7]
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=8]
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=16]
+script = ExtResource( 15 )
+Cue = 0
+CueParam = "NotTheFlowers"
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 6 )
+
+[sub_resource type="Resource" id=5]
+script = ExtResource( 7 )
+
+[sub_resource type="Resource" id=9]
+resource_name = "Directionality"
+script = ExtResource( 11 )
+Direction = 2
+
+[sub_resource type="Resource" id=10]
+resource_name = "TileLocation"
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 7 )
+
+[sub_resource type="Resource" id=11]
+script = ExtResource( 10 )
+
+[sub_resource type="Resource" id=12]
+resource_name = "TileLocation"
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=4]
+script = ExtResource( 7 )
+
+[sub_resource type="Resource" id=13]
+script = ExtResource( 10 )
+
+[sub_resource type="Resource" id=14]
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=17]
+script = ExtResource( 14 )
+Cue = 0
+CueParam = "TalkToARock"
+
+[sub_resource type="Resource" id=18]
+script = ExtResource( 13 )
+Cue = 2
+CueParam = "GameIntro"
 
 [node name="Exploration" type="Node2D"]
 script = ExtResource( 1 )
@@ -65,6 +142,7 @@ tile_data = PoolIntArray( -65532, 7, 0, 4, 8, 0, 65540, 7, 0 )
 [node name="StartCombat" type="Node2D" parent="Actors"]
 position = Vector2( 188.92, 50.5108 )
 script = ExtResource( 8 )
+editorComponents = [ SubResource( 6 ), SubResource( 15 ) ]
 
 [node name="AutoHideSprite" parent="Actors/StartCombat" instance=ExtResource( 9 )]
 
@@ -74,21 +152,24 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
+editorComponents = [ SubResource( 7 ) ]
 
 [node name="AutoHideSprite" parent="Actors/E1" instance=ExtResource( 9 )]
 
 [node name="FlowerDialog" type="Node2D" parent="Actors"]
 position = Vector2( 286.432, 262.656 )
 script = ExtResource( 8 )
+editorComponents = [ SubResource( 8 ), SubResource( 16 ) ]
 
 [node name="AutoHideSprite" parent="Actors/FlowerDialog" instance=ExtResource( 9 )]
 
 [node name="Trainer" type="Node2D" parent="Actors"]
-position = Vector2( 575.823, 315.412 )
+position = Vector2( 576.711, 313.951 )
 script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
+editorComponents = [ SubResource( 1 ), SubResource( 5 ), SubResource( 9 ), SubResource( 10 ) ]
 
 [node name="123" type="Sprite" parent="Actors/Trainer"]
 position = Vector2( 0, -23 )
@@ -100,6 +181,7 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
+editorComponents = [ SubResource( 3 ), SubResource( 11 ), SubResource( 12 ) ]
 
 [node name="123" type="Sprite" parent="Actors/WaTrainer"]
 position = Vector2( 0, -23 )
@@ -111,9 +193,15 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
+editorComponents = [ SubResource( 4 ), SubResource( 13 ), SubResource( 14 ), SubResource( 17 ) ]
 
 [node name="123" type="Sprite" parent="Actors/Grunkle"]
 position = Vector2( 0, -23 )
 texture = ExtResource( 5 )
+
+[node name="Autorun" type="Node2D" parent="Actors"]
+position = Vector2( 128.434, -95.1366 )
+script = ExtResource( 8 )
+editorComponents = [ SubResource( 18 ) ]
 
 [node name="HUD" type="CanvasLayer" parent="."]

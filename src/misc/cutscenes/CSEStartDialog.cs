@@ -1,5 +1,7 @@
 ﻿using Godot;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(CSEStartDialog), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEStartDialog : CutSceneEvent
 {
     [Export]

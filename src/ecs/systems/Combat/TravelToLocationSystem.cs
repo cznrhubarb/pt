@@ -48,7 +48,6 @@ public class TravelToLocationSystem : Ecs.System
                 // TODO: Maybe handle this a different way. If we have an "on end tween" trigger at some point, this won't work.
                 if (path.Length > 1)
                 {
-                    foreach (var p in path) { GD.Print(p); }
                     MapUtils.BuildTweenForActor(manager, movingActor, path);
                 }
 

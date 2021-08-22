@@ -20,7 +20,9 @@ public class Exploration : Manager
 
         foreach (var entity in GetEntitiesWithComponent<AutorunTrigger>())
         {
-            entity.GetComponent<AutorunTrigger>().Action();
+            // TODO: Should this technically be in a system?
+            var triggerComp = entity.GetComponent<AutorunTrigger>();
+            TriggerCue(triggerComp.Cue, triggerComp.CueParam);
         }
     }
 
@@ -111,70 +113,9 @@ public class Exploration : Manager
 
     private void BuildActors(Map map)
     {
-        GD.Print("Build actors");
-        var actor = FindNode("Trainer") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 },
-            new SpriteWrap(),
-            new Directionality() { Direction = Direction.Down },
-            new Selected());
-
-        actor = FindNode("WaTrainer") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 },
-            new SpriteWrap(),
-            new Directionality() { Direction = Direction.Down },
-            new Obstacle());
-
-        actor = FindNode("Grunkle") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 3 },
-            new SpriteWrap(),
-            new InteractTrigger() { Action = () => TriggerCue(CueType.StartDialog, new string[] { "TalkToARock" }) },
-            new Obstacle());
-
-        actor = FindNode("StartCombat") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 },
-                new WalkOnTrigger() { Action = () => TriggerCue(CueType.ChangeScene, new string[] { "Combat" }) });
-
-        actor = FindNode("FlowerDialog") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 },
-                new WalkOnTrigger() { Action = () => TriggerCue(CueType.StartDialog, new string[] { "NotTheFlowers" }) });
-
-        actor = FindNode("E1") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-                new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 });
-
-        // TODO: Should be an entity, once I get the Component as Resource system in place
-        GD.Print("creating autorun trigger");
-        AddComponentToEntity(GetNewEntity(),
-            new AutorunTrigger() { Action = () => TriggerCue(CueType.StartCutScene, new string[] { "GameIntro" }) });
-    }
-
-    public void TriggerCue(CueType cueType, string[] parameters)
-    {
-        switch (cueType)
+        foreach (var entity in FindNode("Actors").GetChildren())
         {
-            case CueType.StartDialog:
-                StartDialog(parameters[0]);
-                break;
-            case CueType.ChangeScene:
-                GetTree().ChangeScene($"res://src/scenes/{parameters[0]}.tscn");
-                break;
-            case CueType.StartCutScene:
-                GD.Print("Start cut scene cue");
-                ApplyState(new CutSceneState(parameters[0]));
-                break;
-            default:
-                throw new ArgumentException($"Attempting to trigger unknown cue: {cueType}");
+            RegisterExistingEntity(entity as Entity);
         }
     }
 
@@ -182,11 +123,26 @@ public class Exploration : Manager
     {
         switch (actionName)
         {
-            case "StartDialogTimeline":
-                StartDialog(args[0] as string);
-                break;
             default:
                 throw new ArgumentException($"Attempting to perform an illegal HUD action: {actionName}");
+        }
+    }
+
+    public void TriggerCue(CueType cueType, string cueParameter)
+    {
+        switch (cueType)
+        {
+            case CueType.StartDialog:
+                StartDialog(cueParameter);
+                break;
+            case CueType.ChangeScene:
+                GetTree().ChangeScene($"res://src/scenes/{cueParameter}.tscn");
+                break;
+            case CueType.StartCutScene:
+                ApplyState(new CutSceneState(cueParameter));
+                break;
+            default:
+                throw new ArgumentException($"Attempting to trigger unknown cue: {cueType}");
         }
     }
 

@@ -1,7 +1,9 @@
 using Ecs;
 using Godot;
 using System.Collections.Generic;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(Map), "res://editoricons/Component.svg", nameof(Resource))]
 public class Map : Component
 {
     public IsoMap IsoMap { get; private set; }

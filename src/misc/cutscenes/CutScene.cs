@@ -1,7 +1,7 @@
-using Ecs;
 using Godot;
-using System;
+using MonoCustomResourceRegistry;
 
+[RegisteredType(nameof(CutScene), "res://editoricons/CutScene.svg", nameof(Resource))]
 public class CutScene : Resource
 {
     [Export]

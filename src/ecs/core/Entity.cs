@@ -2,21 +2,38 @@ using Godot;
 using PokemonTactics.src.ecs.core.exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using MonoCustomResourceRegistry;
 
 namespace Ecs
 {
+    [RegisteredType(nameof(Entity), "res://editoricons/Entity.svg", nameof(Node2D))]
     public class Entity : Node2D
     {
         private static int nextAvailableIndex = 0;
 
         public int Id { get; private set; }
 
-        private Dictionary<Type, Component> components;
+        [Export]
+        private IEnumerable<Component> editorComponents = new List<Component>();
+
+        private IDictionary<Type, Component> components = new Dictionary<Type, Component>();
 
         public Entity()
         {
             Id = nextAvailableIndex++;
-            components = new Dictionary<Type, Component>();
+        }
+
+        public void RegisterExistingComponents(Manager manager)
+        {
+            foreach (var component in editorComponents)
+            {
+                if (component is TileLocation tileLoc)
+                {
+                    tileLoc.TilePosition = manager.TilePositionFromActor(this);
+                }
+                manager.AddComponentToEntity(this, component);
+            }
         }
 
         internal void AddComponent(Component component)
@@ -74,7 +91,6 @@ namespace Ecs
         {
             var tileLocation = this.GetComponent<TileLocation>();
             tileLocation.TilePosition = new Vector3(vec.x, vec.y, tileLocation.TilePosition.z);
-            //GD.Print(tileLocation.TilePosition);
         }
 
         private void SetTilePositionZ(float z)
