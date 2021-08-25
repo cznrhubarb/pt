@@ -1,0 +1,88 @@
+{
+	"events": [
+		{
+			"action": "join",
+			"character": "character-1629554507.json",
+			"event_id": "dialogic_002",
+			"mirror": false,
+			"portrait": "",
+			"position": {
+				"0": false,
+				"1": true,
+				"2": false,
+				"3": false,
+				"4": false
+			}
+		},
+		{
+			"action": "join",
+			"character": "character-1629554482.json",
+			"event_id": "dialogic_002",
+			"mirror": false,
+			"portrait": "",
+			"position": {
+				"0": false,
+				"1": false,
+				"2": false,
+				"3": false,
+				"4": true
+			}
+		},
+		{
+			"character": "character-1629554507.json",
+			"event_id": "dialogic_001",
+			"portrait": "",
+			"text": "So, you wanna fight?!"
+		},
+		{
+			"action": "join",
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_002",
+			"mirror": false,
+			"portrait": "",
+			"position": {
+				"0": true,
+				"1": false,
+				"2": false,
+				"3": false,
+				"4": false
+			}
+		},
+		{
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_001",
+			"portrait": "",
+			"text": "Whoa whoa whoa, you're gonna fight?"
+		},
+		{
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_001",
+			"portrait": "",
+			"text": " I can't be around a bunch of kids beating the shit out of each other, I'm already on probation for something like this."
+		},
+		{
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_001",
+			"portrait": "",
+			"text": "I'm getting out of here."
+		},
+		{
+			"action": "leaveall",
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_003"
+		},
+		{
+			"event_id": "dialogic_023",
+			"wait_seconds": 0.5
+		},
+		{
+			"change_scene": "res://src/scenes/Combat.tscn",
+			"event_id": "dialogic_041"
+		}
+	],
+	"metadata": {
+		"dialogic-version": "1.2.5",
+		"file": "timeline-1629809194.json",
+		"name": "RivalStartsFight"
+	}
+}

@@ -1,0 +1,31 @@
+[gd_resource type="Resource" load_steps=9 format=2]
+
+[ext_resource path="res://src/misc/cutscenes/CutScene.cs" type="Script" id=1]
+[ext_resource path="res://src/misc/cutscenes/CSEStartDialog.cs" type="Script" id=2]
+[ext_resource path="res://src/misc/cutscenes/CSEMoveActorToTarget.cs" type="Script" id=3]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 2 )
+DialogName = "RivalPickAMon"
+
+[sub_resource type="Resource" id=2]
+script = ExtResource( 3 )
+ActorPath = NodePath("Actors/WaTrainer")
+TargetPath = NodePath("Actors/EBulb")
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 2 )
+DialogName = "RivalMakesChoice"
+
+[sub_resource type="Resource" id=4]
+script = ExtResource( 3 )
+ActorPath = NodePath("Actors/WaTrainer")
+TargetPath = NodePath("Actors/ERivalFightStance")
+
+[sub_resource type="Resource" id=5]
+script = ExtResource( 2 )
+DialogName = "RivalStartsFight"
+
+[resource]
+script = ExtResource( 1 )
+Events = [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ) ]

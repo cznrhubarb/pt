@@ -148,7 +148,28 @@ public class Exploration : Manager
             ApplyState(new DialogState());
             var dialog = DialogicSharp.Start(dialogName, false);
             AddChild(dialog);
+            dialog.Connect("dialogic_signal", this, nameof(DialogSignal));
             dialog.Connect("timeline_end", this, nameof(DialogFinished));
+        }
+    }
+
+    private void DialogSignal(string parameter)
+    {
+        // BUG: Pathfinding goes right through obstacles in cut scene state
+        // BUG: Starting a cut scene from the tail end of another cutscene makes it go to exploration state due to a timing issue
+
+        // TODO: Obviously this is all hardcoded and needs to be made generic
+        switch (parameter)
+        {
+            case "ChooseBulb":
+                ApplyState(new CutSceneState("RivalChoosesChar"));
+                break;
+            case "ChooseSquirt":
+                ApplyState(new CutSceneState("RivalChoosesBulb"));
+                break;
+            case "ChooseChar":
+                ApplyState(new CutSceneState("RivalChoosesSquirt"));
+                break;
         }
     }
 

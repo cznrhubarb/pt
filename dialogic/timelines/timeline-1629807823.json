@@ -16,9 +16,9 @@
 		},
 		{
 			"action": "join",
-			"character": "character-1629554482.json",
+			"character": "character-1629554507.json",
 			"event_id": "dialogic_002",
-			"mirror": false,
+			"mirror": true,
 			"portrait": "",
 			"position": {
 				"0": false,
@@ -32,18 +32,12 @@
 			"character": "character-1629554437.json",
 			"event_id": "dialogic_001",
 			"portrait": "",
-			"text": "Look, you look old enough to start fighting monsters. But it's dangerous to go alone."
-		},
-		{
-			"character": "character-1629554437.json",
-			"event_id": "dialogic_001",
-			"portrait": "",
-			"text": "Take one of these baby monsters with you."
+			"text": "You get a monster too. Everyone gets a monster. I don't care how old you are."
 		}
 	],
 	"metadata": {
 		"dialogic-version": "1.2.5",
-		"file": "timeline-1627678139.json",
-		"name": "PickAMon"
+		"file": "timeline-1629807823.json",
+		"name": "RivalPickAMon"
 	}
 }
