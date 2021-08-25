@@ -2,6 +2,7 @@
 using MonoCustomResourceRegistry;
 using System.Collections.Generic;
 
+// Represents the general species info for the monster, used to generate actual instances
 // TODO: Need a new icon for this
 [RegisteredType(nameof(MonsterBlueprint), "res://editoricons/Component.svg", nameof(Resource))]
 public class MonsterBlueprint : Resource
@@ -45,4 +46,6 @@ public class MonsterBlueprint : Resource
     public int BaseStr { get; set; } = 1;
     [Export]
     public int BaseTuf { get; set; } = 1;
+
+    // TODO: Growth stats given to other members of the party
 }
