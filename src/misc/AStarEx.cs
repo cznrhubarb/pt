@@ -48,7 +48,7 @@ public class AStarEx : AStar
         var differingObstacleAtLocation =
             mover != null &&
             obstacles.ContainsKey(toId) &&
-            obstacles[toId] != mover.Affiliation;
+            (obstacles[toId] == Affiliation.Neutral || obstacles[toId] != mover.Affiliation);
 
         var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
         var terrain = terrainTypes[toId];

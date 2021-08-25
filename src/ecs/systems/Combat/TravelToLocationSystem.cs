@@ -53,7 +53,7 @@ public class TravelToLocationSystem : Ecs.System
 
                 turnSpeed.TimeToAct = 20 + (path.Length - 1) * actorMovable.TravelSpeed;
 
-                actorMovable.StartingLocation = actorLocation.Clone() as TileLocation;
+                actorMovable.StartingLocation = actorLocation.Duplicate() as TileLocation;
 
                 manager.AddComponentToEntity(manager.GetNewEntity(), new SetActionsDisplayStateEvent() { Displayed = true });
             }

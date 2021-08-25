@@ -6,7 +6,8 @@ public class CutSceneState : State
 {
     CutScene cutScene;
     int eventIndex = 0;
-    bool sceneIsTerminal = false;
+    bool terminatesWithSceneChange = false;
+    bool finished = false;
 
     public CutSceneState(string cutSceneName)
     {
@@ -22,6 +23,11 @@ public class CutSceneState : State
     {
     }
 
+    public override bool CanTransitionTo<T>()
+    {
+        return finished;
+    }
+
     private void RunNextStep(Manager manager)
     {
         if (eventIndex < cutScene.Events.Length)
@@ -29,19 +35,23 @@ public class CutSceneState : State
             var nextEvent = cutScene.Events[eventIndex++];
             if (nextEvent is CSEChangeScene)
             {
-                sceneIsTerminal = true;
+                terminatesWithSceneChange = true;
             }
             nextEvent.Manager = manager;
             nextEvent.OnComplete = () => RunNextStep(manager);
             nextEvent.RunStep();
         }
-        else if (!sceneIsTerminal)
+        else
         {
-            manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
+            finished = true;
+            if (!terminatesWithSceneChange)
             {
-                Callback = () => manager.ApplyState(new ExplorationRoamState(manager.GetEntitiesWithComponent<Selected>().First())),
-                Delay = 0f
-            });
+                manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
+                {
+                    Callback = () => manager.ApplyState(new ExplorationRoamState(manager.GetEntitiesWithComponent<Selected>().First())),
+                    Delay = 0f
+                });
+            }
         }
     }
 }

@@ -8,10 +8,21 @@ public class MonsterBlueprint : Resource
 {
     // Static things
     [Export]
-    public ProfileDetails ProfileDetails { get; set; } = new ProfileDetails() { Level = 1, MonNumber = 1, Name = "" };
+    public Texture ProfilePicture { get; set; } = null;
 
     [Export]
-    public Elemental Elemental { get; set; } = new Elemental() { Element = Element.Neutral };
+    public Texture Sprite { get; set; } = null;
+    
+    // TODO: Maybe also animations and whatever?
+
+    [Export]
+    public int MonNumber { get; set; } = 1;
+
+    [Export]
+    public string Name { get; set; } = "";
+
+    [Export]
+    public Element Element { get; set; } = Element.Neutral;
 
     // Changes with level, but not individual
     [Export]
@@ -22,8 +33,16 @@ public class MonsterBlueprint : Resource
 
     // Changes with level and individual
     [Export]
-    public Health BaseHealth { get; set; } = new Health() { Max = 1 };
+    public int BaseMaxHealth { get; set; } = 1;
 
     [Export]
-    public FightStats BaseFightStats { get; set; } = new FightStats() { Atn = 1, Dex = 1, Mag = 1, Str = 1, Tuf = 1 };
+    public int BaseAtn { get; set; } = 1;
+    [Export]
+    public int BaseDex { get; set; } = 1;
+    [Export]
+    public int BaseMag { get; set; } = 1;
+    [Export]
+    public int BaseStr { get; set; } = 1;
+    [Export]
+    public int BaseTuf { get; set; } = 1;
 }

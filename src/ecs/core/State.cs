@@ -8,5 +8,7 @@ namespace Ecs
         public virtual void Pre(Manager manager) { }
 
         public virtual void Post(Manager manager) { }
+
+        public virtual bool CanTransitionTo<T>() where T : State { return true; }
     }
 }

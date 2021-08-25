@@ -3,15 +3,10 @@ using System;
 
 namespace Ecs
 {
-    public class Component : Resource, ICloneable
+    public class Component : Resource
     {
         public virtual void GrabReferences(Entity owner)
         {
-        }
-
-        public object Clone()
-        {
-            return MemberwiseClone();
         }
     }
 }

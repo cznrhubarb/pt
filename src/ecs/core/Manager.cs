@@ -103,6 +103,12 @@ namespace Ecs
 
         public virtual void ApplyState<T>(T newState) where T : State
         {
+            if (CurrentState?.CanTransitionTo<T>() == false)
+            {
+                GD.Print("Invalid state transition attempted to " + newState.GetType().Name);
+                return;
+            }
+
             CurrentState?.Post(this);
 
             GD.Print("Entering state " + newState.GetType().Name);

@@ -155,12 +155,10 @@ public class Exploration : Manager
 
     private void DialogSignal(string parameter)
     {
-        // BUG: Pathfinding goes right through obstacles in cut scene state
-        // BUG: Starting a cut scene from the tail end of another cutscene makes it go to exploration state due to a timing issue
-
         // TODO: Obviously this is all hardcoded and needs to be made generic
         switch (parameter)
         {
+            // TODO: Should remove these from the scene when they are picked also, but that's another CSE I haven't built yet
             case "ChooseBulb":
                 ApplyState(new CutSceneState("RivalChoosesChar"));
                 break;
