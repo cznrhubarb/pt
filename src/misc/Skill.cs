@@ -8,16 +8,16 @@ using System.Collections.Generic;
 public class Skill : Resource
 {
     [Export]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
     [Export]
-    public Element Element { get; set; }
+    public Element Element { get; set; } = Element.Neutral;
     public int CurrentTP { get; set; }
     [Export]
-    public int MaxTP { get; set; }
+    public int MaxTP { get; set; } = 10;
     [Export]
-    public int MinRange { get; set; }
+    public int MinRange { get; set; } = 1;
     [Export]
-    public int MaxRange { get; set; }
+    public int MaxRange { get; set; } = 1;
     [Export]
     public int MaxHeightRangeUp { get; set; } = 2;
     [Export]
@@ -33,12 +33,12 @@ public class Skill : Resource
     public bool Physical { get; set; } = true;
 
     [Export]
-    public int Accuracy { get; set; }
+    public int Accuracy { get; set; } = 50;
     [Export]
     public int CritModifier { get; set; } = 0;
 
     [Export]
-    public Dictionary<string, int> Effects { get; set; }
+    public Dictionary<string, int> Effects { get; set; } = new Dictionary<string, int>();
 
     ///Special bonus things
     //targeting type (line, etc) if we want something other than the radiate out shape pattern

@@ -4,7 +4,7 @@ public enum Element
 {
     Fire,
     Water,
-    Air,
+    Wood,
     Earth,
     Metal,
     Neutral,

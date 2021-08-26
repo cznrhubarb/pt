@@ -160,12 +160,18 @@ public class Exploration : Manager
         {
             // TODO: Should remove these from the scene when they are picked also, but that's another CSE I haven't built yet
             case "ChooseBulb":
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
                 ApplyState(new CutSceneState("RivalChoosesChar"));
                 break;
             case "ChooseSquirt":
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Squirtle.tres"), 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
                 ApplyState(new CutSceneState("RivalChoosesBulb"));
                 break;
             case "ChooseChar":
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Squirtle.tres"), 1));
                 ApplyState(new CutSceneState("RivalChoosesSquirt"));
                 break;
         }

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://src/ecs/components/Combat/Movable.cs" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+MaxMove = 3
+MaxJump = 2
+TravelSpeed = 10
+TerrainCostModifiers = {
+}

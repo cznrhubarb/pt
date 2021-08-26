@@ -4,17 +4,18 @@
 
 [resource]
 script = ExtResource( 1 )
-Name = null
-Element = 0
-MaxTP = 0
-MinRange = 0
-MaxRange = 0
+Name = "Tackle"
+Element = 5
+MaxTP = 10
+MinRange = 1
+MaxRange = 1
 MaxHeightRangeUp = 2
 MaxHeightRangeDown = 2
 AreaOfEffect = 0
 MaxAoeHeightDelta = 0
-Speed = 0
+Speed = 10
 Physical = true
-Accuracy = 0
-CritModifier = 0
-Effects = null
+Accuracy = 50
+CritModifier = 10
+Effects = {
+}
