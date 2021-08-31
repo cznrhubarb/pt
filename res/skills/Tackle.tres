@@ -15,7 +15,8 @@ AreaOfEffect = 0
 MaxAoeHeightDelta = 0
 Speed = 10
 Physical = true
-Accuracy = 50
+Accuracy = 100
 CritModifier = 10
 Effects = {
+"StrDamage": 30
 }

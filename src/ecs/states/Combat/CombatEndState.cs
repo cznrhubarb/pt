@@ -15,6 +15,12 @@ public class CombatEndState : State
     public override void Post(Manager manager)
     {
     }
+
+    // No leaving this without a scene change
+    public override bool CanTransitionTo<T>()
+    {
+        return false;
+    }
 }
 
 public enum EndCondition

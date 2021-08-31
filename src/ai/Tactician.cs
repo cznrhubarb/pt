@@ -229,6 +229,11 @@ public class Tactician
             (tae.path, tae.walkingDistance, tae.additionalTurnsNeeded, tae.effects, value: tae.effects.Sum(fx => DetermineValue(acting, fx) / tae.additionalTurnsNeeded)))
             .ToList();
 
+        if (effectValues.Count == 0)
+        {
+            return null;
+        }
+
         var highestValue = effectValues.Aggregate((evOne, evTwo) => evOne.value >= evTwo.value ? evOne : evTwo);
 
         GD.Print($"Calculated scores");

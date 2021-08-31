@@ -48,4 +48,5 @@ public class MonsterBlueprint : Resource
     public int BaseTuf { get; set; } = 1;
 
     // TODO: Growth stats given to other members of the party
+    // TODO: Evolution paths and triggers
 }

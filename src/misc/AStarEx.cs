@@ -14,15 +14,27 @@ public class AStarEx : AStar
     private Dictionary<TerrainType, float> DefaultCosts = new Dictionary<TerrainType, float>()
     {
         { TerrainType.Even, 1 },
-        { TerrainType.Difficult, 2 },
+        { TerrainType.Difficult, 1 },
         { TerrainType.Stone, 1 },
         { TerrainType.Wood, 1 },
-        { TerrainType.Grass, 1.2f },
-        { TerrainType.Dirt, 1.1f },
+        { TerrainType.Grass, 1 },
+        { TerrainType.Dirt, 1 },
         { TerrainType.Water, 2 },
         { TerrainType.DeepWater, 99 },
-        { TerrainType.Sand, 1.4f },
+        { TerrainType.Sand, 1 },
     };
+    //private Dictionary<TerrainType, float> DefaultCosts = new Dictionary<TerrainType, float>()
+    //{
+    //    { TerrainType.Even, 1 },
+    //    { TerrainType.Difficult, 2 },
+    //    { TerrainType.Stone, 1 },
+    //    { TerrainType.Wood, 1 },
+    //    { TerrainType.Grass, 1.2f },
+    //    { TerrainType.Dirt, 1.1f },
+    //    { TerrainType.Water, 2 },
+    //    { TerrainType.DeepWater, 99 },
+    //    { TerrainType.Sand, 1.4f },
+    //};
 
     private struct MapSortPoint
     {

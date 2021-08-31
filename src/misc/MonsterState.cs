@@ -13,7 +13,7 @@ public class MonsterState
 
     public int Level { get; set; }
 
-    public List<Skill> Skills { get; set; }
+    public List<Skill> Skills { get; set; } = new List<Skill>();
 
     public int MaxHealth { get; set; }
 

@@ -43,7 +43,7 @@ public class MonsterFactory
         return monsterState;
     }
 
-    public static List<Component> GenerateComponents(MonsterState monsterState)
+    public static List<Component> GenerateComponents(MonsterState monsterState, Affiliation affiliation)
     {
         var components = new List<Component>();
         var blueprint = monsterState.Blueprint;
@@ -53,11 +53,15 @@ public class MonsterFactory
             Level = monsterState.Level,
             MonNumber = blueprint.MonNumber,
             Name = monsterState.CustomName,
+            Affiliation = affiliation
         });
         components.Add(new Elemental() { Element = blueprint.Element });
 
-        // TODO: Probably need to set TP to max here
         components.Add(new SkillSet() { Skills = monsterState.Skills });
+        foreach (var skill in monsterState.Skills)
+        {
+            skill.CurrentTP = skill.MaxTP;
+        }
 
         var levelIter = monsterState.Level;
         // TODO: There's a faster way to iterate through these :p
@@ -66,6 +70,7 @@ public class MonsterFactory
             if (blueprint.MoveStatsByLevel.ContainsKey(levelIter))
             {
                 components.Add(blueprint.MoveStatsByLevel[levelIter].Duplicate() as Movable);
+                break;
             }
             levelIter--;
         }
@@ -80,6 +85,25 @@ public class MonsterFactory
             Dex = monsterState.Dex,
             Tuf = monsterState.Tuf
         });
+
+        // TODO: This isn't completely accurate because it precludes FriendlyNpcs or NeutralNpcs, but its OK for now
+        switch (affiliation)
+        {
+            case Affiliation.Friendly:
+                components.Add(new PlayerCharacter());
+                break;
+            case Affiliation.Enemy:
+                components.Add(new EnemyNpc());
+                break;
+            case Affiliation.Neutral:
+                components.Add(new Obstacle());
+                break;
+        }
+
+        components.Add(new Selectable());
+        components.Add(new StatusBag());
+        // TODO: Starting time to act should be based on something else, like the movable move speed or average of skills or something
+        components.Add(new TurnSpeed() { TimeToAct = Globals.Random.Next(0, 30) });
 
         return components;
     }

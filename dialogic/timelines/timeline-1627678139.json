@@ -32,7 +32,13 @@
 			"character": "character-1629554437.json",
 			"event_id": "dialogic_001",
 			"portrait": "",
-			"text": "Look, you look old enough to start fighting monsters. But it's dangerous to go alone."
+			"text": "Look, how old are you? 10? 12? That's old enough to start fighting monsters, right?"
+		},
+		{
+			"character": "character-1629554437.json",
+			"event_id": "dialogic_001",
+			"portrait": "",
+			"text": "But it's dangerous to go alone."
 		},
 		{
 			"character": "character-1629554437.json",

@@ -164,6 +164,31 @@ namespace Ecs
             toDelete.Clear();
         }
 
+        protected void AnchorCamera()
+        {
+            var cameraWrapList = GetEntitiesWithComponent<CameraWrap>();
+
+            if (cameraWrapList.Count > 0)
+            {
+                var camera = cameraWrapList[0].GetComponent<CameraWrap>().Camera;
+                var anchorEntities = GetEntitiesWithComponent<CameraAnchor>();
+                foreach (var anchorEnt in anchorEntities)
+                {
+                    var anchorComp = anchorEnt.GetComponent<CameraAnchor>();
+                    if (Globals.cameraAnchorOffsets.ContainsKey(anchorComp.Name))
+                    {
+                        // TODO: Think we need to snap the anchorEnt into place first, which requires running the systems once...
+                        // Not TOOOO big of a deal though, since the wipe goes fast enough that it's not really noticeable
+                        camera.Position = anchorEnt.Position + Globals.cameraAnchorOffsets[anchorComp.Name];
+                        break;
+                    }
+                }
+
+                // Only clear if we are going to a scene with a camera in it. That way we can still have menu only transition scenes.
+                Globals.cameraAnchorOffsets.Clear();
+            }
+        }
+
         public abstract void PerformHudAction(string actionName, params object[] args);
 
         // HACK: Strongly coupled hack

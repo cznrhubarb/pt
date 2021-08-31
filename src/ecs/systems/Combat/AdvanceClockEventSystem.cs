@@ -16,6 +16,7 @@ public class AdvanceClockEventSystem : Ecs.System
     protected override void Update(Entity entity, float deltaTime)
     {
         var advanceEntities = EntitiesFor(TurnSpeedEntityKey)
+            .Where(ent => !ent.HasComponent<Dying>())
             .Select(ent => new SortPair() { entity = ent, turnSpeed = ent.GetComponent<TurnSpeed>() })
             .OrderBy(sp => sp.turnSpeed.TimeToAct);
 

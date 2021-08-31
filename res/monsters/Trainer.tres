@@ -10,7 +10,7 @@
 script = ExtResource( 1 )
 ProfilePicture = ExtResource( 3 )
 Sprite = ExtResource( 2 )
-MonNumber = 999
+MonNumber = 150
 Name = "Trainer"
 Element = 5
 SkillsAvailableByLevel = {

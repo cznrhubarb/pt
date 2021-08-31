@@ -21,6 +21,9 @@ public class RemoveDyingEntitiesSystem : Ecs.System
 
         base.UpdateAll(deltaTime);
 
+        // TODO: Other victory/loss conditions can be added via additional systems.
+        //  Might need to disable this win condition if there are any combats that don't have a "kill everyone" victory condition
+        // TODO: Need to add a "trainer loss" condition here
         var affCounts = new Dictionary<Affiliation, int>() { { Affiliation.Friendly, 0 }, { Affiliation.Enemy, 0 }, { Affiliation.Neutral, 0 } };
         EntitiesFor(AffiliatedEntitiesKey).ForEach(entity =>
         {

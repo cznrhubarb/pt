@@ -85,6 +85,7 @@ config/icon="res://icon.png"
 
 Globals="*res://src/misc/Globals.cs"
 DialogicSingleton="*res://addons/dialogic/Other/DialogicSingleton.gd"
+Transition="*res://src/scenes/Transition.tscn"
 
 [editor_plugins]
 

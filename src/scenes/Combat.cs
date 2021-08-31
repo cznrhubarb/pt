@@ -2,6 +2,7 @@ using Godot;
 using Ecs;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 public class Combat : Manager
 {
@@ -22,6 +23,8 @@ public class Combat : Manager
         BuildControlElements();
         BuildActors(mapComp);
 
+        AnchorCamera();
+
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
     }
 
@@ -36,8 +39,10 @@ public class Combat : Manager
         AddSystem(new RemoveDyingEntitiesSystem());
         AddSystem(new TweenCleanupSystem());
         AddSystem(new RenderStatusEffectsSystem());
+        AddSystem(new CameraAnchoringSystem());
 
         // Event Handling Systems
+        AddSystem(new StatusTickEventSystem());
         AddSystem(new SelectActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());
         AddSystem(new SetActionsDisplayStateEventSystem());
@@ -120,6 +125,7 @@ public class Combat : Manager
         RegisterExistingEntity(camera);
         AddComponentToEntity(camera, new CameraWrap());
 
+        // TODO: Move these components into the editor
         var target = FindNode("Target") as Entity;
         RegisterExistingEntity(target);
         AddComponentsToEntity(target,
@@ -128,115 +134,44 @@ public class Combat : Manager
             new Reticle(), 
             new CameraRef() { Camera = camera.GetComponent<CameraWrap>().Camera }, 
             new TileLocation() { ZLayer = 2 });
+        
+        // HACK: All things inside Actors should be auto registered (like in Exploration), but right now not
+        //  doing that because Target is being handled as a special case and it is in list.
+        RegisterExistingEntity(FindNode("CamAnchor") as Entity);
     }
-
-    private Vector3 TilePositionFromActor(Entity actor, Map map) =>
-        map.IsoMap.PickUncovered(actor.Position)[0].GetComponent<TileLocation>().TilePosition;
 
     private void BuildActors(Map map)
     {
-        var flyingMoveType = new Dictionary<TerrainType, float>
+        // HACK: Just hardcoding some starting points to get started
+        var positions = new Queue<Vector3>();
+        positions.Enqueue(new Vector3(5, 0, 2));
+        positions.Enqueue(new Vector3(5, 1, 2));
+        positions.Enqueue(new Vector3(11, 0, 0));
+        positions.Enqueue(new Vector3(11, -1, 0));
+
+        foreach (var state in WorldState.PartyState)
         {
-            { TerrainType.Stone, 1 },
-            { TerrainType.Wood, 1 },
-            { TerrainType.Grass, 1 },
-            { TerrainType.Dirt, 1 },
-            { TerrainType.Water, 1 },
-            { TerrainType.DeepWater, 1 },
-            { TerrainType.Sand, 1 },
-        };
+            var components = MonsterFactory.GenerateComponents(state, Affiliation.Friendly);
+            var actor = GetNewEntity();
+            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, FlipH = true, Position = new Vector2(0, -23) });
+            AddComponentsToEntity(actor, components.ToArray());
+            AddComponentsToEntity(actor,
+                new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
+                new SpriteWrap(),
+                TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
+        }
 
-        var amphibiousMoveType = new Dictionary<TerrainType, float>
+        foreach (var state in WorldState.RivalPartyState)
         {
-            { TerrainType.Water, 1 },
-            { TerrainType.DeepWater, 1 },
-        };
-        var skillList = new List<Skill>()
-        {
-            new Skill() { Name = "Tackle", Speed = 5, MaxTP = 999, CurrentTP = 500, MinRange = 1, MaxRange = 1, Accuracy = 95, Effects = new Dictionary<string, int>() { { "StrDamage", 10 } } },
-            new Skill() { Name = "Throw Bomb", Speed = 8, MaxTP = 10, CurrentTP = 10, AreaOfEffect = 1, MaxAoeHeightDelta = 1, MinRange = 2, MaxRange = 5, Accuracy = 60, Effects = new Dictionary<string, int>() { { "MagDamage", 30 } } },
-            new Skill() { Name = "Double Team", Speed = 3, MaxTP = 8, CurrentTP = 8, MinRange = 0, MaxRange = 0, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Haste", 3 } } },
-            //new Skill() { Name = "Heal", Speed = 6, MaxTP = 5, CurrentTP = 5, MinRange = 0, MaxRange = 2, Accuracy = 9999, Effects = new Dictionary<string, int>() { { "Heal", 20 } } },
-        };
-
-        var actor = FindNode("Vaporeon") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor, 
-            new ProfileDetails() { Name = "Vaporeon", MonNumber = 134, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 }, 
-            new SpriteWrap(), 
-            new Selectable(), 
-            new PlayerCharacter(), 
-            new Health() { Current = 30, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2, TerrainCostModifiers = amphibiousMoveType, TravelSpeed = 3 }, 
-            new TurnSpeed() { TimeToAct = 12 },
-            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Water },
-            new StatusBag(),
-            new SkillSet() { Skills = skillList });
-        AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
-
-        actor = FindNode("Scyther") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Scyther", MonNumber = 123, Affiliation = Affiliation.Friendly },
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 10 }, 
-            new SpriteWrap(), 
-            new Selectable(), 
-            new PlayerCharacter(), 
-            new Health() { Current = 10, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 2 }, 
-            new TurnSpeed() { TimeToAct = 16 },
-            new FightStats() { Atn = 5, Dex = 17, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Earth },
-            new StatusBag(),
-            new SkillSet() { Skills = skillList });
-        AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
-
-        actor = FindNode("Zapdos") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Zapdos", MonNumber = 145, Affiliation = Affiliation.Enemy },
-            new Pulse() { squishAmountY = 0.03f, squishSpeed = 2 }, 
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 }, 
-            new SpriteWrap(), 
-            new Selectable(),
-            new EnemyNpc(),
-            new Health() { Current = 24, Max = 30 }, 
-            new Movable() { MaxMove = 2, MaxJump = 1, TerrainCostModifiers = flyingMoveType, TravelSpeed = 2 }, 
-            new TurnSpeed() { TimeToAct = 14 },
-            new StatusBag(),
-            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Fire },
-            new SkillSet() { Skills = skillList });
-        AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
-
-        actor = FindNode("Machamp") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor,
-            new ProfileDetails() { Name = "Machamp", MonNumber = 68, Affiliation = Affiliation.Enemy },
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 5 }, 
-            new SpriteWrap(), 
-            new Selectable(), 
-            new EnemyNpc(), 
-            new Health() { Current = 30, Max = 30 }, 
-            new Movable() { MaxMove = 4, MaxJump = 2, TravelSpeed = 4 }, 
-            new TurnSpeed() { TimeToAct = 26 },
-            new StatusBag(),
-            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 9 },
-            new Elemental() { Element = Element.Neutral },
-            new SkillSet() { Skills = skillList });
-        AddComponentToEntity(actor, TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
-
-        actor = FindNode("Rock") as Entity;
-        RegisterExistingEntity(actor);
-        AddComponentsToEntity(actor, 
-            new TileLocation() { TilePosition = TilePositionFromActor(actor, map), ZLayer = 3 }, 
-            new SpriteWrap(), 
-            new Obstacle(), 
-            new Selectable(), 
-            new Health() { Current = 30, Max = 30 },
-            new FightStats() { Atn = 5, Dex = 7, Mag = 8, Str = 6, Tuf = 99 });
+            var components = MonsterFactory.GenerateComponents(state, Affiliation.Enemy);
+            var actor = GetNewEntity();
+            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, Position = new Vector2(0, -23) });
+            AddComponentsToEntity(actor, components.ToArray());
+            AddComponentsToEntity(actor,
+                new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
+                new SpriteWrap(),
+                TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
+        }
     }
 
     public override void PerformHudAction(string actionName, params object[] args)

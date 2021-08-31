@@ -186,8 +186,10 @@ public class TargetUtils
             var targetStatuses = target.GetComponent<StatusBag>().Statuses;
 
             var roll = Globals.Random.Next(100);
+            GD.Print($"Are ya hitting son? {roll}/{targetedComp.HitChance}");
             if (roll < targetedComp.HitChance)
             {
+                GD.Print($"HIT {roll}/{targetedComp.HitChance}");
                 var effects = targetedComp.Effects;
                 foreach (var kvp in effects)
                 {

@@ -72,12 +72,8 @@
 			"event_id": "dialogic_003"
 		},
 		{
-			"event_id": "dialogic_023",
-			"wait_seconds": 0.5
-		},
-		{
-			"change_scene": "res://src/scenes/Combat.tscn",
-			"event_id": "dialogic_041"
+			"emit_signal": "StartFight",
+			"event_id": "dialogic_040"
 		}
 	],
 	"metadata": {

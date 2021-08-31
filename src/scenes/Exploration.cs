@@ -15,8 +15,10 @@ public class Exploration : Manager
         CreateSystems();
         BuildControlElements();
         var mapComp = BuildMap();
-        BuildActors(mapComp);
+        BuildActors();
         MapUtils.RefreshObstacles(mapComp, GetEntitiesWithComponent<TileLocation>());
+
+        AnchorCamera();
 
         foreach (var entity in GetEntitiesWithComponent<AutorunTrigger>())
         {
@@ -32,6 +34,7 @@ public class Exploration : Manager
         AddSystem(new ClampToMapSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new TweenCleanupSystem());
+        AddSystem(new CameraAnchoringSystem());
 
         // Event Handling Systems
         AddSystem(new DeferredEventSystem());
@@ -106,7 +109,7 @@ public class Exploration : Manager
         RegisterExistingEntity(FindNode("Camera") as Entity);
     }
 
-    private void BuildActors(Map map)
+    private void BuildActors()
     {
         foreach (var entity in FindNode("Actors").GetChildren())
         {
@@ -131,7 +134,7 @@ public class Exploration : Manager
                 StartDialog(cueParameter);
                 break;
             case CueType.ChangeScene:
-                GetTree().ChangeScene($"res://src/scenes/{cueParameter}.tscn");
+                Transition.To($"res://src/scenes/{cueParameter}.tscn");
                 break;
             case CueType.StartCutScene:
                 ApplyState(new CutSceneState(cueParameter));
@@ -173,6 +176,9 @@ public class Exploration : Manager
                 WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
                 WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Squirtle.tres"), 1));
                 ApplyState(new CutSceneState("RivalChoosesSquirt"));
+                break;
+            case "StartFight":
+                Transition.To("res://src/scenes/Combat.tscn");
                 break;
         }
     }

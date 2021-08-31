@@ -10,7 +10,7 @@ public class CSEChangeScene : CutSceneEvent
 
     public override void RunStep()
     {
-        Manager.GetTree().ChangeScene($"res://src/scenes/{SceneName}.tscn");
+        Transition.To($"res://src/scenes/{SceneName}.tscn");
         OnComplete();
     }
 }

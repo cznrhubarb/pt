@@ -10,7 +10,7 @@
 script = ExtResource( 1 )
 ProfilePicture = ExtResource( 3 )
 Sprite = ExtResource( 2 )
-MonNumber = 998
+MonNumber = 149
 Name = "WaTrainer"
 Element = 5
 SkillsAvailableByLevel = {

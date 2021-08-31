@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=2]
+[gd_scene load_steps=55 format=2]
 
 [ext_resource path="res://src/scenes/Exploration.cs" type="Script" id=1]
 [ext_resource path="res://res/field_tileset.tres" type="TileSet" id=2]
@@ -19,6 +19,7 @@
 [ext_resource path="res://img/actors/1.png" type="Texture" id=17]
 [ext_resource path="res://img/actors/7.png" type="Texture" id=18]
 [ext_resource path="res://img/actors/4.png" type="Texture" id=19]
+[ext_resource path="res://src/ecs/components/Common/CameraAnchor.cs" type="Script" id=20]
 
 [sub_resource type="Resource" id=1]
 resource_name = "CameraWrap"
@@ -165,6 +166,16 @@ script = ExtResource( 10 )
 [sub_resource type="Resource" id=32]
 resource_name = "SpriteWrap"
 script = ExtResource( 7 )
+
+[sub_resource type="Resource" id=33]
+resource_name = "TileLocation"
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=34]
+resource_name = "CameraAnchor"
+script = ExtResource( 20 )
+Name = "Corner"
 
 [node name="Exploration" type="Node2D"]
 script = ExtResource( 1 )
@@ -357,5 +368,15 @@ editorComponents = [ SubResource( 29 ), SubResource( 30 ), SubResource( 31 ), Su
 position = Vector2( -2.84828, -19.7065 )
 texture = ExtResource( 18 )
 flip_h = true
+
+[node name="CamAnchor" type="Node2D" parent="Actors"]
+position = Vector2( -49.9194, 241.778 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+editorComponents = [ SubResource( 33 ), SubResource( 34 ) ]
+
+[node name="AutoHideSprite" parent="Actors/CamAnchor" instance=ExtResource( 9 )]
 
 [node name="HUD" type="CanvasLayer" parent="."]
