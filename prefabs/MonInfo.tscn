@@ -1,0 +1,238 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://prefabs/MonInfo.cs" type="Script" id=1]
+[ext_resource path="res://img/actors/trainer.png" type="Texture" id=2]
+[ext_resource path="res://res/BungeeRegular_20_outline.tres" type="DynamicFont" id=3]
+[ext_resource path="res://res/BungeeRegular_14.tres" type="DynamicFont" id=4]
+
+[node name="MonInfo" type="Control"]
+margin_left = 70.0
+margin_top = 100.0
+margin_right = 563.0
+margin_bottom = 200.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sprite" type="TextureRect" parent="."]
+margin_left = 14.5905
+margin_top = 17.1815
+margin_right = 54.5905
+margin_bottom = 81.1815
+texture = ExtResource( 2 )
+
+[node name="NameLabel" type="Label" parent="."]
+margin_left = 64.0
+margin_top = 12.0
+margin_right = 131.0
+margin_bottom = 26.0
+custom_fonts/font = ExtResource( 4 )
+text = "Trainer"
+
+[node name="LevelLabel" type="Label" parent="."]
+margin_left = 284.723
+margin_top = 13.4997
+margin_right = 327.723
+margin_bottom = 27.4997
+custom_fonts/font = ExtResource( 4 )
+text = "Lv 99"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HpLabel" type="Label" parent="."]
+margin_left = 65.4084
+margin_top = 45.4538
+margin_right = 108.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "HP
+100"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StrLabel" type="Label" parent="."]
+margin_left = 110.408
+margin_top = 45.4538
+margin_right = 153.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "STR
+10"
+align = 1
+
+[node name="MagLabel" type="Label" parent="."]
+margin_left = 151.408
+margin_top = 45.4538
+margin_right = 194.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "MAG
+10"
+align = 1
+
+[node name="DexLabel" type="Label" parent="."]
+margin_left = 194.408
+margin_top = 45.4538
+margin_right = 237.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "DEX
+10"
+align = 1
+
+[node name="TufLabel" type="Label" parent="."]
+margin_left = 237.408
+margin_top = 45.4538
+margin_right = 280.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "TUF
+10"
+align = 1
+
+[node name="AtnLabel" type="Label" parent="."]
+margin_left = 283.408
+margin_top = 45.4538
+margin_right = 326.408
+margin_bottom = 68.4538
+custom_fonts/font = ExtResource( 4 )
+text = "ATN
+10"
+align = 1
+
+[node name="LevelUpLabel" type="Label" parent="."]
+margin_left = 360.677
+margin_top = 2.11372
+margin_right = 471.677
+margin_bottom = 23.1137
+custom_fonts/font = ExtResource( 3 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "Level up!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LevelGainLabel" type="Label" parent="."]
+margin_left = 330.723
+margin_top = 13.4997
+margin_right = 373.723
+margin_bottom = 27.4997
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+1"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ExperienceGainLabel" type="Label" parent="."]
+margin_left = 337.723
+margin_top = 46.4997
+margin_right = 380.723
+margin_bottom = 60.4997
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+40"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HpGainLabel" type="Label" parent="."]
+margin_left = 75.4084
+margin_top = 72.4538
+margin_right = 118.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+7"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="StrGainLabel" type="Label" parent="."]
+margin_left = 120.408
+margin_top = 72.4538
+margin_right = 163.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+2"
+align = 1
+
+[node name="MagGainLabel" type="Label" parent="."]
+margin_left = 161.408
+margin_top = 72.4538
+margin_right = 204.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+1"
+align = 1
+
+[node name="DexGainLabel" type="Label" parent="."]
+margin_left = 204.408
+margin_top = 72.4538
+margin_right = 247.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+2"
+align = 1
+
+[node name="TufGainLabel" type="Label" parent="."]
+margin_left = 247.408
+margin_top = 72.4538
+margin_right = 290.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+3"
+align = 1
+
+[node name="AtnGainLabel" type="Label" parent="."]
+margin_left = 293.408
+margin_top = 72.4538
+margin_right = 336.408
+margin_bottom = 95.4538
+custom_fonts/font = ExtResource( 4 )
+custom_colors/font_color = Color( 0.0745098, 0.65098, 0.0941176, 1 )
+text = "+0"
+align = 1
+
+[node name="ExperienceBar" type="ProgressBar" parent="."]
+margin_left = 63.0
+margin_top = 30.0
+margin_right = 329.0
+margin_bottom = 44.0
+value = 65.0
+percent_visible = false
+
+[node name="ExperienceLabel" type="Label" parent="."]
+margin_left = 336.359
+margin_top = 31.1585
+margin_right = 378.359
+margin_bottom = 45.1585
+custom_fonts/font = ExtResource( 4 )
+text = "70 XP"
+
+[node name="NewSkillButton" type="Button" parent="."]
+margin_left = 388.0
+margin_top = 30.8524
+margin_right = 472.0
+margin_bottom = 54.8524
+custom_fonts/font = ExtResource( 4 )
+text = "New Skill!"
+
+[node name="NewEvoButton" type="Button" parent="."]
+margin_left = 388.0
+margin_top = 62.0
+margin_right = 488.0
+margin_bottom = 86.0
+custom_fonts/font = ExtResource( 4 )
+text = "New Evo!"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

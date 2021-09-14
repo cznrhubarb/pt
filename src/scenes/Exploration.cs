@@ -70,6 +70,7 @@ public class Exploration : Manager
             { 19, TerrainType.Wood },
         };
 
+        // TODO: Should this be moved to IsoMap? We are duplicating the code here and in Combat
         var tileEntities = new List<Entity>();
         var height = 0;
         foreach (var child in mapNode.GetChildren())

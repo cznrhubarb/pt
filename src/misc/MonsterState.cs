@@ -12,6 +12,7 @@ public class MonsterState
     public string CustomName { get; set; }
 
     public int Level { get; set; }
+    // plus current experience
 
     public List<Skill> Skills { get; set; } = new List<Skill>();
 
