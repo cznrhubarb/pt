@@ -23,6 +23,9 @@ public class MonsterBlueprint : Resource
     public string Name { get; set; } = "";
 
     [Export]
+    public RarityValues Rarity { get; set; } = RarityValues.Common;
+
+    [Export]
     public Element Element { get; set; } = Element.Neutral;
 
     // Changes with level, but not individual

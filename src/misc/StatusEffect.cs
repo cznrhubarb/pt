@@ -17,6 +17,7 @@ public class StatusEffect
     public const float BlindAccuracyModifier = 0.4f;
 }
 
+// TODO: Change these strings to enums
 public class StatusFactory
 {
     public static StatusEffect BuildStatusEffect(string name, int startingCount)

@@ -104,6 +104,7 @@ public class MonsterFactory
         components.Add(new StatusBag());
         // TODO: Starting time to act should be based on something else, like the movable move speed or average of skills or something
         components.Add(new TurnSpeed() { TimeToAct = Globals.Random.Next(0, 30) });
+        components.Add(new Rarity() { Value = blueprint.Rarity });
 
         return components;
     }

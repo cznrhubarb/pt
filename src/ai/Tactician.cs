@@ -280,6 +280,8 @@ public class Tactician
             var amount = 0f;
             switch (kvp.Key)
             {
+                // TODO: These keys should be an enum instead of a string probably?
+                //  Going to have problems with the status effects and the other things being different enums (unless they aren't)
                 case "StrDamage":
                     {
                         amount = (int)kvp.Value;
@@ -399,6 +401,12 @@ public class Tactician
                         {
                             amount = (float)Math.Log(target.GetComponent<Movable>().MaxMove, targetProfile.Level) * targetProfile.Level * Mathf.Sqrt((int)kvp.Value);
                         }
+                    }
+                    break;
+                // Maybe we give the enemy trainer a capture ability for lore sake, but they will never use it against the player
+                case "Capture":
+                    {
+                        amount = -999;
                     }
                     break;
                 default:

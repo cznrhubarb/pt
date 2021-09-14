@@ -83,6 +83,31 @@ public class TargetUtils
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
                         }
                         break;
+                    case "Capture":
+                        {
+                            if (targetStatuses.ContainsKey("Uncaptureable"))
+                            {
+                                targetedComp.HitChance = 0;
+                            }
+                            else
+                            {
+                                // Override the hit chance for capture
+                                var rarity = target.GetComponent<Rarity>().Value;
+                                var healthComp = target.GetComponent<Health>();
+                                var trainerLevel = actingEntity.GetComponent<ProfileDetails>().Level;
+
+                                var chance = Constants.Capture.RarityMods[rarity];
+                                chance += trainerLevel * Constants.Capture.TrainerLevelMod;
+                                chance += Constants.Capture.StatusMods.Max(sm => targetStatuses.ContainsKey(sm.Key) ? sm.Value : 0f);
+                                var healthPercent = Mathf.Clamp(healthComp.Current / healthComp.Max, Constants.Capture.HealthFloor, Constants.Capture.HealthCeiling);
+                                var interpolatedHealth = (healthPercent - Constants.Capture.HealthFloor) / (Constants.Capture.HealthCeiling - Constants.Capture.HealthFloor);
+                                var healthMod = interpolatedHealth * Constants.Capture.HealthCeilingValue + (1 - interpolatedHealth * Constants.Capture.HealthFloorValue);
+                                chance += healthMod;
+                                targetedComp.HitChance = chance;
+                            }
+                            targetedComp.Effects.Add("Capture", null);
+                        }
+                        break;
                     default:
                         // Assume anything not explicitly listed is a status effect
                         targetedComp.Effects.Add(kvp.Key, kvp.Value);
@@ -157,6 +182,31 @@ public class TargetUtils
                             var healthComp = target.GetComponent<Health>();
                             var heal = Math.Ceiling(kvp.Value * actingFightStats.Mag / 100d * 4);
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
+                        }
+                        break;
+                    case "Capture":
+                        {
+                            if (targetStatuses.ContainsKey("Uncaptureable"))
+                            {
+                                targetedComp.HitChance = 0;
+                            }
+                            else
+                            {
+                                // Override the hit chance for capture
+                                var rarity = target.GetComponent<Rarity>().Value;
+                                var healthComp = target.GetComponent<Health>();
+                                var trainerLevel = actingEntity.GetComponent<ProfileDetails>().Level;
+
+                                var chance = Constants.Capture.RarityMods[rarity];
+                                chance += trainerLevel * Constants.Capture.TrainerLevelMod;
+                                chance += Constants.Capture.StatusMods.Max(sm => targetStatuses.ContainsKey(sm.Key) ? sm.Value : 0f);
+                                var healthPercent = Mathf.Clamp(healthComp.Current / healthComp.Max, Constants.Capture.HealthFloor, Constants.Capture.HealthCeiling);
+                                var interpolatedHealth = (healthPercent - Constants.Capture.HealthFloor) / (Constants.Capture.HealthCeiling - Constants.Capture.HealthFloor);
+                                var healthMod = interpolatedHealth * Constants.Capture.HealthCeilingValue + (1 - interpolatedHealth * Constants.Capture.HealthFloorValue);
+                                chance += healthMod;
+                                targetedComp.HitChance = chance;
+                            }
+                            targetedComp.Effects.Add("Capture", null);
                         }
                         break;
                     default:
@@ -234,6 +284,13 @@ public class TargetUtils
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
                             }
                             break;
+                        case "Capture":
+                            {
+                                // TODO: Add capture stasis status effect to both
+                                //        Implement capture stasis status effect
+                                //        Implement end of combat check for this
+                            }
+                            break;
                         default:
                             // Assume anything not explicitly listed is a status effect
                             // TODO: Apply these better depending on the type. Some stack, some don't
@@ -260,7 +317,14 @@ public class TargetUtils
         string targetingString = $"{Math.Min(100, targeted.HitChance)}%";
         foreach (var kvp in targeted.Effects)
         {
-            targetingString += $"   {kvp.Value} {kvp.Key}";
+            if (kvp.Value != null)
+            {
+                targetingString += $"   {kvp.Value} {kvp.Key}";
+            }
+            else
+            {
+                targetingString += $"   {kvp.Key}";
+            }
         }
 
         return targetingString;

@@ -12,6 +12,7 @@ ProfilePicture = ExtResource( 3 )
 Sprite = ExtResource( 2 )
 MonNumber = 4
 Name = "Charmander"
+Rarity = 0
 Element = 0
 SkillsAvailableByLevel = {
 1: ExtResource( 4 )
