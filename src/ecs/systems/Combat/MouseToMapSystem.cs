@@ -21,9 +21,9 @@ public class MouseToMapSystem : Ecs.System
         if (dirty)
         {
             var tileLocationComp = entity.GetComponent<TileLocation>();
-            var cameraComp = entity.GetComponent<CameraRef>();
+            var camera = entity.GetComponent<CameraRef>().Camera;
             var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
-            var translatedMousePos = mousePosition + cameraComp.Camera.Position;
+            var translatedMousePos = mousePosition + camera.Position - GetViewport().Size/2;
 
             var pickedTiles = map.IsoMap.PickUncovered(translatedMousePos);
             if (pickedTiles.Count != 0)

@@ -10,7 +10,7 @@
 script = ExtResource( 1 )
 ProfilePicture = ExtResource( 2 )
 Sprite = ExtResource( 3 )
-MonNumber = 1
+MonNumber = 7
 Name = "Squirtle"
 Element = 1
 SkillsAvailableByLevel = {
