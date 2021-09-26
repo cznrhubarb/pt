@@ -34,6 +34,7 @@ public class Combat : Manager
         AddSystem(new MouseToMapSystem());
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
+        AddSystem(new ApplyPositionOffsetSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
         AddSystem(new RemoveDyingEntitiesSystem());
@@ -42,6 +43,7 @@ public class Combat : Manager
         AddSystem(new CameraAnchoringSystem());
 
         // Event Handling Systems
+        AddSystem(new CreateShockwaveEventSystem());
         AddSystem(new StatusTickEventSystem());
         AddSystem(new SelectActionEventSystem());
         AddSystem(new AdvanceClockEventSystem());

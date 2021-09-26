@@ -32,11 +32,13 @@ public class Exploration : Manager
     {
         AddSystem(new FollowCameraControlSystem());
         AddSystem(new ClampToMapSystem());
+        AddSystem(new ApplyPositionOffsetSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new TweenCleanupSystem());
         AddSystem(new CameraAnchoringSystem());
 
         // Event Handling Systems
+        AddSystem(new CreateShockwaveEventSystem());
         AddSystem(new DeferredEventSystem());
 
         AddSystem<ExplorationRoamState>(new HandleMovementInputSystem());

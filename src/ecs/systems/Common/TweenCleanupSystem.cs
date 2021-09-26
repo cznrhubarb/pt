@@ -12,10 +12,13 @@ public class TweenCleanupSystem : Ecs.System
         var tweening = entity.GetComponent<Tweening>();
         if (tweening.TweenSequence.Complete)
         {
-            manager.RemoveComponentFromEntity<Tweening>(entity);
             if (tweening.DeleteEntityOnComplete)
             {
                 manager.DeleteEntity(entity.Id);
+            }
+            else
+            {
+                manager.RemoveComponentFromEntity<Tweening>(entity);
             }
         }
     }
