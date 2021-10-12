@@ -51,7 +51,7 @@ public class MonsterFactory
         components.Add(new ProfileDetails()
         {
             Level = monsterState.Level,
-            MonNumber = blueprint.MonNumber,
+            ProfilePicture = blueprint.ProfilePicture,
             Name = monsterState.CustomName,
             Affiliation = affiliation
         });

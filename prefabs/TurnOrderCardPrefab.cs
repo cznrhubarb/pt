@@ -4,12 +4,12 @@ public class TurnOrderCardPrefab : Node2D
 {
     public Label ValueLabel { get; private set; }
 
-    private string portraitPath;
+    private Texture portrait;
     private string cardPath;
 
-    public void Init(string portrait, Affiliation affiliation)
+    public void Init(Texture portrait, Affiliation affiliation)
     {
-        portraitPath = $"res://img/portraits/{portrait}.png";
+        this.portrait = portrait;
         switch (affiliation)
         {
             case Affiliation.Enemy:
@@ -27,7 +27,7 @@ public class TurnOrderCardPrefab : Node2D
     public override void _Ready()
     {
         (FindNode("CardBack") as TextureRect).Texture = GD.Load<Texture>(cardPath);
-        (FindNode("Portrait") as Sprite).Texture = GD.Load<Texture>(portraitPath);
+        (FindNode("Portrait") as Sprite).Texture = portrait;
         ValueLabel = FindNode("ValueLabel") as Label;
     }
 }

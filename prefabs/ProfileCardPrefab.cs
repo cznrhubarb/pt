@@ -148,7 +148,7 @@ public class ProfileCardPrefab : Control
         }
 
         backgroundRect.Modulate = backgroundColor;
-        portraitSprite.Texture = GD.Load<Texture>($"res://img/portraits/{profileDetails.MonNumber}.png");
+        portraitSprite.Texture = profileDetails.ProfilePicture;
         nameLabel.Text = profileDetails.Name;
         (GetNode("Level") as Label).Text = $"Lvl {profileDetails.Level}";
 

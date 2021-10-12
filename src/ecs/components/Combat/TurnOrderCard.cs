@@ -25,7 +25,7 @@ public class TurnOrderCard : Component
     {
         var prefab = ResourceLoader.Load<PackedScene>("res://prefabs/TurnOrderCardPrefab.tscn");
         var toc = new TurnOrderCard() { card = (TurnOrderCardPrefab)prefab.Instance() };
-        toc.card.Init(profileDetails.MonNumber.ToString(), profileDetails.Affiliation);
+        toc.card.Init(profileDetails.ProfilePicture, profileDetails.Affiliation);
 
         var hud = Globals.SceneTree.Root.FindNode("HUD", true, false);
         hud.AddChild(toc.card);
