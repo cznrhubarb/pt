@@ -15,6 +15,8 @@ public class Skill : Resource
     [Export]
     public int MaxTP { get; set; } = 10;
     [Export]
+    public TargetingMode TargetingMode { get; set; } = TargetingMode.StandardArea;
+    [Export]
     public int MinRange { get; set; } = 1;
     [Export]
     public int MaxRange { get; set; } = 1;

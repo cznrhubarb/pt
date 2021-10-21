@@ -7,13 +7,83 @@ using System.Linq;
 
 public class TargetUtils
 {
-    public static List<Vector3> GetTargetLocations(Skill selectedSkill, Map map, Vector3 targetCenter)
+    public static List<Vector3> GetPotentialTargetLocations(Skill selectedSkill, Map map, Vector3 origin)
     {
-        var areaRange = selectedSkill.AreaOfEffect;
-        var maxAoeHeightDelta = selectedSkill.MaxAoeHeightDelta;
-        return map.AStar.GetPointsBetweenRange(targetCenter, 0, areaRange)
-            .Where(pt => Math.Abs(pt.z - targetCenter.z) <= maxAoeHeightDelta)
-            .ToList();
+        List<Vector3> points = null;
+        // TODO: Is this duplicated code with the method below? Maybe just a little.
+        switch (selectedSkill.TargetingMode)
+        {
+            case TargetingMode.StandardArea:
+                {
+                    points = map.AStar.GetPointsBetweenRange(origin, selectedSkill.MinRange, selectedSkill.MaxRange)
+                        .Where(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp)
+                        .ToList();
+                }
+                break;
+            case TargetingMode.StandardLine:
+            case TargetingMode.WholeLine:
+                {
+                    points = map.AStar.GetPointsInLine(origin, Direction.Up.ToVector3(), selectedSkill.MaxRange)
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Down.ToVector3(), selectedSkill.MaxRange))
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Left.ToVector3(), selectedSkill.MaxRange))
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Right.ToVector3(), selectedSkill.MaxRange))
+                        .Where(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp)
+                        .ToList();
+                }
+                break;
+            case TargetingMode.BlockedLine:
+                {
+                    Func<Direction, Vector3?> firstObstaclePosInDirection = (dir) => map.AStar.GetPointsInLine(origin, dir.ToVector3(), selectedSkill.MaxRange)
+                        .TakeWhile(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp)
+                        .Cast<Vector3?>()
+                        .FirstOrDefault(pt => map.AStar.HasObstacleAtLocation(pt.Value));
+
+                    points = new List<Vector3?>
+                    {
+                        firstObstaclePosInDirection(Direction.Up),
+                        firstObstaclePosInDirection(Direction.Down),
+                        firstObstaclePosInDirection(Direction.Left),
+                        firstObstaclePosInDirection(Direction.Right),
+                    }.Where(pt => pt.HasValue).Select(pt => pt.Value).ToList();
+                }
+                break;
+            default:
+                points = new List<Vector3>();
+                break;
+        }
+
+        return points;
+    }
+
+    public static List<Vector3> GetTargetEffectLocations(Skill selectedSkill, Map map, Vector3 origin, Vector3 targetCenter)
+    {
+        switch (selectedSkill.TargetingMode)
+        {
+            case TargetingMode.StandardArea:
+            case TargetingMode.StandardLine:
+            case TargetingMode.BlockedLine:
+                {
+                    var areaRange = selectedSkill.AreaOfEffect;
+                    var maxAoeHeightDelta = selectedSkill.MaxAoeHeightDelta;
+                    return map.AStar.GetPointsBetweenRange(targetCenter, 0, areaRange)
+                        .Where(pt => Math.Abs(pt.z - targetCenter.z) <= maxAoeHeightDelta)
+                        .ToList();
+                }
+            case TargetingMode.WholeLine:
+                {
+                    Func<Direction, IEnumerable<Vector3>> getPointsInDirection = (dir) =>
+                        map.AStar.GetPointsInLine(origin, dir.ToVector3(), selectedSkill.MaxRange)
+                        .Where(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp);
+
+                    var targetLine = new Direction[] { Direction.Up, Direction.Down, Direction.Left, Direction.Right }
+                        .Select(getPointsInDirection)
+                        .FirstOrDefault(line => line.Contains(targetCenter));
+
+                    return targetLine?.ToList() ?? new List<Vector3>();
+                }
+            default:
+                return new List<Vector3>();
+        }
     }
 
     // TODO: Obviously this is a massive amount of duplicated code with the method below
@@ -31,7 +101,7 @@ public class TargetUtils
 
         var actingFightStats = actingEntity.GetComponent<FightStats>();
 
-        return actualTargets.Select(target =>
+        var markedTargets = actualTargets.Select(target =>
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
@@ -83,6 +153,10 @@ public class TargetUtils
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
                         }
                         break;
+                    case "SelfMobility":
+                        // Nothing for now
+                        // But ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                        break;
                     case "Capture":
                         {
                             if (targetStatuses.ContainsKey("Uncaptureable"))
@@ -117,6 +191,14 @@ public class TargetUtils
 
             return (target, targetedComp);
         }).ToList();
+
+        //if (selectedSkill.Effects.ContainsKey("SelfMobility"))
+        //{
+        //    var targetedComp = new Targeted();
+        //    markedTargets.Add(actingEntity, 
+        //}
+
+        return markedTargets;
     }
 
     public static List<Entity> MarkTargets(
@@ -183,6 +265,10 @@ public class TargetUtils
                             var heal = Math.Ceiling(kvp.Value * actingFightStats.Mag / 100d * 4);
                             targetedComp.Effects.Add(kvp.Key, (int)heal);
                         }
+                        break;
+                    case "SelfMobility":
+                        // Nothing for now
+                        // But ideally we should be showing a shadow image of where the new locations are for everyone targeted.
                         break;
                     case "Capture":
                         {
@@ -282,6 +368,11 @@ public class TargetUtils
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + (int)kvp.Value);
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
+                            }
+                            break;
+                        case "SelfMobility":
+                            {
+
                             }
                             break;
                         case "Capture":

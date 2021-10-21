@@ -260,15 +260,48 @@ public class AStarEx : AStar
             .ToList();
     }
 
-    public void SetObstacle(Vector3 position, Affiliation affiliation)
+    public IEnumerable<Vector3> GetPointsInLine(Vector3 startPosition, Vector3 direction, int maxRange)
     {
-        obstacles.Add(HashId(position), affiliation);
+        var results = new List<Vector3>();
+
+        var fromPoint = GetClosestPoint(startPosition);
+
+        while (fromPoint != -1 && maxRange > 0)
+        {
+            // TODO: There is a more elegant solution than this flag/break for sure.
+            bool found = false;
+            foreach (var possibleNext in GetPointConnections(fromPoint))
+            {
+                var possibleNextPos = GetPointPosition(possibleNext);
+                var dirPos = GetPointPosition(fromPoint) + direction;
+                // Ignore Z, the consumer filters that
+                if (possibleNextPos.x == dirPos.x && possibleNextPos.y == dirPos.y)
+                {
+                    fromPoint = possibleNext;
+                    maxRange--;
+                    results.Add(possibleNextPos);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                break;
+            }
+        }
+
+        return results;
     }
 
-    public void ClearObstacles()
-    {
+    public void SetObstacle(Vector3 position, Affiliation affiliation) =>
+        obstacles.Add(HashId(position), affiliation);
+
+    public void ClearObstacles() =>
         obstacles.Clear();
-    }
+
+    public bool HasObstacleAtLocation(Vector3 position) => 
+        obstacles.ContainsKey(HashId(position));
 
     public Vector3? GetBestTileMatch(Vector3 position, int maxJump) =>
         GetBestTileMatch(position, maxJump, new HashSet<TerrainType>());

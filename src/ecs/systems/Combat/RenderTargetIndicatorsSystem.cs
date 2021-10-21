@@ -8,6 +8,7 @@ public class RenderTargetIndicatorsSystem : Ecs.System
     private const string ActionLocationEntityKey = "actionLocation";
     private const string ReticleEntityKey = "reticle";
     private const string MapEntityKey = "map";
+    private const string SelectedEntityKey = "selected";
 
     public RenderTargetIndicatorsSystem()
     {
@@ -18,6 +19,8 @@ public class RenderTargetIndicatorsSystem : Ecs.System
         AddRequiredComponent<TileLocation>(ActionLocationEntityKey);
         AddRequiredComponent<Reticle>(ReticleEntityKey);
         AddRequiredComponent<Map>(MapEntityKey);
+        AddRequiredComponent<Selected>(SelectedEntityKey);
+        AddRequiredComponent<TileLocation>(SelectedEntityKey);
     }
 
     public override void UpdateAll(float deltaTime)
@@ -38,7 +41,8 @@ public class RenderTargetIndicatorsSystem : Ecs.System
 
         if (targetLocation != null && manager.CurrentState is PlayerTargetingState ptState)
         {
-            var points = TargetUtils.GetTargetLocations(ptState.SelectedSkill, map, reticleLocation.TilePosition);
+            var origin = SingleEntityFor(SelectedEntityKey).GetComponent<TileLocation>().TilePosition;
+            var points = TargetUtils.GetTargetEffectLocations(ptState.SelectedSkill, map, origin, reticleLocation.TilePosition);
 
             for (var i = 0; i < points.Count; i++)
             {

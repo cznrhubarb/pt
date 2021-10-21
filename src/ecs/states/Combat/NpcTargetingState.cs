@@ -46,7 +46,7 @@ public class NpcTargetingState : State
 
                     plan.SelectedSkill.CurrentTP--;
 
-                    var skillTargetPoints = TargetUtils.GetTargetLocations(plan.SelectedSkill, map, plan.SkillTargetLocation);
+                    var skillTargetPoints = TargetUtils.GetTargetEffectLocations(plan.SelectedSkill, map, plan.MoveTargetLocation, plan.SkillTargetLocation);
 
                     targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_030.png");
 

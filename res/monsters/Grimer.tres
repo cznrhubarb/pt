@@ -1,19 +1,19 @@
 [gd_resource type="Resource" load_steps=6 format=2]
 
 [ext_resource path="res://src/misc/MonsterBlueprint.cs" type="Script" id=1]
-[ext_resource path="res://img/portraits/1.png" type="Texture" id=2]
-[ext_resource path="res://img/actors/1.png" type="Texture" id=3]
-[ext_resource path="res://res/skills/ZapDash.tres" type="Resource" id=4]
+[ext_resource path="res://img/portraits/88.png" type="Texture" id=2]
+[ext_resource path="res://img/actors/88.png" type="Texture" id=3]
+[ext_resource path="res://res/skills/Tackle.tres" type="Resource" id=4]
 [ext_resource path="res://res/movables/Move3Jump2.tres" type="Resource" id=5]
 
 [resource]
 script = ExtResource( 1 )
 ProfilePicture = ExtResource( 2 )
 Sprite = ExtResource( 3 )
-MonNumber = 1
-Name = "Bulbasaur"
+MonNumber = 88
+Name = "Grimer"
 Rarity = 0
-Element = 2
+Element = 1
 SkillsAvailableByLevel = {
 1: ExtResource( 4 )
 }

@@ -78,8 +78,8 @@ public class Tactician
         var standPointsByTarget = new Dictionary<Vector3, List<Vector3>>();
         foreach (var position in placesToStand)
         {
-            var targetPoints = map.AStar.GetPointsBetweenRange(position, skill.MinRange, skill.MaxRange)
-                .Where(pt => position.z - pt.z <= skill.MaxHeightRangeDown && pt.z - position.z <= skill.MaxHeightRangeUp);
+            var targetPoints = TargetUtils.GetPotentialTargetLocations(skill, map, position);
+
             foreach (var pt in targetPoints)
             {
                 var list = standPointsByTarget.ContainsKey(pt) ? standPointsByTarget[pt] : new List<Vector3>();
@@ -127,7 +127,7 @@ public class Tactician
             // Temporarily set the actors tile position to the theoretical standing position
             actingLocationComp.TilePosition = tsp.standPosition;
 
-            var targetLocations = TargetUtils.GetTargetLocations(skill, map, tsp.targetPosition);
+            var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, tsp.standPosition, tsp.targetPosition);
             var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
 
             // Revert the actors tile position to the original
@@ -194,7 +194,7 @@ public class Tactician
         {
             // Not updating the acting unit's stand position as presumably we are over a turn away when doing this
             var targetPosition = target.GetComponent<TileLocation>().TilePosition;
-            var targetLocations = TargetUtils.GetTargetLocations(skill, map, targetPosition);
+            var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, startingPosition, targetPosition);
             var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
 
             return (name: target.GetComponent<ProfileDetails>().Name, targetPosition, effects);
@@ -304,6 +304,9 @@ public class Tactician
                         // Invert positive effects
                         amount = -amount;
                     }
+                    break;
+                // No tactical value for movement yet. It'll really come from strategic value I think?
+                case "SelfMobility":
                     break;
                 // Value of applying a status effect the target already has is 0
                 case "Protect":

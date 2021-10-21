@@ -5,8 +5,6 @@ public static class Constants
 {
     public static readonly CaptureValues Capture = new CaptureValues();
 
-
-
     public class CaptureValues
     {
         public readonly float HealthFloor = 0.1f;
