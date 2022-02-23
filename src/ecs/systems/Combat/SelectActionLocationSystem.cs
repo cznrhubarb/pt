@@ -62,6 +62,13 @@ public class SelectActionLocationSystem : Ecs.System
                     {
                         movingActor.GetComponent<TurnSpeed>().TimeToAct *= 2;
                     }
+
+                    if (movingActor.HasComponent<Directionality>())
+                    {
+                        movingActor.GetComponent<Directionality>().Direction = 
+                            (targetLocation.TilePosition - movingActor.GetComponent<TileLocation>().TilePosition).ToDirection();
+                    }
+
                     TargetUtils.PerformAction(manager, EntitiesFor(TargetedKey));
                     manager.AddComponentToEntity(manager.GetNewEntity(), new StatusTickEvent() { TickingEntity = movingActor });
                     manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());

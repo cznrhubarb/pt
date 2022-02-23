@@ -33,6 +33,7 @@ public class Exploration : Manager
         AddSystem(new FollowCameraControlSystem());
         AddSystem(new ClampToMapSystem());
         AddSystem(new ApplyPositionOffsetSystem());
+        AddSystem(new ApplyDirectionToSpriteSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new TweenCleanupSystem());
         AddSystem(new CameraAnchoringSystem());

@@ -100,6 +100,7 @@ public class MonsterFactory
                 break;
         }
 
+        components.Add(new Directionality());
         components.Add(new Selectable());
         components.Add(new StatusBag());
         // TODO: Starting time to act should be based on something else, like the movable move speed or average of skills or something

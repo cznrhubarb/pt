@@ -1,24 +1,24 @@
-[gd_scene load_steps=57 format=2]
+[gd_scene load_steps=58 format=2]
 
 [ext_resource path="res://src/scenes/Exploration.cs" type="Script" id=1]
 [ext_resource path="res://res/field_tileset.tres" type="TileSet" id=2]
-[ext_resource path="res://img/actors/watrainer.png" type="Texture" id=3]
-[ext_resource path="res://img/actors/trainer.png" type="Texture" id=4]
+[ext_resource path="res://img/sprites/1.png" type="Texture" id=3]
+[ext_resource path="res://img/sprites/4.png" type="Texture" id=4]
 [ext_resource path="res://img/actors/grunkle.png" type="Texture" id=5]
 [ext_resource path="res://src/ecs/components/Common/Selected.cs" type="Script" id=6]
 [ext_resource path="res://src/ecs/components/Common/SpriteWrap.cs" type="Script" id=7]
 [ext_resource path="res://src/ecs/core/Entity.cs" type="Script" id=8]
 [ext_resource path="res://prefabs/AutoHideSprite.tscn" type="PackedScene" id=9]
 [ext_resource path="res://src/ecs/components/Common/Obstacle.cs" type="Script" id=10]
-[ext_resource path="res://src/ecs/components/Exploration/Directionality.cs" type="Script" id=11]
+[ext_resource path="res://src/ecs/components/Common/Directionality.cs" type="Script" id=11]
 [ext_resource path="res://src/ecs/components/Common/TileLocation.cs" type="Script" id=12]
 [ext_resource path="res://src/ecs/components/Exploration/AutorunTrigger.cs" type="Script" id=13]
 [ext_resource path="res://src/ecs/components/Exploration/InteractTrigger.cs" type="Script" id=14]
 [ext_resource path="res://src/ecs/components/Exploration/WalkOnTrigger.cs" type="Script" id=15]
 [ext_resource path="res://src/ecs/components/Common/CameraWrap.cs" type="Script" id=16]
-[ext_resource path="res://img/actors/1.png" type="Texture" id=17]
-[ext_resource path="res://img/actors/7.png" type="Texture" id=18]
-[ext_resource path="res://img/actors/4.png" type="Texture" id=19]
+[ext_resource path="res://img/sprites/7.png" type="Texture" id=17]
+[ext_resource path="res://img/sprites/60.png" type="Texture" id=18]
+[ext_resource path="res://img/sprites/98.png" type="Texture" id=19]
 [ext_resource path="res://src/ecs/components/Common/CameraAnchor.cs" type="Script" id=20]
 [ext_resource path="res://src/ecs/components/Common/GooglyEyes.cs" type="Script" id=21]
 
@@ -68,7 +68,7 @@ script = ExtResource( 7 )
 
 [sub_resource type="Resource" id=11]
 script = ExtResource( 11 )
-Direction = 2
+Direction = 0
 
 [sub_resource type="Resource" id=12]
 script = ExtResource( 12 )
@@ -76,7 +76,7 @@ ZLayer = 5
 
 [sub_resource type="Resource" id=13]
 script = ExtResource( 21 )
-EyeOffsets = PoolVector3Array(  )
+EyeOffsets = PoolRealArray(  )
 EyeSizes = PoolRealArray(  )
 
 [sub_resource type="Resource" id=14]
@@ -90,75 +90,79 @@ script = ExtResource( 10 )
 script = ExtResource( 7 )
 
 [sub_resource type="Resource" id=17]
+script = ExtResource( 11 )
+Direction = 3
+
+[sub_resource type="Resource" id=18]
 script = ExtResource( 12 )
 ZLayer = 5
 
-[sub_resource type="Resource" id=18]
+[sub_resource type="Resource" id=19]
 script = ExtResource( 14 )
 Cue = 0
 CueParam = "ImpatientGrunkle"
 
-[sub_resource type="Resource" id=19]
+[sub_resource type="Resource" id=20]
 script = ExtResource( 7 )
 
-[sub_resource type="Resource" id=20]
+[sub_resource type="Resource" id=21]
 script = ExtResource( 10 )
 
-[sub_resource type="Resource" id=21]
+[sub_resource type="Resource" id=22]
 script = ExtResource( 13 )
 Cue = 2
 CueParam = "GameIntro"
 
-[sub_resource type="Resource" id=22]
+[sub_resource type="Resource" id=23]
 script = ExtResource( 12 )
 ZLayer = 5
 
-[sub_resource type="Resource" id=23]
+[sub_resource type="Resource" id=24]
 script = ExtResource( 7 )
 
-[sub_resource type="Resource" id=24]
+[sub_resource type="Resource" id=25]
 script = ExtResource( 10 )
 
-[sub_resource type="Resource" id=25]
+[sub_resource type="Resource" id=26]
 script = ExtResource( 14 )
 Cue = 0
 CueParam = "ChooseBulbasaur"
 
-[sub_resource type="Resource" id=26]
+[sub_resource type="Resource" id=27]
 script = ExtResource( 10 )
 
-[sub_resource type="Resource" id=27]
+[sub_resource type="Resource" id=28]
 script = ExtResource( 7 )
 
-[sub_resource type="Resource" id=28]
+[sub_resource type="Resource" id=29]
 script = ExtResource( 12 )
 ZLayer = 5
-
-[sub_resource type="Resource" id=29]
-script = ExtResource( 14 )
-Cue = 0
-CueParam = "ChooseCharmander"
 
 [sub_resource type="Resource" id=30]
 script = ExtResource( 14 )
 Cue = 0
-CueParam = "ChooseSquirtle"
+CueParam = "ChooseCharmander"
 
 [sub_resource type="Resource" id=31]
-script = ExtResource( 12 )
-ZLayer = 5
+script = ExtResource( 14 )
+Cue = 0
+CueParam = "ChooseSquirtle"
 
 [sub_resource type="Resource" id=32]
-script = ExtResource( 10 )
-
-[sub_resource type="Resource" id=33]
-script = ExtResource( 7 )
-
-[sub_resource type="Resource" id=34]
 script = ExtResource( 12 )
 ZLayer = 5
 
+[sub_resource type="Resource" id=33]
+script = ExtResource( 10 )
+
+[sub_resource type="Resource" id=34]
+script = ExtResource( 7 )
+
 [sub_resource type="Resource" id=35]
+script = ExtResource( 12 )
+ZLayer = 5
+
+[sub_resource type="Resource" id=36]
 script = ExtResource( 20 )
 Name = "Corner"
 
@@ -284,7 +288,8 @@ editorComponents = [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), Sub
 
 [node name="123" type="Sprite" parent="Actors/Trainer"]
 position = Vector2( 0, -23 )
-texture = ExtResource( 4 )
+texture = ExtResource( 19 )
+hframes = 4
 
 [node name="WaTrainer" type="Node2D" parent="Actors"]
 position = Vector2( 429.903, 342.351 )
@@ -292,11 +297,12 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ) ]
+editorComponents = [ SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ) ]
 
 [node name="123" type="Sprite" parent="Actors/WaTrainer"]
 position = Vector2( 0, -23 )
-texture = ExtResource( 3 )
+texture = ExtResource( 18 )
+hframes = 4
 
 [node name="Grunkle" type="Node2D" parent="Actors"]
 position = Vector2( 336.636, 195.308 )
@@ -304,7 +310,7 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 17 ), SubResource( 18 ), SubResource( 19 ), SubResource( 20 ) ]
+editorComponents = [ SubResource( 18 ), SubResource( 19 ), SubResource( 20 ), SubResource( 21 ) ]
 
 [node name="123" type="Sprite" parent="Actors/Grunkle"]
 position = Vector2( 0, -23 )
@@ -313,7 +319,7 @@ texture = ExtResource( 5 )
 [node name="Autorun" type="Node2D" parent="Actors"]
 position = Vector2( 128.434, -95.1366 )
 script = ExtResource( 8 )
-editorComponents = [ SubResource( 21 ) ]
+editorComponents = [ SubResource( 22 ) ]
 
 [node name="Bulbasaur" type="Node2D" parent="Actors"]
 position = Vector2( 241.258, 29.1295 )
@@ -321,12 +327,13 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 22 ), SubResource( 23 ), SubResource( 24 ), SubResource( 25 ) ]
+editorComponents = [ SubResource( 23 ), SubResource( 24 ), SubResource( 25 ), SubResource( 26 ) ]
 
 [node name="Sprite" type="Sprite" parent="Actors/Bulbasaur"]
 position = Vector2( -0.8909, -14.9819 )
-texture = ExtResource( 17 )
+texture = ExtResource( 3 )
 flip_h = true
+hframes = 4
 
 [node name="Charmander" type="Node2D" parent="Actors"]
 position = Vector2( 191.543, 50.3358 )
@@ -334,12 +341,13 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 26 ), SubResource( 27 ), SubResource( 28 ), SubResource( 29 ) ]
+editorComponents = [ SubResource( 27 ), SubResource( 28 ), SubResource( 29 ), SubResource( 30 ) ]
 
 [node name="Sprite" type="Sprite" parent="Actors/Charmander"]
 position = Vector2( -0.8909, -23.2698 )
-texture = ExtResource( 19 )
+texture = ExtResource( 4 )
 flip_h = true
+hframes = 4
 
 [node name="Squirtle" type="Node2D" parent="Actors"]
 position = Vector2( 143.88, 75.7264 )
@@ -347,12 +355,13 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 30 ), SubResource( 31 ), SubResource( 32 ), SubResource( 33 ) ]
+editorComponents = [ SubResource( 31 ), SubResource( 32 ), SubResource( 33 ), SubResource( 34 ) ]
 
 [node name="Sprite" type="Sprite" parent="Actors/Squirtle"]
 position = Vector2( -2.84828, -19.7065 )
-texture = ExtResource( 18 )
+texture = ExtResource( 17 )
 flip_h = true
+hframes = 4
 
 [node name="CamAnchor" type="Node2D" parent="Actors"]
 position = Vector2( -49.9194, 241.778 )
@@ -360,7 +369,7 @@ script = ExtResource( 8 )
 __meta__ = {
 "_edit_group_": true
 }
-editorComponents = [ SubResource( 34 ), SubResource( 35 ) ]
+editorComponents = [ SubResource( 35 ), SubResource( 36 ) ]
 
 [node name="AutoHideSprite" parent="Actors/CamAnchor" instance=ExtResource( 9 )]
 

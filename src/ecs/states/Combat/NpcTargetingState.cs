@@ -48,6 +48,12 @@ public class NpcTargetingState : State
 
                     var skillTargetPoints = TargetUtils.GetTargetEffectLocations(plan.SelectedSkill, map, plan.MoveTargetLocation, plan.SkillTargetLocation);
 
+                    if (acting.HasComponent<Directionality>())
+                    {
+                        acting.GetComponent<Directionality>().Direction =
+                            (plan.SkillTargetLocation - tilePosition).ToDirection();
+                    }
+
                     targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_030.png");
 
                     // TODO: If we put the targeteds in the tactical plan somehow, we can avoid doing a lot of the stuff in here

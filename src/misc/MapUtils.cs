@@ -56,6 +56,7 @@ public class MapUtils
         var tweenSeq = new TweenSequence(manager.GetTree());
         for (var idx = 1; idx < path.Length; idx++)
         {
+            tweenSeq.AppendCallback(movingActor, "SetDirection", new object[] { (path[idx] - path[idx - 1]).ToDirection() });
             // TODO: Slightly roundabout way of tweening our actors, primarily for the benefit of z sorting, and it still isn't perfect :(
             if (path[idx].z != path[idx - 1].z)
             {

@@ -98,5 +98,14 @@ namespace Ecs
             var tileLocation = this.GetComponent<TileLocation>();
             tileLocation.TilePosition = new Vector3(tileLocation.TilePosition.x, tileLocation.TilePosition.y, z);
         }
+
+        private void SetDirection(Direction direction)
+        {
+            var directionality = this.GetComponentOrNull<Directionality>();
+            if (directionality != null)
+            {
+                directionality.Direction = direction;
+            }
+        }
     }
 }

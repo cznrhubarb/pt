@@ -62,6 +62,8 @@ public class TravelToLocationSystem : Ecs.System
         {
             var actorMovable = movingActor.GetComponent<Movable>();
 
+            // TODO: Not sure when it happened, but we have a bug here now (Damn not having unit tests!)
+            //  Going back sends the player back to the origin or something right now?
             if (actorMovable.StartingLocation != null)
             {
                 if (movingActor.HasComponent<Tweening>())

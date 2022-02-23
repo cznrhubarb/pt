@@ -39,6 +39,7 @@ public class CutSceneState : State
             }
             nextEvent.Manager = manager;
             nextEvent.OnComplete = () => RunNextStep(manager);
+            GD.Print(nextEvent.GetType());
             nextEvent.RunStep();
         }
         else

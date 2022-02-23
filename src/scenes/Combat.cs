@@ -35,6 +35,7 @@ public class Combat : Manager
         AddSystem(new PulseSystem());
         AddSystem(new ClampToMapSystem());
         AddSystem(new ApplyPositionOffsetSystem());
+        AddSystem(new ApplyDirectionToSpriteSystem());
         AddSystem(new DepthSortSystem());
         AddSystem(new RenderTurnOrderCardsSystem());
         AddSystem(new RemoveDyingEntitiesSystem());
@@ -155,7 +156,7 @@ public class Combat : Manager
         {
             var components = MonsterFactory.GenerateComponents(state, Affiliation.Friendly);
             var actor = GetNewEntity();
-            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, FlipH = true, Position = new Vector2(0, -23) });
+            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, Position = new Vector2(0, -23), Hframes = 4 });
             AddComponentsToEntity(actor, components.ToArray());
             AddComponentsToEntity(actor,
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
@@ -167,7 +168,7 @@ public class Combat : Manager
         {
             var components = MonsterFactory.GenerateComponents(state, Affiliation.Enemy);
             var actor = GetNewEntity();
-            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, Position = new Vector2(0, -23) });
+            actor.AddChild(new Sprite() { Texture = state.Blueprint.Sprite, Position = new Vector2(0, -23), Hframes = 4 });
             AddComponentsToEntity(actor, components.ToArray());
             AddComponentsToEntity(actor,
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },

@@ -2,7 +2,7 @@
 
 [ext_resource path="res://src/misc/MonsterBlueprint.cs" type="Script" id=1]
 [ext_resource path="res://img/portraits/7.png" type="Texture" id=2]
-[ext_resource path="res://img/actors/7.png" type="Texture" id=3]
+[ext_resource path="res://img/sprites/7.png" type="Texture" id=3]
 [ext_resource path="res://res/skills/Tackle.tres" type="Resource" id=4]
 [ext_resource path="res://res/movables/Move3Jump2.tres" type="Resource" id=5]
 
