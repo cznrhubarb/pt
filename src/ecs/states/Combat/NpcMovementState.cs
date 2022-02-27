@@ -29,8 +29,9 @@ public class NpcMovementState : State
         else
         {
             var moveStats = acting.GetComponent<Movable>();
+            var affiliation = acting.GetComponent<Affiliated>().Affiliation;
             var startingPosition = actorLocation.TilePosition;
-            points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+            points = map.AStar.GetPointsInRange(moveStats, affiliation, startingPosition);
         }
         travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");
 
@@ -41,7 +42,8 @@ public class NpcMovementState : State
                 if (actorLocation.TilePosition != plan.MoveTargetLocation)
                 {
                     var actorMovable = acting.GetComponent<Movable>();
-                    var path = map.AStar.GetPath(actorMovable, actorLocation.TilePosition, plan.MoveTargetLocation);
+                    var actorAffiliation = acting.GetComponent<Affiliated>().Affiliation;
+                    var path = map.AStar.GetPath(actorMovable, actorAffiliation, actorLocation.TilePosition, plan.MoveTargetLocation);
                     acting.GetComponent<TurnSpeed>().TimeToAct += (path.Length - 1) * actorMovable.TravelSpeed;
 
                     var tweenSeq = MapUtils.BuildTweenForActor(manager, acting, path);

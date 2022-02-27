@@ -23,6 +23,8 @@ public class Combat : Manager
         BuildControlElements();
         BuildActors(mapComp);
 
+        AddComponentToEntity(GetNewEntity(), new CombatSpoils());
+
         AnchorCamera();
 
         AddComponentToEntity(GetNewEntity(), new AdvanceClockEvent());
@@ -145,6 +147,10 @@ public class Combat : Manager
 
     private void BuildActors(Map map)
     {
+        // HACK: Setting these for testing
+        WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
+        WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
+
         // HACK: Just hardcoding some starting points to get started
         var positions = new Queue<Vector3>();
         positions.Enqueue(new Vector3(5, 0, 2));
@@ -161,7 +167,7 @@ public class Combat : Manager
             AddComponentsToEntity(actor,
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
                 new SpriteWrap(),
-                TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
+                TurnOrderCard.For(actor.GetComponent<ProfileDetails>(), Affiliation.Friendly));
         }
 
         foreach (var state in WorldState.RivalPartyState)
@@ -173,7 +179,7 @@ public class Combat : Manager
             AddComponentsToEntity(actor,
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
                 new SpriteWrap(),
-                TurnOrderCard.For(actor.GetComponent<ProfileDetails>()));
+                TurnOrderCard.For(actor.GetComponent<ProfileDetails>(), Affiliation.Enemy));
         }
     }
 

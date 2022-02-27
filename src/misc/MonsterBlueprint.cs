@@ -13,7 +13,7 @@ public class MonsterBlueprint : Resource
 
     [Export]
     public Texture Sprite { get; set; } = null;
-    
+
     // TODO: Maybe also animations and whatever?
 
     [Export]
@@ -35,21 +35,15 @@ public class MonsterBlueprint : Resource
     [Export]
     public IDictionary<int, Movable> MoveStatsByLevel { get; set; } = new Dictionary<int, Movable>();
 
-    // Changes with level and individual
+    // Each of these values represent the base stat when the monster is at level 100
     [Export]
-    public int BaseMaxHealth { get; set; } = 1;
+    public StatBundle Base { get; set; } = new StatBundle();
 
+    // These represent the amount of Partnership growth they give to
+    //  other members of their team at the end of a successful combat.
+    // One point here correlates to the same as one base state point.
     [Export]
-    public int BaseAtn { get; set; } = 1;
-    [Export]
-    public int BaseDex { get; set; } = 1;
-    [Export]
-    public int BaseMag { get; set; } = 1;
-    [Export]
-    public int BaseStr { get; set; } = 1;
-    [Export]
-    public int BaseTuf { get; set; } = 1;
+    public StatBundle PartnershipGrowth { get; set; } = new StatBundle();
 
-    // TODO: Growth stats given to other members of the party
     // TODO: Evolution paths and triggers
 }

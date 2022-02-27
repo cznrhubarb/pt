@@ -38,7 +38,8 @@ public class Tactician
         }
         else
         {
-            placesToStand = map.AStar.GetPointsInRange(acting.GetComponent<Movable>(), acting.GetComponent<TileLocation>().TilePosition);
+            placesToStand = map.AStar.GetPointsInRange(acting.GetComponent<Movable>(), 
+                acting.GetComponent<Affiliated>().Affiliation, acting.GetComponent<TileLocation>().TilePosition);
         }
 
         var bestPlan = acting.GetComponent<SkillSet>().Skills
@@ -70,6 +71,7 @@ public class Tactician
         var actingLocationComp = acting.GetComponent<TileLocation>();
         var startingPosition = actingLocationComp.TilePosition;
         var movable = acting.GetComponent<Movable>();
+        var affiliation = acting.GetComponent<Affiliated>().Affiliation;
 
         GD.Print($"Evaluating skill throwing from {placesToStand.Count} points");
 
@@ -96,7 +98,7 @@ public class Tactician
         //      both damage output for crits and damage taken from other people critting
         var targetStandPairs = standPointsByTarget.Select(kvp =>
         {
-            var paths = kvp.Value.Select(newPosition => (newPosition, map.AStar.GetPath(movable, startingPosition, newPosition).Length));
+            var paths = kvp.Value.Select(newPosition => (newPosition, map.AStar.GetPath(movable, affiliation, startingPosition, newPosition).Length));
             var closest = paths.Aggregate((pathOne, pathTwo) => 
             {
                 if (pathOne.Length == pathTwo.Length && pathTwo.newPosition.z > pathOne.newPosition.z)
@@ -188,6 +190,7 @@ public class Tactician
         var actingLocationComp = acting.GetComponent<TileLocation>();
         var startingPosition = actingLocationComp.TilePosition;
         var movable = acting.GetComponent<Movable>();
+        var affiliation = acting.GetComponent<Affiliated>().Affiliation;
 
         // For each skill, find the value of dropping it dead center on each potential target
         var effectsOfSkillAtTargets = potentialTargets.Select(target =>
@@ -207,7 +210,7 @@ public class Tactician
         var travelAndEffects = effectsOfSkillAtTargets.Select(target =>
         {
             // QQ? Does this work? Since the target position will be an obstacle in pathfinding
-            var path = map.AStar.GetPath(movable, startingPosition, target.targetPosition);
+            var path = map.AStar.GetPath(movable, affiliation, startingPosition, target.targetPosition);
             // Very imperfect because it doesn't take into account skills with more vertical range than
             //  our jump heights. This might incorrectly assume it would take longer than needed to
             //  use the skill, but it's all approximations anyway.
@@ -425,8 +428,8 @@ public class Tactician
         //  so we're less likely to whack our own team unless it's like... really worth it.
         // Since we're inverting positive effect values above, this also means we're a little
         //  more likely to help our own team than to hurt the other team (We'll see if that's the right choice in testing)
-        Affiliation actingAff = acting.GetComponent<ProfileDetails>().Affiliation;
-        Affiliation targetAff = target.GetComponent<ProfileDetails>().Affiliation;
+        Affiliation actingAff = acting.GetComponent<Affiliated>().Affiliation;
+        Affiliation targetAff = target.GetComponent<Affiliated>().Affiliation;
         if (actingAff == targetAff)
         {
             value *= -1.5f;

@@ -31,6 +31,7 @@ public class PlayerMovementState : State
             else
             {
                 var moveStats = acting.GetComponent<Movable>();
+                var affiliation = acting.GetComponent<Affiliated>().Affiliation;
 
                 // If we are /returning/ to this state by going backwards, then just use starting location instead of current
                 var startingPosition = acting.GetComponent<TileLocation>().TilePosition;
@@ -39,7 +40,7 @@ public class PlayerMovementState : State
                     startingPosition = moveStats.StartingLocation.TilePosition;
                 }
 
-                points = map.AStar.GetPointsInRange(moveStats, startingPosition);
+                points = map.AStar.GetPointsInRange(moveStats, affiliation, startingPosition);
                 if (moveStats.StartingLocation != null)
                 {
                     points.Add(acting.GetComponent<TileLocation>().TilePosition);

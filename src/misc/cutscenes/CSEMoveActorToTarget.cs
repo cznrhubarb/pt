@@ -9,7 +9,6 @@ public class CSEMoveActorToTarget : CutSceneEvent
 {
     private static readonly Movable cutSceneMovable = new Movable()
     {
-        Affiliation = Affiliation.Neutral,
         MaxJump = 2,
         MaxMove = 99,
         TerrainCostModifiers = new Dictionary<TerrainType, float>
@@ -34,7 +33,7 @@ public class CSEMoveActorToTarget : CutSceneEvent
         if (actorLocation.TilePosition != finalPosition)
         {
             var map = Manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
-            var path = map.AStar.GetPath(cutSceneMovable, actorLocation.TilePosition, finalPosition);
+            var path = map.AStar.GetPath(cutSceneMovable, Affiliation.Neutral, actorLocation.TilePosition, finalPosition);
 
             var tweenSeq = MapUtils.BuildTweenForActor(Manager, actor, path);
             tweenSeq.Connect("finished", this, nameof(MovementFinished));

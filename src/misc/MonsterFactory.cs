@@ -11,7 +11,7 @@ public class MonsterFactory
         var monsterState = new MonsterState();
         monsterState.Blueprint = blueprint;
         monsterState.Level = level;
-        monsterState.CustomName = blueprint.Name;
+        monsterState.Experience = 90;
 
         var levelIter = level;
         // TODO: There's a faster way to iterate through these :p
@@ -24,21 +24,19 @@ public class MonsterFactory
             levelIter--;
         }
 
-        // TODO: Determine growth for level and uniquness modifiers
-        var maxHealth = blueprint.BaseMaxHealth;
-        monsterState.MaxHealth = maxHealth;
+        monsterState.Partnership = new StatBundle();
 
-        // TODO: Determine growth for level and uniquness modifiers
-        var atn = blueprint.BaseAtn;
-        var mag = blueprint.BaseMag;
-        var str = blueprint.BaseStr;
-        var dex = blueprint.BaseDex;
-        var tuf = blueprint.BaseTuf;
-        monsterState.Atn = atn;
-        monsterState.Mag = mag;
-        monsterState.Str = str;
-        monsterState.Dex = dex;
-        monsterState.Tuf = tuf;
+        monsterState.Genetics = new StatBundle()
+        {
+            Health = Globals.Random.Next(0, 50),
+            Atn = Globals.Random.Next(0, 50),
+            Dex = Globals.Random.Next(0, 50),
+            Mag = Globals.Random.Next(0, 50),
+            Str = Globals.Random.Next(0, 50),
+            Tuf = Globals.Random.Next(0, 50)
+        };
+
+        monsterState.RecalculateStats();
 
         return monsterState;
     }
@@ -48,13 +46,7 @@ public class MonsterFactory
         var components = new List<Component>();
         var blueprint = monsterState.Blueprint;
 
-        components.Add(new ProfileDetails()
-        {
-            Level = monsterState.Level,
-            ProfilePicture = blueprint.ProfilePicture,
-            Name = monsterState.CustomName,
-            Affiliation = affiliation
-        });
+        components.Add(new ProfileDetails() { MonsterState = monsterState });
         components.Add(new Elemental() { Element = blueprint.Element });
 
         components.Add(new SkillSet() { Skills = monsterState.Skills });
@@ -100,6 +92,7 @@ public class MonsterFactory
                 break;
         }
 
+        components.Add(new Affiliated() { Affiliation = affiliation });
         components.Add(new Directionality());
         components.Add(new Selectable());
         components.Add(new StatusBag());

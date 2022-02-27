@@ -9,23 +9,42 @@ public class MonsterState
     // This is where we get element, number, move stats, textures, etc
     public MonsterBlueprint Blueprint { get; set; }
 
-    public string CustomName { get; set; }
+    private string customName = null;
+    public string CustomName
+    {
+        get => customName ?? Blueprint.Name;
+        set => customName = value;
+    }
 
     public int Level { get; set; }
-    // plus current experience
+    public int Experience { get; set; }
 
     public List<Skill> Skills { get; set; } = new List<Skill>();
 
-    public int MaxHealth { get; set; }
+    public StatBundle EffectiveStats { get; set; } = new StatBundle();
+    public int MaxHealth { get => EffectiveStats.Health; }
+    public int Atn { get => EffectiveStats.Atn; }
+    public int Dex { get => EffectiveStats.Dex; }
+    public int Mag { get => EffectiveStats.Mag; }
+    public int Str { get => EffectiveStats.Str; }
+    public int Tuf { get => EffectiveStats.Tuf; }
 
-    public int Atn { get; set; }
-    public int Dex { get; set; }
-    public int Mag { get; set; }
-    public int Str { get; set; }
-    public int Tuf { get; set; }
+    public StatBundle Partnership { get; set; } = new StatBundle();
 
-    // Plus add in hidden growth stats or whatever we need?
+    public StatBundle Genetics { get; set; } = new StatBundle();
 
     public void Save() { throw new NotImplementedException(); }
     public void Load() { throw new NotImplementedException(); }
+
+    public void RecalculateStats()
+    {
+        EffectiveStats = (Blueprint.Base + Partnership + Genetics) * Level / 100;
+    }
+
+    public StatBundle DetermineStatGainFromLevelUp(int levelsGained)
+    {
+        var valuesAtLevelUp = (Blueprint.Base + Partnership + Genetics) * (Level + levelsGained) / 100;
+
+        return valuesAtLevelUp - EffectiveStats;
+    }
 }

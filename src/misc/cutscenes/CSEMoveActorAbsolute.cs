@@ -10,7 +10,6 @@ public class CSEMoveActorAbsolute : CutSceneEvent
 {
     private static readonly Movable cutSceneMovable = new Movable() 
     { 
-        Affiliation = Affiliation.Neutral, 
         MaxJump = 2, 
         MaxMove = 99, 
         TerrainCostModifiers = new Dictionary<TerrainType, float>
@@ -33,7 +32,7 @@ public class CSEMoveActorAbsolute : CutSceneEvent
         if (actorLocation.TilePosition != FinalPosition)
         {
             var map = Manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
-            var path = map.AStar.GetPath(cutSceneMovable, actorLocation.TilePosition, FinalPosition);
+            var path = map.AStar.GetPath(cutSceneMovable, Affiliation.Neutral, actorLocation.TilePosition, FinalPosition);
 
             var tweenSeq = MapUtils.BuildTweenForActor(Manager, actor, path);
             tweenSeq.Connect("finished", this, nameof(MovementFinished), new Godot.Collections.Array() { Manager, 0.5f });

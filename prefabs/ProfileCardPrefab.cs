@@ -131,9 +131,10 @@ public class ProfileCardPrefab : Control
         }
 
         var profileDetails = currentProfileEntity.GetComponent<ProfileDetails>();
+        var affiliation = currentProfileEntity.GetComponent<Affiliated>().Affiliation;
 
         Color backgroundColor;
-        switch (profileDetails.Affiliation)
+        switch (affiliation)
         {
             case Affiliation.Enemy:
                 backgroundColor = Color.Color8(221, 74, 63);

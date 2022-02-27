@@ -44,6 +44,7 @@ public class AStarEx : AStar
     }
 
     private Movable mover = null;
+    private Affiliation moverAffiliation = Affiliation.Neutral;
     private Dictionary<int, TerrainType> terrainTypes = new Dictionary<int, TerrainType>();
     private Dictionary<int, Affiliation> obstacles = new Dictionary<int, Affiliation>();
 
@@ -60,7 +61,7 @@ public class AStarEx : AStar
         var differingObstacleAtLocation =
             mover != null &&
             obstacles.ContainsKey(toId) &&
-            (obstacles[toId] == Affiliation.Neutral || obstacles[toId] != mover.Affiliation);
+            (obstacles[toId] == Affiliation.Neutral || obstacles[toId] != moverAffiliation);
 
         var baseCost = Mathf.Pow(fromPos.x - toPos.x, 2) + Mathf.Pow(fromPos.y - toPos.y, 2);
         var terrain = terrainTypes[toId];
@@ -159,21 +160,23 @@ public class AStarEx : AStar
         }
     }
 
-    public Vector3[] GetPath(Movable moveStats, Vector3 startPosition, Vector3 endPosition)
+    public Vector3[] GetPath(Movable moveStats, Affiliation affiliation, Vector3 startPosition, Vector3 endPosition)
     {
         mover = moveStats;
+        moverAffiliation = affiliation;
 
         // GetPoints / GetPointConnections
 
         return GetPointPath(GetClosestPoint(startPosition), GetClosestPoint(endPosition));
     }
 
-    public List<Vector3> GetPointsInRange(Movable moveStats, Vector3 startPosition)
+    public List<Vector3> GetPointsInRange(Movable moveStats, Affiliation affiliation, Vector3 startPosition)
     {
         var startingPoint = GetClosestPoint(startPosition);
         var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, moveStats.MaxMove) };
 
         mover = moveStats;
+        moverAffiliation = affiliation;
 
         var evalIndex = 0;
         while (evalIndex < pointsInRange.Count)
@@ -224,6 +227,7 @@ public class AStarEx : AStar
         var pointsInRange = new List<MapSortPoint>() { new MapSortPoint(startingPoint, maxRange) };
 
         mover = null;
+        moverAffiliation = Affiliation.Neutral;
 
         var evalIndex = 0;
         while (evalIndex < pointsInRange.Count)

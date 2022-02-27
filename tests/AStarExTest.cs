@@ -11,8 +11,7 @@ public class AStarExTest : WAT.Test
         { 
             MaxMove = 2, 
             MaxJump = 1, 
-            StartingLocation = new TileLocation() { TilePosition = new Vector3(0, 0, 0) }, 
-            Affiliation = Affiliation.Friendly 
+            StartingLocation = new TileLocation() { TilePosition = new Vector3(0, 0, 0) }
         };
     }
 
@@ -40,7 +39,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(new List<Vector3>() { new Vector3(0, 0, 0) });
         var astar = new AStarEx(map);
 
-        Assert.IsEqual(astar.GetPointsInRange(TestMover, new Vector3(0, 0, 0)).Count, 0);
+        Assert.IsEqual(astar.GetPointsInRange(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0)).Count, 0);
     }
 
     [Test]
@@ -57,7 +56,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(points);
         var astar = new AStarEx(map);
 
-        var results = astar.GetPointsInRange(TestMover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 4);
         for (var i = 1; i < points.Count; i++)
         {
@@ -88,7 +87,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(points);
         var astar = new AStarEx(map);
 
-        var results = astar.GetPointsInRange(TestMover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 12);
         for (var i = 1; i < points.Count - 1; i++)
         {
@@ -110,7 +109,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(points);
         var astar = new AStarEx(map);
 
-        var results = astar.GetPointsInRange(TestMover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 0);
     }
 
@@ -130,7 +129,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(points);
         var astar = new AStarEx(map);
 
-        var results = astar.GetPointsInRange(TestMover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 3);
         for (var i = 1; i <= 3; i++)
         {
@@ -158,7 +157,7 @@ public class AStarExTest : WAT.Test
         var mover = TestMover;
         mover.MaxMove = 5;
 
-        var results = astar.GetPointsInRange(mover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(mover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 2);
         for (var i = 1; i <= 2; i++)
         {
@@ -186,7 +185,7 @@ public class AStarExTest : WAT.Test
         var mover = TestMover;
         mover.MaxMove = 5;
 
-        var results = astar.GetPointsInRange(mover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(mover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 4);
         Assert.ListContains(results, points[1]);
         Assert.ListContains(results, points[2]);
@@ -222,7 +221,7 @@ public class AStarExTest : WAT.Test
         var mover = TestMover;
         mover.MaxMove = 5;
 
-        var results = astar.GetPointsInRange(mover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(mover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 3);
     }
 
@@ -254,7 +253,7 @@ public class AStarExTest : WAT.Test
         mover.MaxMove = 2;
         mover.TerrainCostModifiers.Add(TerrainType.Difficult, 0.5f);
 
-        var results = astar.GetPointsInRange(mover, new Vector3(0, 0, 0));
+        var results = astar.GetPointsInRange(mover, Affiliation.Friendly, new Vector3(0, 0, 0));
         Assert.IsEqual(results.Count, 3);
     }
 
@@ -274,7 +273,7 @@ public class AStarExTest : WAT.Test
         var map = GenerateMap(points);
         var astar = new AStarEx(map);
 
-        var results = astar.GetPath(TestMover, new Vector3(0, 0, 0), new Vector3(1, 1, 2));
+        var results = astar.GetPath(TestMover, Affiliation.Friendly, new Vector3(0, 0, 0), new Vector3(1, 1, 2));
         Assert.IsEqual(results.Length, 3);
         for (var i = 0; i < results.Length; i++)
         {

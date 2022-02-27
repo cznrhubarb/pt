@@ -21,11 +21,11 @@ public class TurnOrderCard : Component
         set => card.Position = value;
     }
 
-    public static TurnOrderCard For(ProfileDetails profileDetails)
+    public static TurnOrderCard For(ProfileDetails profileDetails, Affiliation affiliation)
     {
         var prefab = ResourceLoader.Load<PackedScene>("res://prefabs/TurnOrderCardPrefab.tscn");
         var toc = new TurnOrderCard() { card = (TurnOrderCardPrefab)prefab.Instance() };
-        toc.card.Init(profileDetails.ProfilePicture, profileDetails.Affiliation);
+        toc.card.Init(profileDetails.ProfilePicture, affiliation);
 
         var hud = Globals.SceneTree.Root.FindNode("HUD", true, false);
         hud.AddChild(toc.card);

@@ -19,9 +19,3 @@ SkillsAvailableByLevel = {
 MoveStatsByLevel = {
 1: ExtResource( 5 )
 }
-BaseMaxHealth = 30
-BaseAtn = 10
-BaseDex = 10
-BaseMag = 10
-BaseStr = 10
-BaseTuf = 10

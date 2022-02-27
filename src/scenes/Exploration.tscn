@@ -76,7 +76,7 @@ ZLayer = 5
 
 [sub_resource type="Resource" id=13]
 script = ExtResource( 21 )
-EyeOffsets = PoolRealArray(  )
+EyeOffsets = PoolVector3Array(  )
 EyeSizes = PoolRealArray(  )
 
 [sub_resource type="Resource" id=14]
@@ -110,8 +110,8 @@ script = ExtResource( 10 )
 
 [sub_resource type="Resource" id=22]
 script = ExtResource( 13 )
-Cue = 2
-CueParam = "GameIntro"
+Cue = 1
+CueParam = "Combat"
 
 [sub_resource type="Resource" id=23]
 script = ExtResource( 12 )

@@ -13,4 +13,8 @@ public static class WorldState
     {
         MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/WaTrainer.tres"), 1)
     };
+
+    public static List<Item> Inventory { get; set; } = new List<Item>();
+
+    public static List<MonsterState> MonsterBank { get; set; } = new List<MonsterState>();
 }

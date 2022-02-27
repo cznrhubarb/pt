@@ -42,8 +42,9 @@ public class TravelToLocationSystem : Ecs.System
             {
                 var map = SingleEntityFor(MapEntityKey).GetComponent<Map>();
                 var actorMovable = movingActor.GetComponent<Movable>();
+                var actorAffiliation = movingActor.GetComponent<Affiliated>().Affiliation;
                 var actorLocation = movingActor.GetComponent<TileLocation>();
-                var path = map.AStar.GetPath(actorMovable, actorLocation.TilePosition, reticleLocationComp.TilePosition);
+                var path = map.AStar.GetPath(actorMovable, actorAffiliation, actorLocation.TilePosition, reticleLocationComp.TilePosition);
 
                 // TODO: Maybe handle this a different way. If we have an "on end tween" trigger at some point, this won't work.
                 if (path.Length > 1)

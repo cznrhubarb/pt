@@ -5,11 +5,13 @@ using System.Linq;
 public class RemoveDyingEntitiesSystem : Ecs.System
 {
     private const string AffiliatedEntitiesKey = "affiliated";
+    private const string CombatSpoilsKey = "combatSpoils";
 
     public RemoveDyingEntitiesSystem()
     {
         AddRequiredComponent<Dying>();
-        AddRequiredComponent<ProfileDetails>(AffiliatedEntitiesKey);
+        AddRequiredComponent<Affiliated>(AffiliatedEntitiesKey);
+        AddRequiredComponent<CombatSpoils>(CombatSpoilsKey);
     }
 
     public override void UpdateAll(float deltaTime)
@@ -27,7 +29,7 @@ public class RemoveDyingEntitiesSystem : Ecs.System
         var affCounts = new Dictionary<Affiliation, int>() { { Affiliation.Friendly, 0 }, { Affiliation.Enemy, 0 }, { Affiliation.Neutral, 0 } };
         EntitiesFor(AffiliatedEntitiesKey).ForEach(entity =>
         {
-            affCounts[entity.GetComponent<ProfileDetails>().Affiliation]++;
+            affCounts[entity.GetComponent<Affiliated>().Affiliation]++;
         });
         if (affCounts[Affiliation.Friendly] == 0)
         {
@@ -42,6 +44,13 @@ public class RemoveDyingEntitiesSystem : Ecs.System
     protected override void Update(Entity entity, float deltaTime) 
     {
         entity.GetComponentOrNull<TurnOrderCard>()?.Cleanup();
+
+        if (entity.HasComponent<ProfileDetails>() && entity.HasComponent<Affiliated>())
+        {
+            var combatSpoils = SingleEntityFor(CombatSpoilsKey).GetComponent<CombatSpoils>();
+            var affiliation = entity.GetComponent<Affiliated>().Affiliation;
+            combatSpoils.DeathPool[affiliation].Add(entity.GetComponent<ProfileDetails>().MonsterState);
+        }
 
         manager.DeleteEntity(entity.Id);
     }
