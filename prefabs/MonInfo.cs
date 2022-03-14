@@ -16,6 +16,7 @@ public class MonInfo : Control
 
     public override void _Ready()
     {
+        // TODO: Need to show move stats too :(
         GetLabel("LevelUpLabel").Visible = false;
         GetLabel("HpGainLabel").Visible = false;
         GetLabel("StrGainLabel").Visible = false;

@@ -28,6 +28,16 @@ public class SelectActionEventSystem : Ecs.System
             var movableComp = acting.GetComponentOrNull<Movable>();
             if (movableComp != null)
             {
+                if (movableComp.StartingLocation != acting.GetComponent<TileLocation>()
+                    && acting.GetComponent<StatusBag>().Statuses.ContainsKey("Capturing"))
+                {
+                    // We moved, so break the capture.
+                    acting.GetComponent<StatusBag>().Statuses.Remove("Capturing");
+                    var captive = manager.GetEntitiesWithComponent<Captured>()[0];
+                    captive.GetComponent<StatusBag>().Statuses.Remove("Captured");
+                    manager.RemoveComponentFromEntity<Captured>(captive);
+                }
+
                 movableComp.StartingLocation = null;
             }
 

@@ -39,11 +39,13 @@ public class MonsterState
     public void RecalculateStats()
     {
         EffectiveStats = (Blueprint.Base + Partnership + Genetics) * Level / 100;
+        EffectiveStats.Health += 10;
     }
 
     public StatBundle DetermineStatGainFromLevelUp(int levelsGained)
     {
         var valuesAtLevelUp = (Blueprint.Base + Partnership + Genetics) * (Level + levelsGained) / 100;
+        valuesAtLevelUp.Health += 10;
 
         return valuesAtLevelUp - EffectiveStats;
     }

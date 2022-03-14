@@ -61,7 +61,7 @@ public class NpcTargetingState : State
                     var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
                         .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
 
-                    var actualTargets = TargetUtils.MarkTargets(manager, plan.SelectedSkill, acting, potentialTargets, skillTargetPoints);
+                    var actualTargets = TargetUtils.MarkTargets(manager, plan.SelectedSkill, acting, potentialTargets, plan.SkillTargetLocation, skillTargetPoints);
 
                     manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
                     {
@@ -79,7 +79,7 @@ public class NpcTargetingState : State
                             {
                                 acting.GetComponent<TurnSpeed>().TimeToAct *= 2;
                             }
-                            TargetUtils.PerformAction(manager, actualTargets);
+                            TargetUtils.PerformAction(manager, acting, actualTargets);
                             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
                         },
                         Delay = 1.5f

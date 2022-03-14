@@ -26,6 +26,14 @@ public class Skill : Resource
     public int MaxHeightRangeDown { get; set; } = 2;
     [Export]
     public int AreaOfEffect { get; set; } = 0;
+    // TODO: Probably better to create a min/max AoE range instead.
+    [Export]
+    public bool AoeExcludesCenter { get; set; } = false;
+    // HACK: This is used because movement skills look at the pre-movement state.
+    //  (Which I guess is correct for some moves and not others.)
+    //  Probably OK to leave this hack in long term I think?
+    [Export]
+    public bool IgnoreUser { get; set; } = false;
     [Export]
     public int MaxAoeHeightDelta { get; set; } = 0;
     // Lower is better
@@ -40,7 +48,10 @@ public class Skill : Resource
     public int CritModifier { get; set; } = 0;
 
     [Export]
-    public Dictionary<string, int> Effects { get; set; } = new Dictionary<string, int>();
+    public Dictionary<string, object> TargetEffects { get; set; } = new Dictionary<string, object>();
+
+    [Export]
+    public Dictionary<string, object> SelfEffects { get; set; } = new Dictionary<string, object>();
 
     ///Special bonus things
     //targeting type (line, etc) if we want something other than the radiate out shape pattern

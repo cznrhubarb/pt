@@ -12,7 +12,10 @@ public class StatusTickEventSystem : Ecs.System
 
     protected override void Update(Entity entity, float deltaTime)
     {
-        var bag = entity.GetComponent<StatusTickEvent>().TickingEntity.GetComponentOrNull<StatusBag>();
+        // TODO: Not sure I like this. Maybe it should just be a component we
+        //  add to the entity and remove just the component instead of the entity?
+        var tickingEntity = entity.GetComponent<StatusTickEvent>().TickingEntity;
+        var bag = tickingEntity.GetComponentOrNull<StatusBag>();
 
         if (bag != null)
         {
@@ -20,6 +23,7 @@ public class StatusTickEventSystem : Ecs.System
             {
                 if (status.Value.Tickable)
                 {
+                    GD.Print("Tick down: " + status.Key);
                     status.Value.Count--;
                 }
 
@@ -27,21 +31,21 @@ public class StatusTickEventSystem : Ecs.System
                 {
                     case "Regen":
                         {
-                            var healthComp = entity.GetComponent<Health>();
+                            var healthComp = tickingEntity.GetComponent<Health>();
                             var healAmount = (int)(healthComp.Max * StatusEffect.RegenHealPortion);
                             healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + healAmount);
-                            FactoryUtils.BuildTextEffect(manager, entity.GetComponent<TileLocation>().TilePosition, healAmount.ToString(), new Color(0.5f, 0.9f, 0.3f));
+                            FactoryUtils.BuildTextEffect(manager, tickingEntity.GetComponent<TileLocation>().TilePosition, healAmount.ToString(), new Color(0.5f, 0.9f, 0.3f));
                         }
                         break;
                     case "Poison":
                         {
-                            var healthComp = entity.GetComponent<Health>();
+                            var healthComp = tickingEntity.GetComponent<Health>();
                             var damageAmount = (int)(healthComp.Max * StatusEffect.PoisonDamagePortion);
                             healthComp.Current -= Math.Min(healthComp.Current, damageAmount);
-                            FactoryUtils.BuildTextEffect(manager, entity.GetComponent<TileLocation>().TilePosition, damageAmount.ToString(), new Color(0.9f, 0.2f, 0.8f));
+                            FactoryUtils.BuildTextEffect(manager, tickingEntity.GetComponent<TileLocation>().TilePosition, damageAmount.ToString(), new Color(0.9f, 0.2f, 0.8f));
                             if (healthComp.Current == 0)
                             {
-                                manager.AddComponentToEntity(entity, new Dying());
+                                manager.AddComponentToEntity(tickingEntity, new Dying());
                             }
                         }
                         break;
@@ -52,11 +56,10 @@ public class StatusTickEventSystem : Ecs.System
 
                 return status;
             })
-                .Where(status => status.Value.Count > 0)
+                .Where(status => !status.Value.Tickable || status.Value.Count > 0)
                 .ToDictionary(status => status.Key, status => status.Value);
         }
 
-        // TODO: Make an EventSystem subclass of System that handles cleanup automatically
         manager.DeleteEntity(entity.Id);
     }
 }

@@ -54,7 +54,7 @@ public class TravelToLocationSystem : Ecs.System
 
                 turnSpeed.TimeToAct = 20 + (path.Length - 1) * actorMovable.TravelSpeed;
 
-                actorMovable.StartingLocation = actorLocation.Duplicate() as TileLocation;
+                actorMovable.StartingLocation = new TileLocation() { TilePosition = actorLocation.TilePosition };
 
                 manager.AddComponentToEntity(manager.GetNewEntity(), new SetActionsDisplayStateEvent() { Displayed = true });
             }
@@ -63,8 +63,6 @@ public class TravelToLocationSystem : Ecs.System
         {
             var actorMovable = movingActor.GetComponent<Movable>();
 
-            // TODO: Not sure when it happened, but we have a bug here now (Damn not having unit tests!)
-            //  Going back sends the player back to the origin or something right now?
             if (actorMovable.StartingLocation != null)
             {
                 if (movingActor.HasComponent<Tweening>())

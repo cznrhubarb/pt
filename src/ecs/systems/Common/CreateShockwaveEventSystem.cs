@@ -46,8 +46,7 @@ public class CreateShockwaveEventSystem : Ecs.System
             // Aligned with the shockwave?
             if (delta == Vector3.Zero || shockwaveEvent.Direction.Dot(delta.Normalized()) >= 0)
             {
-                // TODO: Naive distance, doesn't take into account height delta. Not sure how that should play into it TBH
-                var distance = Mathf.Abs(delta.x) + Mathf.Abs(delta.y);
+                var distance = delta.Length();
                 mag = shockwaveEvent.Magnitude * Mathf.Pow(TransferDamp, distance);
 
                 var tile = map.IsoMap.GetTileAt(point);

@@ -63,13 +63,23 @@ public class SelectActionLocationSystem : Ecs.System
                         movingActor.GetComponent<TurnSpeed>().TimeToAct *= 2;
                     }
 
-                    if (movingActor.HasComponent<Directionality>())
+                    var actorPos = movingActor.GetComponent<TileLocation>().TilePosition;
+                    if (movingActor.HasComponent<Directionality>() && actorPos != targetLocation.TilePosition)
                     {
                         movingActor.GetComponent<Directionality>().Direction = 
-                            (targetLocation.TilePosition - movingActor.GetComponent<TileLocation>().TilePosition).ToDirection();
+                            (targetLocation.TilePosition - actorPos).ToDirection();
                     }
 
-                    TargetUtils.PerformAction(manager, EntitiesFor(TargetedKey));
+                    if (movingActor.GetComponent<StatusBag>().Statuses.ContainsKey("Capturing"))
+                    {
+                        // We acted, so break the capture.
+                        movingActor.GetComponent<StatusBag>().Statuses.Remove("Capturing");
+                        var captive = manager.GetEntitiesWithComponent<Captured>()[0];
+                        captive.GetComponent<StatusBag>().Statuses.Remove("Captured");
+                        manager.RemoveComponentFromEntity<Captured>(captive);
+                    }
+
+                    TargetUtils.PerformAction(manager, movingActor, EntitiesFor(TargetedKey));
                     manager.AddComponentToEntity(manager.GetNewEntity(), new StatusTickEvent() { TickingEntity = movingActor });
                     manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
                 }

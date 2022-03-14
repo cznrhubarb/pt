@@ -101,6 +101,7 @@ public class ProfileCardPrefab : Control
         else if (profileEntity == null)
         {
             animationPlayer.Play("SlideOut");
+            TargetingInfo = "";
         }
 
         currentProfileEntity = profileEntity;
@@ -183,11 +184,19 @@ public class ProfileCardPrefab : Control
             skillElementSprites[i].Texture = GD.Load<Texture>($"res://img/icons/element_{skills[i].Element.ToString().ToLower()}.png");
             skillNameLabels[i].Text = skills[i].Name;
             skillTpLabels[i].Text = $"{skills[i].CurrentTP} / {skills[i].MaxTP}";
-            // TODO: If the entity is silenced, show these as "disabled"
-            //skillElementSprites[i]. = skills[i].CurrentTP == 0 || (!skills[i].Physical && silenced);
+
             skillElementSprites[i].Visible = true;
             skillNameLabels[i].Visible = true;
             skillTpLabels[i].Visible = true;
+
+            var modColor = new Color(1, 1, 1);
+            if (skills[i].CurrentTP == 0 || (!skills[i].Physical && silenced))
+            {
+                modColor = new Color(0.5f, 0.5f, 0.5f);
+            }
+            skillElementSprites[i].Modulate = modColor;
+            skillNameLabels[i].Modulate = modColor;
+            skillTpLabels[i].Modulate = modColor;
         }
         for (var i = skills.Count; i < 4; i++)
         {

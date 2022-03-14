@@ -1,40 +1,36 @@
 ﻿
 using Ecs;
-using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class MonsterFactory
 {
     public static MonsterState BuildMonster(MonsterBlueprint blueprint, int level)
     {
-        var monsterState = new MonsterState();
-        monsterState.Blueprint = blueprint;
-        monsterState.Level = level;
-        monsterState.Experience = 90;
-
-        var levelIter = level;
-        // TODO: There's a faster way to iterate through these :p
-        while (levelIter > 0 && monsterState.Skills.Count < 4)
+        var monsterState = new MonsterState
         {
-            if (blueprint.SkillsAvailableByLevel.ContainsKey(levelIter))
+            Blueprint = blueprint,
+            Level = level,
+            Experience = 90,
+            Partnership = new StatBundle(),
+            Genetics = new StatBundle()
             {
-                monsterState.Skills.Add(blueprint.SkillsAvailableByLevel[levelIter].Duplicate() as Skill);
+                Health = Globals.Random.Next(0, 50),
+                Atn = Globals.Random.Next(0, 50),
+                Dex = Globals.Random.Next(0, 50),
+                Mag = Globals.Random.Next(0, 50),
+                Str = Globals.Random.Next(0, 50),
+                Tuf = Globals.Random.Next(0, 50)
             }
-            levelIter--;
-        }
-
-        monsterState.Partnership = new StatBundle();
-
-        monsterState.Genetics = new StatBundle()
-        {
-            Health = Globals.Random.Next(0, 50),
-            Atn = Globals.Random.Next(0, 50),
-            Dex = Globals.Random.Next(0, 50),
-            Mag = Globals.Random.Next(0, 50),
-            Str = Globals.Random.Next(0, 50),
-            Tuf = Globals.Random.Next(0, 50)
         };
+
+        var lastFourSkills = blueprint.SkillsAvailableByLevel
+            .Where(skill => skill.Key <= level)
+            .OrderByDescending(skill => skill.Key)
+            .Take(4)
+            .Select(skill => skill.Value.Duplicate() as Skill);
+        monsterState.Skills.AddRange(lastFourSkills);
 
         monsterState.RecalculateStats();
 
@@ -55,17 +51,13 @@ public class MonsterFactory
             skill.CurrentTP = skill.MaxTP;
         }
 
-        var levelIter = monsterState.Level;
-        // TODO: There's a faster way to iterate through these :p
-        while (levelIter > 0)
-        {
-            if (blueprint.MoveStatsByLevel.ContainsKey(levelIter))
-            {
-                components.Add(blueprint.MoveStatsByLevel[levelIter].Duplicate() as Movable);
-                break;
-            }
-            levelIter--;
-        }
+        var movable = blueprint.MoveStatsByLevel
+            .Where(skill => skill.Key <= monsterState.Level)
+            .OrderByDescending(skill => skill.Key)
+            .Select(skill => skill.Value)
+            .First()
+            .Duplicate() as Movable;
+        components.Add(movable);
 
         components.Add(new Health() { Current = monsterState.MaxHealth, Max = monsterState.MaxHealth });
 
@@ -96,8 +88,8 @@ public class MonsterFactory
         components.Add(new Directionality());
         components.Add(new Selectable());
         components.Add(new StatusBag());
-        // TODO: Starting time to act should be based on something else, like the movable move speed or average of skills or something
-        components.Add(new TurnSpeed() { TimeToAct = Globals.Random.Next(0, 30) });
+        var avgSkillSpeed = monsterState.Skills.Sum(skill => skill.Speed) / monsterState.Skills.Count;
+        components.Add(new TurnSpeed() { TimeToAct = avgSkillSpeed + movable.TravelSpeed });
         components.Add(new Rarity() { Value = blueprint.Rarity });
 
         return components;

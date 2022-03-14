@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource( 1 )
 Name = "Zap Dash"
-Element = 0
+Element = 7
 MaxTP = 10
 TargetingMode = 3
 MinRange = 1
@@ -13,12 +13,16 @@ MaxRange = 10
 MaxHeightRangeUp = 1
 MaxHeightRangeDown = 1
 AreaOfEffect = 0
+AoeExcludesCenter = false
+IgnoreUser = false
 MaxAoeHeightDelta = 0
 Speed = 5
 Physical = true
 Accuracy = 100
 CritModifier = 10
-Effects = {
-"SelfMobility": "TeleportToTarget",
-"StrDamage": 30
+TargetEffects = {
+"MagDamage": 20
+}
+SelfEffects = {
+"Move": "ToAdjacent"
 }

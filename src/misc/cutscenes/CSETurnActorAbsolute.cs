@@ -13,7 +13,6 @@ public class CSETurnActorAbsolute : CutSceneEvent
     public override void RunStep()
     {
         var actor = Manager.GetNode(ActorPath) as Entity;
-        GD.Print("TURN ABSOLUTE");
         actor.GetComponent<Directionality>().Direction = Direction;
         OnComplete();
     }

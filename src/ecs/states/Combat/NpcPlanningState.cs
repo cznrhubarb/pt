@@ -19,7 +19,9 @@ public class NpcPlanningState : State
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
         manager.PerformHudAction("SetProfile", Direction.Right, null);
 
-        if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Sleep"))
+        var statuses = acting.GetComponent<StatusBag>().Statuses;
+        // TODO: Maybe "Captured" monsters have a chance to struggle free here?
+        if (statuses.ContainsKey("Sleep") || statuses.ContainsKey("Captured"))
         {
             acting.GetComponent<TurnSpeed>().TimeToAct = 40;
             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());

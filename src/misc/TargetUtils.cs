@@ -23,17 +23,17 @@ public class TargetUtils
             case TargetingMode.StandardLine:
             case TargetingMode.WholeLine:
                 {
-                    points = map.AStar.GetPointsInLine(origin, Direction.Up.ToVector3(), selectedSkill.MaxRange)
-                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Down.ToVector3(), selectedSkill.MaxRange))
-                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Left.ToVector3(), selectedSkill.MaxRange))
-                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Right.ToVector3(), selectedSkill.MaxRange))
+                    points = map.AStar.GetPointsInLine(origin, Direction.Up, selectedSkill.MaxRange)
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Down, selectedSkill.MaxRange))
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Left, selectedSkill.MaxRange))
+                        .Concat(map.AStar.GetPointsInLine(origin, Direction.Right, selectedSkill.MaxRange))
                         .Where(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp)
                         .ToList();
                 }
                 break;
             case TargetingMode.BlockedLine:
                 {
-                    Func<Direction, Vector3?> firstObstaclePosInDirection = (dir) => map.AStar.GetPointsInLine(origin, dir.ToVector3(), selectedSkill.MaxRange)
+                    Func<Direction, Vector3?> firstObstaclePosInDirection = (dir) => map.AStar.GetPointsInLine(origin, dir, selectedSkill.MaxRange)
                         .TakeWhile(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp)
                         .Cast<Vector3?>()
                         .FirstOrDefault(pt => map.AStar.HasObstacleAtLocation(pt.Value));
@@ -67,12 +67,13 @@ public class TargetUtils
                     var maxAoeHeightDelta = selectedSkill.MaxAoeHeightDelta;
                     return map.AStar.GetPointsBetweenRange(targetCenter, 0, areaRange)
                         .Where(pt => Math.Abs(pt.z - targetCenter.z) <= maxAoeHeightDelta)
+                        .Where(pt => !(selectedSkill.AoeExcludesCenter && pt == targetCenter))
                         .ToList();
                 }
             case TargetingMode.WholeLine:
                 {
                     Func<Direction, IEnumerable<Vector3>> getPointsInDirection = (dir) =>
-                        map.AStar.GetPointsInLine(origin, dir.ToVector3(), selectedSkill.MaxRange)
+                        map.AStar.GetPointsInLine(origin, dir, selectedSkill.MaxRange)
                         .Where(pt => origin.z - pt.z <= selectedSkill.MaxHeightRangeDown && pt.z - origin.z <= selectedSkill.MaxHeightRangeUp);
 
                     var targetLine = new Direction[] { Direction.Up, Direction.Down, Direction.Left, Direction.Right }
@@ -90,13 +91,17 @@ public class TargetUtils
     // TODO: Also the name is terrible
     // TODO: Also I don't like returning a tuple if I can avoid it
     public static List<(Entity, Targeted)> GetTargeteds(
+        Map map,
         Skill selectedSkill,
         Entity actingEntity,
         IEnumerable<Entity> potentialTargets,
+        Vector3 targetCenter,
         IEnumerable<Vector3> skillTargetLocations)
     {
         var actualTargets = potentialTargets.Where(target =>
             skillTargetLocations.Any(stl => target.GetComponent<TileLocation>().TilePosition == stl)
+        ).Where(target =>
+            !(selectedSkill.IgnoreUser && target == actingEntity)
         );
 
         var actingFightStats = actingEntity.GetComponent<FightStats>();
@@ -112,7 +117,7 @@ public class TargetUtils
                 targetedComp.HitChance *= StatusEffect.BlindAccuracyModifier;
             }
 
-            foreach (var kvp in selectedSkill.Effects)
+            foreach (var kvp in selectedSkill.TargetEffects)
             {
                 switch (kvp.Key)
                 {
@@ -125,12 +130,12 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Str - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Protect"))
                             {
                                 damage *= StatusEffect.ProtectDamageModifier;
                             }
-                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)damage);
                         }
                         break;
                     case "MagDamage":
@@ -138,24 +143,33 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Mag - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Shell"))
                             {
                                 damage *= StatusEffect.ShellDamageModifier;
                             }
-                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)damage);
                         }
                         break;
                     case "Heal":
                         {
                             var healthComp = target.GetComponent<Health>();
-                            var heal = Math.Ceiling(kvp.Value * actingFightStats.Mag / 100d * 4);
-                            targetedComp.Effects.Add(kvp.Key, (int)heal);
+                            var heal = Math.Ceiling((int)kvp.Value * actingFightStats.Mag / 100d * 4);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)heal);
                         }
                         break;
-                    case "SelfMobility":
-                        // Nothing for now
-                        // But ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                    case "Push":
+                    case "Pull":
+                        // ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                        targetedComp.TargetEffects.Add(kvp.Key, kvp.Value);
+                        break;
+                    case "CureNegativeStatuses":
+                        {
+                            targetStatuses
+                                .Where(status => !status.Value.Positive)
+                                .ToList()
+                                .ForEach(status => targetedComp.TargetEffects.Add($"-{status.Key}", null));
+                        }
                         break;
                     case "Capture":
                         {
@@ -179,24 +193,42 @@ public class TargetUtils
                                 chance += healthMod;
                                 targetedComp.HitChance = chance;
                             }
-                            targetedComp.Effects.Add("Capture", null);
+                            targetedComp.TargetEffects.Add("Capture", null);
                         }
                         break;
                     default:
                         // Assume anything not explicitly listed is a status effect
-                        targetedComp.Effects.Add(kvp.Key, kvp.Value);
+                        targetedComp.TargetEffects.Add(kvp.Key, kvp.Value);
+                        break;
+                }
+            }
+
+            foreach (var kvp in selectedSkill.SelfEffects)
+            {
+                switch (kvp.Key)
+                {
+                    case "Move":
+                        // Need a shadow display
+                        var actingLocation = actingEntity.GetComponent<TileLocation>();
+                        var newPos = actingLocation.TilePosition;
+                        if (kvp.Value.Equals("ToTarget"))
+                        {
+                            newPos = targetCenter;
+                        }
+                        else if (kvp.Value.Equals("ToAdjacent"))
+                        {
+                            var targetPos = target.GetComponent<TileLocation>().TilePosition;
+                            var direction = (actingLocation.TilePosition - targetPos).ToDirection();
+                            newPos = map.AStar.GetPointsInLine(targetPos, direction, 1).First();
+                        }
+
+                        targetedComp.UserEffects.Add(kvp.Key, newPos);
                         break;
                 }
             }
 
             return (target, targetedComp);
         }).ToList();
-
-        //if (selectedSkill.Effects.ContainsKey("SelfMobility"))
-        //{
-        //    var targetedComp = new Targeted();
-        //    markedTargets.Add(actingEntity, 
-        //}
 
         return markedTargets;
     }
@@ -206,10 +238,13 @@ public class TargetUtils
         Skill selectedSkill,
         Entity actingEntity,
         IEnumerable<Entity> potentialTargets,
+        Vector3 targetCenter,
         IEnumerable<Vector3> skillTargetLocations)
     {
         var actualTargets = potentialTargets.Where(target =>
             skillTargetLocations.Any(stl => target.GetComponent<TileLocation>().TilePosition == stl)
+        ).Where(target =>
+            !(selectedSkill.IgnoreUser && target == actingEntity)
         );
 
         var actingFightStats = actingEntity.GetComponent<FightStats>();
@@ -225,7 +260,7 @@ public class TargetUtils
                 targetedComp.HitChance *= StatusEffect.BlindAccuracyModifier;
             }
 
-            foreach (var kvp in selectedSkill.Effects)
+            foreach (var kvp in selectedSkill.TargetEffects)
             {
                 switch (kvp.Key)
                 {
@@ -238,12 +273,12 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Str - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Protect"))
                             {
                                 damage *= StatusEffect.ProtectDamageModifier;
                             }
-                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)damage);
                         }
                         break;
                     case "MagDamage":
@@ -251,24 +286,33 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Mag - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling(kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Shell"))
                             {
                                 damage *= StatusEffect.ShellDamageModifier;
                             }
-                            targetedComp.Effects.Add(kvp.Key, (int)damage);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)damage);
                         }
                         break;
                     case "Heal":
                         {
                             var healthComp = target.GetComponent<Health>();
-                            var heal = Math.Ceiling(kvp.Value * actingFightStats.Mag / 100d * 4);
-                            targetedComp.Effects.Add(kvp.Key, (int)heal);
+                            var heal = Math.Ceiling((int)kvp.Value * actingFightStats.Mag / 100d * 4);
+                            targetedComp.TargetEffects.Add(kvp.Key, (int)heal);
                         }
                         break;
-                    case "SelfMobility":
-                        // Nothing for now
-                        // But ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                    case "Push":
+                    case "Pull":
+                        // ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                        targetedComp.TargetEffects.Add(kvp.Key, kvp.Value);
+                        break;
+                    case "CureNegativeStatuses":
+                        {
+                            targetStatuses
+                                .Where(status => !status.Value.Positive)
+                                .ToList()
+                                .ForEach(status => targetedComp.TargetEffects.Add($"-{status.Key}", null));
+                        }
                         break;
                     case "Capture":
                         {
@@ -292,15 +336,41 @@ public class TargetUtils
                                 chance += healthMod;
                                 targetedComp.HitChance = chance;
                             }
-                            targetedComp.Effects.Add("Capture", null);
+                            targetedComp.TargetEffects.Add("Capture", null);
                         }
                         break;
                     default:
                         // Assume anything not explicitly listed is a status effect
-                        targetedComp.Effects.Add(kvp.Key, kvp.Value);
+                        targetedComp.TargetEffects.Add(kvp.Key, kvp.Value);
                         break;
                 }
             }
+
+            foreach (var kvp in selectedSkill.SelfEffects)
+            {
+                switch (kvp.Key)
+                {
+                    case "Move":
+                        // Need a shadow display
+                        var actingLocation = actingEntity.GetComponent<TileLocation>();
+                        var newPos = actingLocation.TilePosition;
+                        if (kvp.Value.Equals("ToTarget"))
+                        {
+                            newPos = targetCenter;
+                        }
+                        else if (kvp.Value.Equals("ToAdjacent"))
+                        {
+                            var targetPos = target.GetComponent<TileLocation>().TilePosition;
+                            var direction = (actingLocation.TilePosition - targetPos).ToDirection();
+                            var map = manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
+                            newPos = map.AStar.GetPointsInLine(targetPos, direction, 1).First();
+                        }
+
+                        targetedComp.UserEffects.Add(kvp.Key, newPos);
+                        break;
+                }
+            }
+
             manager.AddComponentToEntity(target, targetedComp);
         }
 
@@ -314,7 +384,7 @@ public class TargetUtils
         return actualTargets.ToList();
     }
 
-    public static void PerformAction(Manager manager, IEnumerable<Entity> targets)
+    public static void PerformAction(Manager manager, Entity acting, IEnumerable<Entity> targets)
     {
         foreach (var target in targets)
         {
@@ -326,8 +396,7 @@ public class TargetUtils
             if (roll < targetedComp.HitChance)
             {
                 GD.Print($"HIT {roll}/{targetedComp.HitChance}");
-                var effects = targetedComp.Effects;
-                foreach (var kvp in effects)
+                foreach (var kvp in targetedComp.TargetEffects)
                 {
                     switch (kvp.Key)
                     {
@@ -370,9 +439,50 @@ public class TargetUtils
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
                             }
                             break;
-                        case "SelfMobility":
+                        case "Push":
                             {
-
+                                // TODO: We should move this into the targeted so we can do the shadow
+                                var actingPos = acting.GetComponent<TileLocation>().TilePosition;
+                                var targetLocation = target.GetComponent<TileLocation>();
+                                var pushDirection = (targetLocation.TilePosition - actingPos).ToDirection();
+                                var map = manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
+                                var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pushDirection, (int)kvp.Value);
+                                // Filter out points. We allow any drop, and only a max 1 upwards change
+                                var newPos = targetLocation.TilePosition;
+                                foreach (var pt in points)
+                                {
+                                    if (pt.z > newPos.z + 1 || map.AStar.HasObstacleAtLocation(pt))
+                                    {
+                                        break;
+                                    }
+                                    newPos = pt;
+                                }
+                                // TODO: Tween to this pos instead of jumping
+                                // TODO: Needs to consider impassable (or "impassable" in the sense that move cost is very high) terrains as well
+                                targetLocation.TilePosition = newPos;
+                            }
+                            break;
+                        case "Pull":
+                            {
+                                // TODO: We should move this into the targeted so we can do the shadow
+                                var actingPos = acting.GetComponent<TileLocation>().TilePosition;
+                                var targetLocation = target.GetComponent<TileLocation>();
+                                var pullDirection = (actingPos - targetLocation.TilePosition).ToDirection();
+                                var map = manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
+                                var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pullDirection, (int)kvp.Value);
+                                // Filter out points. We assume if we can target a pull, we are close enough on height delta
+                                var newPos = targetLocation.TilePosition;
+                                foreach (var pt in points)
+                                {
+                                    if (map.AStar.HasObstacleAtLocation(pt))
+                                    {
+                                        break;
+                                    }
+                                    newPos = pt;
+                                }
+                                // TODO: Tween to this pos instead of jumping
+                                // TODO: Needs to consider impassable (or "impassable" in the sense that move cost is very high) terrains as well
+                                targetLocation.TilePosition = newPos;
                             }
                             break;
                         case "Capture":
@@ -385,8 +495,22 @@ public class TargetUtils
                         default:
                             // Assume anything not explicitly listed is a status effect
                             // TODO: Apply these better depending on the type. Some stack, some don't
-                            target.GetComponent<StatusBag>().Statuses.Add(kvp.Key, StatusFactory.BuildStatusEffect(kvp.Key, (int)kvp.Value));
-                            FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Key, new Color(0.5f, 0.4f, 1));
+                            if (kvp.Key == "Captured")
+                            {
+                                manager.AddComponentToEntity(target, new Captured());
+                            }
+
+                            var textToDisplay = kvp.Key;
+                            if (kvp.Key.StartsWith("-"))
+                            {
+                                target.GetComponent<StatusBag>().Statuses.Remove(kvp.Key.TrimStart('-'));
+                            }
+                            else
+                            {
+                                target.GetComponent<StatusBag>().Statuses.Add(kvp.Key, StatusFactory.BuildStatusEffect(kvp.Key, (int)kvp.Value));
+                                textToDisplay = "+" + textToDisplay;
+                            }
+                            FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, textToDisplay, new Color(0.5f, 0.4f, 1));
                             break;
                     }
                 }
@@ -394,6 +518,17 @@ public class TargetUtils
             else
             {
                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "MISS", new Color(0.7f, 0.6f, 0.6f));
+            }
+
+            // Self effects happen even if there is a miss.
+            foreach (var kvp in targetedComp.UserEffects)
+            {
+                switch (kvp.Key)
+                {
+                    case "Move":
+                        acting.GetComponent<TileLocation>().TilePosition = (Vector3)kvp.Value;
+                        break;
+                }
             }
         }
     }
@@ -406,7 +541,7 @@ public class TargetUtils
         }
 
         string targetingString = $"{Math.Min(100, targeted.HitChance)}%";
-        foreach (var kvp in targeted.Effects)
+        foreach (var kvp in targeted.TargetEffects)
         {
             if (kvp.Value != null)
             {

@@ -76,7 +76,7 @@ ZLayer = 5
 
 [sub_resource type="Resource" id=13]
 script = ExtResource( 21 )
-EyeOffsets = PoolVector3Array(  )
+EyeOffsets = PoolRealArray(  )
 EyeSizes = PoolRealArray(  )
 
 [sub_resource type="Resource" id=14]

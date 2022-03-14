@@ -6,6 +6,7 @@ public class RenderTargetProfileSystem : Ecs.System
     private const string PotentialTargetKey = "potentialTarget";
     private const string TargetedKey = "targeted";
     private const string SelectedKey = "selected";
+    private const string ReticleKey = "reticle";
 
     public RenderTargetProfileSystem()
     {
@@ -20,6 +21,9 @@ public class RenderTargetProfileSystem : Ecs.System
         AddRequiredComponent<ProfileDetails>(PotentialTargetKey);
         AddRequiredComponent<FightStats>(PotentialTargetKey);
         AddRequiredComponent<Health>(PotentialTargetKey);
+
+        AddRequiredComponent<Reticle>(ReticleKey);
+        AddRequiredComponent<TileLocation>(ReticleKey);
 
         AddRequiredComponent<Targeted>(TargetedKey);
     }
@@ -38,7 +42,8 @@ public class RenderTargetProfileSystem : Ecs.System
                 .Where(ind => ind.GetComponent<SpriteWrap>().Sprite.Visible)
                 .Select(ind => ind.GetComponent<TileLocation>().TilePosition);
             var potentialTargets = EntitiesFor(PotentialTargetKey);
-            TargetUtils.MarkTargets(manager, ptState.SelectedSkill, SingleEntityFor(SelectedKey), potentialTargets, indicatorLocations);
+            var targetCenter = EntitiesFor(ReticleKey).First().GetComponent<TileLocation>().TilePosition;
+            TargetUtils.MarkTargets(manager, ptState.SelectedSkill, SingleEntityFor(SelectedKey), potentialTargets, targetCenter, indicatorLocations);
         }
     }
 

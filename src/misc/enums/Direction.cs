@@ -35,7 +35,7 @@ static class DirectionExtensions
             vector.x = 0;
         }
 
-        var flatVec = new Vector2(vector.x, vector.y).Normalized();
+        var flatVec = vector.Flatten().Normalized();
         if (flatVec == Vector2.Up)
             return Direction.Up;
         else if (flatVec == Vector2.Down)

@@ -44,6 +44,7 @@ public class Combat : Manager
         AddSystem(new TweenCleanupSystem());
         AddSystem(new RenderStatusEffectsSystem());
         AddSystem(new CameraAnchoringSystem());
+        AddSystem(new RenderViewProfileSystem());
 
         // Event Handling Systems
         AddSystem(new CreateShockwaveEventSystem());
@@ -145,7 +146,7 @@ public class Combat : Manager
         RegisterExistingEntity(FindNode("CamAnchor") as Entity);
     }
 
-    private void BuildActors(Map map)
+    private void BuildActors()
     {
         // HACK: Setting these for testing
         WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
@@ -168,6 +169,9 @@ public class Combat : Manager
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
                 new SpriteWrap(),
                 TurnOrderCard.For(actor.GetComponent<ProfileDetails>(), Affiliation.Friendly));
+            actor.GetComponent<StatusBag>().Statuses.Add("Uncaptureable", StatusFactory.BuildStatusEffect("Uncaptureable", -1));
+            actor.GetComponent<StatusBag>().Statuses.Add("Immobilize", StatusFactory.BuildStatusEffect("Immobilize", 10));
+            actor.GetComponent<StatusBag>().Statuses.Add("Poison", StatusFactory.BuildStatusEffect("Poison", 10));
         }
 
         foreach (var state in WorldState.RivalPartyState)
@@ -180,6 +184,7 @@ public class Combat : Manager
                 new TileLocation() { TilePosition = positions.Dequeue(), ZLayer = 10 },
                 new SpriteWrap(),
                 TurnOrderCard.For(actor.GetComponent<ProfileDetails>(), Affiliation.Enemy));
+            actor.GetComponent<StatusBag>().Statuses.Add("Uncaptureable", StatusFactory.BuildStatusEffect("Uncaptureable", -1));
         }
     }
 

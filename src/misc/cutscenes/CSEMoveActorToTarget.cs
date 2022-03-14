@@ -4,6 +4,10 @@ using System.Linq;
 using MonoCustomResourceRegistry;
 using System.Collections.Generic;
 
+// This is a 95% copy of CSEMoveActorAbsolute, but the way to remove
+//  the code duplication is to make this inherit from CSEMAA, but
+//  due to the export keywords, that leaves the editor with extra unused
+//  parameters on this, which is confusing. I'd rather have duplicate code :/
 [RegisteredType(nameof(CSEMoveActorToTarget), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEMoveActorToTarget : CutSceneEvent
 {

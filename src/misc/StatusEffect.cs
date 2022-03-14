@@ -22,40 +22,56 @@ public class StatusFactory
 {
     public static StatusEffect BuildStatusEffect(string name, int startingCount)
     {
-        var effect = new StatusEffect();
-        effect.Name = name;
-        effect.Count = startingCount;
+        var effect = new StatusEffect { Name = name, Count = startingCount };
         switch (name)
         {
             case "Protect":
-                effect.Icon = GD.Load("res://img/icon/status/elated.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/elated.png") as Texture;
+                effect.Positive = true;
                 break;
             case "Shell":
-                effect.Icon = GD.Load("res://img/icon/status/ghost.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/ghost.png") as Texture;
+                effect.Positive = true;
                 break;
             case "Haste":
-                effect.Icon = GD.Load("res://img/icon/status/clone.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/clone.png") as Texture;
+                effect.Positive = true;
                 break;
             case "Slow":
-                effect.Icon = GD.Load("res://img/icon/status/numb.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/numb.png") as Texture;
                 break;
             case "Regen":
-                effect.Icon = GD.Load("res://img/icon/status/bless.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/bless.png") as Texture;
+                effect.Positive = true;
                 break;
             case "Poison":
-                effect.Icon = GD.Load("res://img/icon/status/poison.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/poison.png") as Texture;
                 break;
             case "Blind":
-                effect.Icon = GD.Load("res://img/icon/status/curse.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/curse.png") as Texture;
                 break;
             case "Silence":
-                effect.Icon = GD.Load("res://img/icon/status/silence.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/silence.png") as Texture;
                 break;
             case "Sleep":
-                effect.Icon = GD.Load("res://img/icon/status/sleep.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/sleep.png") as Texture;
                 break;
             case "Immobilize":
-                effect.Icon = GD.Load("res://img/icon/status/stone.png") as Texture;
+                effect.Icon = GD.Load("res://img/icons/status/stone.png") as Texture;
+                break;
+            case "Captured":
+                effect.Icon = GD.Load("res://img/icons/status/gloom.png") as Texture;
+                effect.Tickable = false;
+                break;
+            case "Uncaptureable":
+                effect.Icon = GD.Load("res://img/icons/status/resolve.png") as Texture;
+                effect.Positive = true;
+                effect.Tickable = false;
+                break;
+            case "Capturing":
+                effect.Icon = GD.Load("res://img/icons/status/charm.png") as Texture;
+                effect.Positive = true;
+                effect.Tickable = false;
                 break;
             default:
                 throw new ArgumentException($"Invalid status effect being built: {name}");
@@ -78,6 +94,12 @@ public class StatusFactory
     * Blind
     * Silence
     * Immobilize
+    * 
+    * 
+    *       Not tickable
+    * Captured
+    * Capturing
+    * Uncaptureable
     */
 
 // OTHER GAMES

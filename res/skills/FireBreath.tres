@@ -4,12 +4,12 @@
 
 [resource]
 script = ExtResource( 1 )
-Name = "Tackle"
-Element = 5
+Name = "Fire Breath"
+Element = 0
 MaxTP = 10
-TargetingMode = 0
+TargetingMode = 2
 MinRange = 1
-MaxRange = 1
+MaxRange = 3
 MaxHeightRangeUp = 2
 MaxHeightRangeDown = 2
 AreaOfEffect = 0

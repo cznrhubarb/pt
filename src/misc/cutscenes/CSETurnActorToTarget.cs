@@ -14,7 +14,6 @@ public class CSETurnActorToTarget : CutSceneEvent
     {
         var actor = Manager.GetNode(ActorPath) as Entity;
         var target = Manager.GetNode(TargetPath) as Entity;
-        GD.Print("TURN TO TARGET");
         var actorPosition = actor.GetComponent<TileLocation>().TilePosition;
         var targetPosition = target.GetComponent<TileLocation>().TilePosition;
 

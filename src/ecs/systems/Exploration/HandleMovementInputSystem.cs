@@ -91,7 +91,9 @@ public class HandleMovementInputSystem : Ecs.System
             if (trigger.GetComponent<TileLocation>().TilePosition == newPos)
             {
                 var triggerComp = trigger.GetComponent<WalkOnTrigger>();
-                // TODO: HACK: Strong coupling
+                // TODO: HACK: Strong coupling. Fixed by moving TriggerCue out to Manager
+                //  but that comes with the extra cost of having to move all the dialog
+                //  stuff currently in exploration only to combat also :(
                 if (manager is Exploration ex)
                 {
                     ex.TriggerCue(triggerComp.Cue, triggerComp.CueParam);

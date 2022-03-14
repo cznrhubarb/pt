@@ -4,7 +4,6 @@ using System.Linq;
 using MonoCustomResourceRegistry;
 using System.Collections.Generic;
 
-// TODO: Clean up the fact that this is a 99% duplicate of CSEMoveActorToTarget
 [RegisteredType(nameof(CSEMoveActorAbsolute), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEMoveActorAbsolute : CutSceneEvent
 {

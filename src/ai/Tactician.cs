@@ -94,8 +94,7 @@ public class Tactician
         GD.Print($"There are a total of {standPointsByTarget.Sum(l => l.Value.Count)} pairs of places you could stand and throw");
 
         // For each unique place a skill could land, find the shortest distance the acting entity would have to travel to in order to throw it
-        //  TODO: for now we'll prefer high ground in case of path length ties, but it could play a larger part since it can affect
-        //      both damage output for crits and damage taken from other people critting
+        //  We prefer high ground in case of path length ties
         var targetStandPairs = standPointsByTarget.Select(kvp =>
         {
             var paths = kvp.Value.Select(newPosition => (newPosition, map.AStar.GetPath(movable, affiliation, startingPosition, newPosition).Length));
@@ -130,7 +129,7 @@ public class Tactician
             actingLocationComp.TilePosition = tsp.standPosition;
 
             var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, tsp.standPosition, tsp.targetPosition);
-            var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
+            var effects = TargetUtils.GetTargeteds(map, skill, acting, potentialTargets, tsp.targetPosition, targetLocations);
 
             // Revert the actors tile position to the original
             actingLocationComp.TilePosition = startingPosition;
@@ -168,7 +167,7 @@ public class Tactician
         foreach (var fx in highestValue.effects)
         {
             GD.Print($"  {fx.Item1.GetComponent<ProfileDetails>().Name}");
-            foreach (var fx2 in fx.Item2.Effects)
+            foreach (var fx2 in fx.Item2.TargetEffects)
             {
                 GD.Print($"    {fx2.Key}: {fx2.Value}");
             }
@@ -198,7 +197,7 @@ public class Tactician
             // Not updating the acting unit's stand position as presumably we are over a turn away when doing this
             var targetPosition = target.GetComponent<TileLocation>().TilePosition;
             var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, startingPosition, targetPosition);
-            var effects = TargetUtils.GetTargeteds(skill, acting, potentialTargets, targetLocations);
+            var effects = TargetUtils.GetTargeteds(map, skill, acting, potentialTargets, targetPosition, targetLocations);
 
             return (name: target.GetComponent<ProfileDetails>().Name, targetPosition, effects);
         }).ToList();
@@ -277,7 +276,7 @@ public class Tactician
         var targetHealthComp = target.GetComponent<Health>();
         var targetProfile = target.GetComponent<ProfileDetails>();
 
-        foreach (var kvp in skillEffects.Effects)
+        foreach (var kvp in skillEffects.TargetEffects)
         {
             // All values in here we assume are targeting enemies, so positive effects are negative
             var amount = 0f;
@@ -288,16 +287,29 @@ public class Tactician
                 case "StrDamage":
                     {
                         amount = (int)kvp.Value;
+                        var killWithoutCrit = amount >= targetHealthComp.Current;
                         amount += skillEffects.CritChance / 100f * amount;
                         amount = Math.Min(targetHealthComp.Current, amount);
-                        // TODO: Weight death blows a bit higher, and weight crit a bit less on deathblows since it's less certain
+                        // Deathblows are weighted higher
+                        if (killWithoutCrit)
+                        {
+                            amount *= 1.5f;
+                        }
+                        else if (amount >= targetHealthComp.Current)
+                        {
+                            amount *= 1 + skillEffects.CritChance / 200f;
+                        }
                     }
                     break;
                 case "MagDamage":
                     {
                         amount = (int)kvp.Value;
                         amount = Math.Min(targetHealthComp.Current, amount);
-                        // TODO: Weight death blows a bit higher
+                        // Deathblows are weighted higher
+                        if (amount >= targetHealthComp.Current)
+                        {
+                            amount *= 1.5f;
+                        }
                     }
                     break;
                 case "Heal":
@@ -308,8 +320,9 @@ public class Tactician
                         amount = -amount;
                     }
                     break;
-                // No tactical value for movement yet. It'll really come from strategic value I think?
-                case "SelfMobility":
+                // No tactical value for push/pull yet. Will come in strategically or if falling/collision can deal damage.
+                case "Push":
+                case "Pull":
                     break;
                 // Value of applying a status effect the target already has is 0
                 case "Protect":
@@ -409,9 +422,18 @@ public class Tactician
                         }
                     }
                     break;
+                case "CureNegativeStatuses":
+                    {
+                        var negStatusCount = targetStatuses.Values.Count(status => !status.Positive);
+                        amount = negStatusCount * targetProfile.Level * 5;
+                        // Invert positive effects
+                        amount = -amount;
+                    }
+                    break;
                 // Maybe we give the enemy trainer a capture ability for lore sake, but they will never use it against the player
                 case "Capture":
                     {
+                        // TODO: This will make the enemy trainer definitely use it on their own peeps though...
                         amount = -999;
                     }
                     break;
@@ -423,6 +445,15 @@ public class Tactician
             value += amount;
         }
 
+        foreach (var kvp in skillEffects.UserEffects)
+        {
+            switch (kvp.Key)
+            {
+                case "Move":
+                    // TODO: Not sure how to track value of this.
+                    break;
+            }
+        }
 
         // If we're the same affiliation, make it a negative value and weigh it a bit more
         //  so we're less likely to whack our own team unless it's like... really worth it.

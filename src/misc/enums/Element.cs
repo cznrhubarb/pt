@@ -3,8 +3,12 @@ public enum Element
 {
     Fire,
     Water,
-    Wood,
+    Wood,       // Rename to plant
     Earth,
     Metal,
     Neutral,
+
+    Air,
+    Electric,
+    Plant,
 }

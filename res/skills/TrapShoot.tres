@@ -4,24 +4,25 @@
 
 [resource]
 script = ExtResource( 1 )
-Name = "Tackle"
-Element = 5
+Name = "Trap Shoot"
+Element = 2
 MaxTP = 10
-TargetingMode = 0
+TargetingMode = 3
 MinRange = 1
-MaxRange = 1
-MaxHeightRangeUp = 2
-MaxHeightRangeDown = 2
+MaxRange = 10
+MaxHeightRangeUp = 1
+MaxHeightRangeDown = 1
 AreaOfEffect = 0
 AoeExcludesCenter = false
 IgnoreUser = false
 MaxAoeHeightDelta = 0
-Speed = 10
+Speed = 5
 Physical = true
 Accuracy = 100
 CritModifier = 10
 TargetEffects = {
-"StrDamage": 15
+"MagDamage": 5,
+"Pull": 2
 }
 SelfEffects = {
 }

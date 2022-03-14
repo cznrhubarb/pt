@@ -88,7 +88,6 @@ public class AStarEx : AStar
     public override float _EstimateCost(int fromId, int toId)
     {
         // No savings to be had (or at least I don't know what is safe to consider a saving)
-        // TODO: Might be able ot optimize here by moving estimate cost into calculate and then
         return _ComputeCost(fromId, toId);
     }
 
@@ -164,8 +163,6 @@ public class AStarEx : AStar
     {
         mover = moveStats;
         moverAffiliation = affiliation;
-
-        // GetPoints / GetPointConnections
 
         return GetPointPath(GetClosestPoint(startPosition), GetClosestPoint(endPosition));
     }
@@ -264,20 +261,26 @@ public class AStarEx : AStar
             .ToList();
     }
 
-    public IEnumerable<Vector3> GetPointsInLine(Vector3 startPosition, Vector3 direction, int maxRange)
+    public IEnumerable<Vector3> GetPointsInLine(Vector3 startPosition, Direction direction, int maxRange)
     {
         var results = new List<Vector3>();
 
         var fromPoint = GetClosestPoint(startPosition);
+        var dirVec = direction.ToVector3();
 
+        // This looks a lot more complex than the obvious solution of adding startPosition and
+        //  direction to find the next points, but that doesn't take into account height changes
+        //  and standard tile connectivity
+        // This method could be a little more elegant (remove the flag/break) if it was done
+        //  recursively, but it didn't feel worth the brainpower to bother solving since it
+        //  wouldn't really be any faster
         while (fromPoint != -1 && maxRange > 0)
         {
-            // TODO: There is a more elegant solution than this flag/break for sure.
             bool found = false;
             foreach (var possibleNext in GetPointConnections(fromPoint))
             {
                 var possibleNextPos = GetPointPosition(possibleNext);
-                var dirPos = GetPointPosition(fromPoint) + direction;
+                var dirPos = GetPointPosition(fromPoint) + dirVec;
                 // Ignore Z, the consumer filters that
                 if (possibleNextPos.x == dirPos.x && possibleNextPos.y == dirPos.y)
                 {

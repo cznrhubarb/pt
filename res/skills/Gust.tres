@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource( 1 )
-Name = "Tackle"
-Element = 5
+Name = "Gust"
+Element = 6
 MaxTP = 10
 TargetingMode = 0
 MinRange = 1
@@ -21,7 +21,8 @@ Physical = true
 Accuracy = 100
 CritModifier = 10
 TargetEffects = {
-"StrDamage": 15
+"Push": 2,
+"StrDamage": 5
 }
 SelfEffects = {
 }

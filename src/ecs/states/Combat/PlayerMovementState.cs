@@ -45,10 +45,8 @@ public class PlayerMovementState : State
                 {
                     points.Add(acting.GetComponent<TileLocation>().TilePosition);
                 }
-                else
-                {
-                    acting.GetComponent<TurnSpeed>().TimeToAct = 20;
-                }
+
+                acting.GetComponent<TurnSpeed>().TimeToAct = 20;
             }
 
             travelLocations = MapUtils.GenerateTileLocationsForPoints<TravelLocation>(manager, points, "res://img/tiles/image_part_029.png");

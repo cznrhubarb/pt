@@ -13,11 +13,14 @@ MaxRange = 2
 MaxHeightRangeUp = 2
 MaxHeightRangeDown = 2
 AreaOfEffect = 0
+AoeExcludesCenter = false
+IgnoreUser = false
 MaxAoeHeightDelta = 0
 Speed = 10
 Physical = true
 Accuracy = 100
 CritModifier = 10
-Effects = {
-"Capture": 0
+TargetEffects = {
+}
+SelfEffects = {
 }

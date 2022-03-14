@@ -1,20 +1,29 @@
-[gd_resource type="Resource" load_steps=10 format=2]
+[gd_resource type="Resource" load_steps=9 format=2]
 
 [ext_resource path="res://src/misc/MonsterBlueprint.cs" type="Script" id=1]
 [ext_resource path="res://img/sprites/98.png" type="Texture" id=2]
 [ext_resource path="res://img/portraits/trainer.png" type="Texture" id=3]
 [ext_resource path="res://res/skills/Capture.tres" type="Resource" id=4]
 [ext_resource path="res://res/movables/Move3Jump2.tres" type="Resource" id=5]
+[ext_resource path="res://src/misc/StatBundle.cs" type="Script" id=6]
 
-[sub_resource type="CSharpScript" id=1]
+[sub_resource type="Resource" id=1]
+script = ExtResource( 6 )
+Health = 1000
+Atn = 400
+Dex = 400
+Mag = 400
+Str = 400
+Tuf = 400
 
 [sub_resource type="Resource" id=2]
-script = SubResource( 1 )
-
-[sub_resource type="CSharpScript" id=3]
-
-[sub_resource type="Resource" id=4]
-script = SubResource( 3 )
+script = ExtResource( 6 )
+Health = 1
+Atn = 1
+Dex = 1
+Mag = 1
+Str = 1
+Tuf = 1
 
 [resource]
 script = ExtResource( 1 )
@@ -30,5 +39,5 @@ SkillsAvailableByLevel = {
 MoveStatsByLevel = {
 1: ExtResource( 5 )
 }
-Base = SubResource( 2 )
-PartnershipGrowth = SubResource( 4 )
+Base = SubResource( 1 )
+PartnershipGrowth = SubResource( 2 )
