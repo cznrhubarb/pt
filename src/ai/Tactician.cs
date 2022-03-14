@@ -129,7 +129,7 @@ public class Tactician
             actingLocationComp.TilePosition = tsp.standPosition;
 
             var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, tsp.standPosition, tsp.targetPosition);
-            var effects = TargetUtils.GetTargeteds(map, skill, acting, potentialTargets, tsp.targetPosition, targetLocations);
+            var effects = TargetUtils.GetTargetingOutcomes(map, skill, acting, potentialTargets, tsp.targetPosition, targetLocations);
 
             // Revert the actors tile position to the original
             actingLocationComp.TilePosition = startingPosition;
@@ -166,8 +166,8 @@ public class Tactician
         GD.Print("Targets:");
         foreach (var fx in highestValue.effects)
         {
-            GD.Print($"  {fx.Item1.GetComponent<ProfileDetails>().Name}");
-            foreach (var fx2 in fx.Item2.TargetEffects)
+            GD.Print($"  {fx.Entity.GetComponent<ProfileDetails>().Name}");
+            foreach (var fx2 in fx.Outcome.TargetEffects)
             {
                 GD.Print($"    {fx2.Key}: {fx2.Value}");
             }
@@ -197,7 +197,7 @@ public class Tactician
             // Not updating the acting unit's stand position as presumably we are over a turn away when doing this
             var targetPosition = target.GetComponent<TileLocation>().TilePosition;
             var targetLocations = TargetUtils.GetTargetEffectLocations(skill, map, startingPosition, targetPosition);
-            var effects = TargetUtils.GetTargeteds(map, skill, acting, potentialTargets, targetPosition, targetLocations);
+            var effects = TargetUtils.GetTargetingOutcomes(map, skill, acting, potentialTargets, targetPosition, targetLocations);
 
             return (name: target.GetComponent<ProfileDetails>().Name, targetPosition, effects);
         }).ToList();
@@ -267,11 +267,11 @@ public class Tactician
         };
     }
 
-    private static float DetermineValue(Entity acting, (Entity, Targeted) effect)
+    private static float DetermineValue(Entity acting, TargetUtils.TargetingOutcomePair effect)
     {
         var value = 0f;
-        var target = effect.Item1;
-        var skillEffects = effect.Item2;
+        var target = effect.Entity;
+        var skillEffects = effect.Outcome;
         var targetStatuses = target.GetComponent<StatusBag>().Statuses;
         var targetHealthComp = target.GetComponent<Health>();
         var targetProfile = target.GetComponent<ProfileDetails>();

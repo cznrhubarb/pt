@@ -19,9 +19,9 @@ public class Combat : Manager
 
         ApplyState(new CombatStartState());
         CreateSystems();
-        var mapComp = BuildMap();
+        BuildMap();
         BuildControlElements();
-        BuildActors(mapComp);
+        BuildActors();
 
         AddComponentToEntity(GetNewEntity(), new CombatSpoils());
 
@@ -64,7 +64,7 @@ public class Combat : Manager
         AddSystem<RoamMapState>(new SelectActorSystem());
     }
 
-    private Map BuildMap()
+    private void BuildMap()
     {
         var mapNode = FindNode("Map");
         var tileToTerrain = new Dictionary<int, TerrainType>()
@@ -116,13 +116,9 @@ public class Combat : Manager
             }
         }
 
-        var mapEnt = GetNewEntity();
-        var mapComp = new Map(tileEntities);
-        AddComponentToEntity(mapEnt, mapComp);
+        AddComponentToEntity(GetNewEntity(), new Map(tileEntities));
 
         mapNode.QueueFree();
-
-        return mapComp;
     }
 
     private void BuildControlElements()
@@ -170,8 +166,6 @@ public class Combat : Manager
                 new SpriteWrap(),
                 TurnOrderCard.For(actor.GetComponent<ProfileDetails>(), Affiliation.Friendly));
             actor.GetComponent<StatusBag>().Statuses.Add("Uncaptureable", StatusFactory.BuildStatusEffect("Uncaptureable", -1));
-            actor.GetComponent<StatusBag>().Statuses.Add("Immobilize", StatusFactory.BuildStatusEffect("Immobilize", 10));
-            actor.GetComponent<StatusBag>().Statuses.Add("Poison", StatusFactory.BuildStatusEffect("Poison", 10));
         }
 
         foreach (var state in WorldState.RivalPartyState)
