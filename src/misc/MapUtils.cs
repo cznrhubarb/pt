@@ -34,6 +34,11 @@ public class MapUtils
 
         foreach (var entity in entities)
         {
+            if (entity.HasComponent<Dying>())
+            {
+                continue;
+            }
+
             var tilePosition = entity.GetComponent<TileLocation>().TilePosition;
 
             if (entity.HasComponent<PlayerCharacter>() || entity.HasComponent<FriendlyNpc>())

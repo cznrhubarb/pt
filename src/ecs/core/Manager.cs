@@ -134,8 +134,13 @@ namespace Ecs
                 stateSystems[stateType] = new List<System>();
             }
             stateSystems[stateType].Add(system);
-            system.BindManager(this);
-            AddChild(system);
+
+            // Some systems are shared between states and we only need to add it once
+            if (!GetChildren().Contains(system))
+            {
+                system.BindManager(this);
+                AddChild(system);
+            }
         }
 
         private void UpdateEntityRegistration(Entity entity)

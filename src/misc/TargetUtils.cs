@@ -87,6 +87,21 @@ public class TargetUtils
         }
     }
 
+    public static List<TargetingOutcomePair> MarkTargetingOutcomes(
+        Manager manager,
+        Skill selectedSkill,
+        Entity actingEntity,
+        IEnumerable<Entity> potentialTargets,
+        Vector3 targetCenter,
+        IEnumerable<Vector3> skillTargetLocations)
+    {
+        var map = manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
+        var targetingOutcomes = GetTargetingOutcomes(map, selectedSkill, actingEntity, potentialTargets, targetCenter, skillTargetLocations);
+        targetingOutcomes.ForEach(to => manager.AddComponentToEntity(to.Entity, to.Outcome));
+
+        return targetingOutcomes;
+    }
+
     public static List<TargetingOutcomePair> GetTargetingOutcomes(
         Map map,
         Skill selectedSkill,
@@ -103,7 +118,7 @@ public class TargetUtils
 
         var actingFightStats = actingEntity.GetComponent<FightStats>();
 
-        var markedTargets = actualTargets.Select(target =>
+        var targetingOutcomes = actualTargets.Select(target =>
         {
             var targetedComp = new Targeted();
             var targetFightStats = target.GetComponent<FightStats>();
@@ -157,7 +172,6 @@ public class TargetUtils
                         break;
                     case "Push":
                         {
-                            // TODO: We should move this into the targeted so we can do the shadow
                             var actingPos = actingEntity.GetComponent<TileLocation>().TilePosition;
                             var targetLocation = target.GetComponent<TileLocation>();
                             var pushDirection = (targetLocation.TilePosition - actingPos).ToDirection();
@@ -173,12 +187,12 @@ public class TargetUtils
                                 newPos = pt;
                             }
                             // TODO: Needs to consider impassable (or "impassable" in the sense that move cost is very high) terrains as well
-                            targetedComp.TargetEffects.Add(kvp.Key, newPos);
+                            targetedComp.TargetEffects.Add("Move", newPos);
                         }
                         break;
                     case "Pull":
                         {
-                            // ideally we should be showing a shadow image of where the new locations are for everyone targeted.
+                            // TODO: Ideally we should be showing a shadow image of where the new locations are for everyone targeted.
                             var actingPos = actingEntity.GetComponent<TileLocation>().TilePosition;
                             var targetLocation = target.GetComponent<TileLocation>();
                             var pullDirection = (actingPos - targetLocation.TilePosition).ToDirection();
@@ -194,7 +208,7 @@ public class TargetUtils
                                 newPos = pt;
                             }
                             // TODO: Needs to consider impassable (or "impassable" in the sense that move cost is very high) terrains as well
-                            targetedComp.TargetEffects.Add(kvp.Key, newPos);
+                            targetedComp.TargetEffects.Add("Move", newPos);
                         }
                         break;
                     case "CureNegativeStatuses":
@@ -237,12 +251,19 @@ public class TargetUtils
                 }
             }
 
+            return new TargetingOutcomePair() { Entity = target, Outcome = targetedComp };
+        }).ToList();
+
+        // This makes sure we're actually on a spot we can target
+        if (skillTargetLocations.Count() > 0)
+        {
+            var selfTargetedComp = new Targeted() { HitChance = 9999, CritChance = 0 };
             foreach (var kvp in selectedSkill.SelfEffects)
             {
                 switch (kvp.Key)
                 {
                     case "Move":
-                        // Need a shadow display
+                        // TODO: Need a shadow display
                         var actingLocation = actingEntity.GetComponent<TileLocation>();
                         var newPos = actingLocation.TilePosition;
                         if (kvp.Value.Equals("ToTarget"))
@@ -251,20 +272,30 @@ public class TargetUtils
                         }
                         else if (kvp.Value.Equals("ToAdjacent"))
                         {
+                            // ToAdjacent assumes we only ever have one target, because otherwise what
+                            //  do we mean adjacent to?
+                            var target = actualTargets.FirstOrDefault();
+                            if (target == null)
+                            {
+                                continue;
+                            }
                             var targetPos = target.GetComponent<TileLocation>().TilePosition;
                             var direction = (actingLocation.TilePosition - targetPos).ToDirection();
                             newPos = map.AStar.GetPointsInLine(targetPos, direction, 1).First();
                         }
 
-                        targetedComp.UserEffects.Add(kvp.Key, newPos);
+                        selfTargetedComp.TargetEffects.Add("Move", newPos);
                         break;
                 }
             }
 
-            return new TargetingOutcomePair() { Entity = target, Outcome = targetedComp };
-        }).ToList();
+            if (selfTargetedComp.TargetEffects.Count > 0)
+            {
+                targetingOutcomes.Add(new TargetingOutcomePair() { Entity = actingEntity, Outcome = selfTargetedComp });
+            }
+        }
 
-        return markedTargets;
+        return targetingOutcomes;
     }
 
     public static void PerformAction(Manager manager, Entity acting, IEnumerable<Entity> targets)
@@ -275,10 +306,9 @@ public class TargetUtils
             var targetStatuses = target.GetComponent<StatusBag>().Statuses;
 
             var roll = Globals.Random.Next(100);
-            GD.Print($"Are ya hitting son? {roll}/{targetedComp.HitChance}");
+            //GD.Print($"Are ya hitting son? {roll}/{targetedComp.HitChance}");
             if (roll < targetedComp.HitChance)
             {
-                GD.Print($"HIT {roll}/{targetedComp.HitChance}");
                 foreach (var kvp in targetedComp.TargetEffects)
                 {
                     switch (kvp.Key)
@@ -322,8 +352,7 @@ public class TargetUtils
                                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
                             }
                             break;
-                        case "Push":
-                        case "Pull":
+                        case "Move":
                             {
                                 // TODO: Tween to this pos instead of jumping
                                 target.GetComponent<TileLocation>().TilePosition = (Vector3)kvp.Value;
@@ -363,20 +392,6 @@ public class TargetUtils
             {
                 FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "MISS", new Color(0.7f, 0.6f, 0.6f));
             }
-
-            // Self effects happen even if there is a miss.
-            foreach (var kvp in targetedComp.UserEffects)
-            {
-                switch (kvp.Key)
-                {
-                    case "Move":
-                        {
-                            // TODO: Tween to this pos instead of jumping
-                            acting.GetComponent<TileLocation>().TilePosition = (Vector3)kvp.Value;
-                        }
-                        break;
-                }
-            }
         }
     }
 
@@ -384,29 +399,5 @@ public class TargetUtils
     {
         public Entity Entity { get; set; }
         public Targeted Outcome { get; set; }
-    }
-
-    // TODO: When targeting string rendering is moved to its own system, this code should also move there.
-    public static string BuildTargetingString(Targeted targeted)
-    {
-        if (targeted == null)
-        {
-            return "";
-        }
-
-        string targetingString = $"{Math.Min(100, targeted.HitChance)}%";
-        foreach (var kvp in targeted.TargetEffects)
-        {
-            if (kvp.Value != null)
-            {
-                targetingString += $"   {kvp.Value} {kvp.Key}";
-            }
-            else
-            {
-                targetingString += $"   {kvp.Key}";
-            }
-        }
-
-        return targetingString;
     }
 }

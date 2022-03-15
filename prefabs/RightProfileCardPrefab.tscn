@@ -9,7 +9,6 @@
 [ext_resource path="res://prefabs/ProfileCardPrefab.cs" type="Script" id=7]
 [ext_resource path="res://res/BungeeRegular_20_outline.tres" type="DynamicFont" id=8]
 
-
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.905882, 0.25098, 0.12549, 1 )
 

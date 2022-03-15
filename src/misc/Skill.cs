@@ -3,7 +3,6 @@ using MonoCustomResourceRegistry;
 using System;
 using System.Collections.Generic;
 
-// TODO: Maybe need a new icon here
 [RegisteredType(nameof(Skill), "res://editoricons/Component.svg", nameof(Resource))]
 public class Skill : Resource
 {

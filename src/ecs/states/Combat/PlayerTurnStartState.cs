@@ -16,7 +16,6 @@ public class PlayerTurnStartState : State
     public override void Pre(Manager manager)
     {
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
-        manager.PerformHudAction("SetProfile", Direction.Right, null);
 
         if (acting.GetComponent<StatusBag>().Statuses.ContainsKey("Sleep"))
         {

@@ -56,21 +56,10 @@ public class NpcTargetingState : State
 
                     targetLocations = MapUtils.GenerateTileLocationsForPoints<TargetLocation>(manager, skillTargetPoints, "res://img/tiles/image_part_030.png");
 
-                    // TODO: If we put the targeteds in the tactical plan somehow, we can avoid doing a lot of the stuff in here
-                    // Kinda dumb way to do this because we're not in a system
                     var potentialTargets = manager.GetEntitiesWithComponent<ProfileDetails>()
                         .Where(ent => ent.HasComponent<TileLocation>() && ent.HasComponent<FightStats>() && ent.HasComponent<Health>());
 
-                    var targetingOutcomes = TargetUtils.GetTargetingOutcomes(map, plan.SelectedSkill, acting, potentialTargets, plan.SkillTargetLocation, skillTargetPoints);
-                    targetingOutcomes.ForEach(to => manager.AddComponentToEntity(to.Entity, to.Outcome));
-
-                    // TODO: This can probably be put into a separate system so it is handled automatically everywhere they are targeted.
-                    var firstTarget = targetingOutcomes.FirstOrDefault()?.Entity;
-                    manager.PerformHudAction("SetTargetingInfo", TargetUtils.BuildTargetingString(firstTarget?.GetComponent<Targeted>()));
-                    manager.PerformHudAction("SetProfile", Direction.Right, firstTarget);
-                    // TODO: Indicate if there are more than one
-                    // TODO: Deterministic sort by distance from center
-                    // TODO: Maybe here, maybe somewhere else, but display an on map indicator of which unit is displaying profile card
+                    TargetUtils.MarkTargetingOutcomes(manager, plan.SelectedSkill, acting, potentialTargets, plan.SkillTargetLocation, skillTargetPoints);
 
                     manager.AddComponentToEntity(manager.GetNewEntity(), new DeferredEvent()
                     {
@@ -88,7 +77,14 @@ public class NpcTargetingState : State
                             {
                                 acting.GetComponent<TurnSpeed>().TimeToAct *= 2;
                             }
-                            TargetUtils.PerformAction(manager, acting, targetingOutcomes.Select(to => to.Entity));
+
+                            var targetedEntities = manager.GetEntitiesWithComponent<Targeted>();
+                            TargetUtils.PerformAction(manager, acting, targetedEntities);
+                            foreach (var target in targetedEntities)
+                            {
+                                manager.RemoveComponentFromEntity<Targeted>(target);
+                            }
+
                             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());
                         },
                         Delay = 1.5f

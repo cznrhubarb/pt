@@ -44,7 +44,6 @@ public class Combat : Manager
         AddSystem(new TweenCleanupSystem());
         AddSystem(new RenderStatusEffectsSystem());
         AddSystem(new CameraAnchoringSystem());
-        AddSystem(new RenderViewProfileSystem());
 
         // Event Handling Systems
         AddSystem(new CreateShockwaveEventSystem());
@@ -54,14 +53,26 @@ public class Combat : Manager
         AddSystem(new SetActionsDisplayStateEventSystem());
         AddSystem(new DeferredEventSystem());
 
+        // Systems shared between states
+        var rtis = new RenderTargetingInformationSystem();
+        var rvps = new RenderViewProfileSystem();
+        var rmsps = new RenderMoveShadowPreviewSystem();
+
         AddSystem<PlayerMovementState>(new TravelToLocationSystem());
         AddSystem<PlayerMovementState>(new RenderSelectedMovementSystem());
+        AddSystem<PlayerMovementState>(rvps);
 
         AddSystem<PlayerTargetingState>(new SelectActionLocationSystem());
         AddSystem<PlayerTargetingState>(new RenderTargetIndicatorsSystem());
-        AddSystem<PlayerTargetingState>(new RenderTargetProfileSystem());
+        AddSystem<PlayerTargetingState>(new MarkTargetsSystem());
+        AddSystem<PlayerTargetingState>(rtis);
+        AddSystem<PlayerTargetingState>(rmsps);
+
+        AddSystem<NpcTargetingState>(rtis);
+        AddSystem<NpcTargetingState>(rmsps);
 
         AddSystem<RoamMapState>(new SelectActorSystem());
+        AddSystem<RoamMapState>(rvps);
     }
 
     private void BuildMap()
@@ -152,7 +163,7 @@ public class Combat : Manager
         var positions = new Queue<Vector3>();
         positions.Enqueue(new Vector3(5, 0, 2));
         positions.Enqueue(new Vector3(5, 1, 2));
-        positions.Enqueue(new Vector3(11, 0, 0));
+        positions.Enqueue(new Vector3(10, 0, 0));
         positions.Enqueue(new Vector3(11, -1, 0));
 
         foreach (var state in WorldState.PartyState)
@@ -187,15 +198,17 @@ public class Combat : Manager
         switch (actionName)
         {
             case "SetProfile":
-                var side = (Direction)args[0];
-                var profileEntity = args[1] as Entity;
-                if (side == Direction.Left)
                 {
-                    leftProfileCard.SetProfile(profileEntity);
-                }
-                else if (side == Direction.Right)
-                {
-                    rightProfileCard.SetProfile(profileEntity);
+                    var side = (Direction)args[0];
+                    var profileEntity = args[1] as Entity;
+                    if (side == Direction.Left)
+                    {
+                        leftProfileCard.SetProfile(profileEntity);
+                    }
+                    else if (side == Direction.Right)
+                    {
+                        rightProfileCard.SetProfile(profileEntity);
+                    }
                 }
                 break;
             case "SetActionMenuDisplayed":
@@ -212,7 +225,17 @@ public class Combat : Manager
                 actionMenu.RegisterSkillSet(args[0] as SkillSet, (bool)args[1]);
                 break;
             case "SetTargetingInfo":
-                rightProfileCard.TargetingInfo = args[0] as string;
+                {
+                    var side = (Direction)args[0];
+                    if (side == Direction.Left)
+                    {
+                        leftProfileCard.TargetingInfo = args[1] as string;
+                    }
+                    else if (side == Direction.Right)
+                    {
+                        rightProfileCard.TargetingInfo = args[1] as string;
+                    }
+                }
                 break;
             case "UpdateStatusEffects":
                 {

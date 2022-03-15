@@ -17,7 +17,6 @@ public class NpcPlanningState : State
     {
         GD.Print("NPC planning: " + acting.Name);
         manager.PerformHudAction("SetProfile", Direction.Left, acting);
-        manager.PerformHudAction("SetProfile", Direction.Right, null);
 
         var statuses = acting.GetComponent<StatusBag>().Statuses;
         // TODO: Maybe "Captured" monsters have a chance to struggle free here?

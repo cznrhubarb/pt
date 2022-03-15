@@ -40,6 +40,8 @@ public class AdvanceClockEventSystem : Ecs.System
             manager.ApplyState(new NpcPlanningState(nextActor, SingleEntityFor(MapEntityKey)));
         }
 
+        manager.PerformHudAction("SetProfile", Direction.Right, null);
+
         manager.DeleteEntity(entity.Id);
     }
 

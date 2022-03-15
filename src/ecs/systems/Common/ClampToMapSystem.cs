@@ -8,6 +8,7 @@ public class ClampToMapSystem : Ecs.System
     public ClampToMapSystem()
     {
         AddRequiredComponent<TileLocation>();
+
         AddRequiredComponent<Map>(MapEntityKey);
     }
 

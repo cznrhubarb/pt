@@ -3,7 +3,7 @@ using System;
 
 public class DepthSortSystem : Ecs.System
 {
-    private const int SpaceFactor = 10;
+    public const int SpaceFactor = 10;
 
     public DepthSortSystem()
     {
