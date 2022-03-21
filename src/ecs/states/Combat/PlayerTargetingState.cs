@@ -69,10 +69,8 @@ public class PlayerTargetingState : State
         {
             // Max number of indicators we need is defined by [x = maxRange, y = minRange, n = numNeeded]
             //  n = x * (x + 1) * 2 - y * (y - 1) * 2 (+1 if y = 0)
-            // TODO: This number updates if we have a ring targeting method
-            var minAreaOfEffect = 0;
-            maxPoints = SelectedSkill.AreaOfEffect * (SelectedSkill.AreaOfEffect + 1) * 2
-                        - minAreaOfEffect * (minAreaOfEffect - 1) * 2
+            maxPoints = SelectedSkill.MaxAoeRange * (SelectedSkill.MaxAoeRange + 1) * 2
+                        - SelectedSkill.MinAoeRange * (SelectedSkill.MinAoeRange - 1) * 2
                         + 1;
         }
 

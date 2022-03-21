@@ -1,0 +1,5 @@
+EvoLineID,FromMonsterID,ToMonsterID,EvolutionMethod,Params,evolvesFrom,evolvesTo
+1,1,2,,,Bulba,Ivy
+1,2,3,,,Ivy,Venu
+2,4,5,,,Mander,Meleon
+2,5,6,,,Meleon,Izard

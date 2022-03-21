@@ -213,9 +213,11 @@ public class Tactician
             // Very imperfect because it doesn't take into account skills with more vertical range than
             //  our jump heights. This might incorrectly assume it would take longer than needed to
             //  use the skill, but it's all approximations anyway.
-            var walkingDistance = path.Length - skill.AreaOfEffect - skill.MaxRange - 1;
+            // TODO: This doesn't work if the skill has a min AoeRange and we need to move AWAY
+            var walkingDistance = path.Length - skill.MaxAoeRange - skill.MaxRange - 1;
             // Doesn't take into account terrain difficulty either :p
             // Integer math on purpose to get a whole number of turns
+            // TODO/BUG: This is div0 if they can't move.
             var additionalTurnsNeeded = walkingDistance / movable.MaxMove;
             return (path, walkingDistance, additionalTurnsNeeded, target.effects);
         })
@@ -443,16 +445,6 @@ public class Tactician
             }
 
             value += amount;
-        }
-
-        foreach (var kvp in skillEffects.UserEffects)
-        {
-            switch (kvp.Key)
-            {
-                case "Move":
-                    // TODO: Not sure how to track value of this.
-                    break;
-            }
         }
 
         // If we're the same affiliation, make it a negative value and weigh it a bit more

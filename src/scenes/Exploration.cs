@@ -166,18 +166,18 @@ public class Exploration : Manager
         switch (parameter)
         {
             case "ChooseBulb":
-                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
-                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[1], 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[4], 1));
                 ApplyState(new CutSceneState("RivalChoosesChar"));
                 break;
             case "ChooseSquirt":
-                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Squirtle.tres"), 1));
-                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[7], 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[1], 1));
                 ApplyState(new CutSceneState("RivalChoosesBulb"));
                 break;
             case "ChooseChar":
-                WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
-                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Squirtle.tres"), 1));
+                WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[4], 1));
+                WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[7], 1));
                 ApplyState(new CutSceneState("RivalChoosesSquirt"));
                 break;
             case "StartFight":

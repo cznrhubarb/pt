@@ -2,6 +2,7 @@
 using Godot;
 using MonoCustomResourceRegistry;
 
+// MIKE_TODO: Remove all tags when migration is complete
 [RegisteredType(nameof(StatBundle), "res://editoricons/Component.svg", nameof(Resource))]
 public class StatBundle : Resource
 {

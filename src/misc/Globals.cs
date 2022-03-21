@@ -12,6 +12,7 @@ public class Globals : Node
 
     public override void _Ready()
     {
+        DataLoader.LoadAll();
         SceneTree = GetTree();
     } 
 }

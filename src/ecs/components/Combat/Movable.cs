@@ -19,4 +19,16 @@ public class Movable : Component
     public Dictionary<TerrainType, float> TerrainCostModifiers { get; set; } = new Dictionary<TerrainType, float>();
 
     public TileLocation StartingLocation { get; set; } = null;
+
+    public Movable Clone()
+    {
+        return new Movable()
+        {
+            MaxMove = MaxMove,
+            MaxJump = MaxJump,
+            TravelSpeed = TravelSpeed,
+            // TODO: Should be deep copy
+            TerrainCostModifiers = TerrainCostModifiers
+        };
+    }
 }

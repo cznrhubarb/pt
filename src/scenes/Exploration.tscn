@@ -110,8 +110,8 @@ script = ExtResource( 10 )
 
 [sub_resource type="Resource" id=22]
 script = ExtResource( 13 )
-Cue = 1
-CueParam = "Combat"
+Cue = 2
+CueParam = "GameIntro"
 
 [sub_resource type="Resource" id=23]
 script = ExtResource( 12 )

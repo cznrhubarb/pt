@@ -1,6 +1,6 @@
 ﻿
 // Maybe common enums can all go in one common file?
-public enum RarityValues
+public enum RarityValue
 {
     Common,
     Uncommon,

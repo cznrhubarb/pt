@@ -11,7 +11,7 @@ public class CutSceneState : State
 
     public CutSceneState(string cutSceneName)
     {
-        cutScene = GD.Load<CutScene>($"res://res/cutscenes/{cutSceneName}.tres");
+        cutScene = DataLoader.CutSceneData[cutSceneName];
     }
 
     public override void Pre(Manager manager)
@@ -30,7 +30,7 @@ public class CutSceneState : State
 
     private void RunNextStep(Manager manager)
     {
-        if (eventIndex < cutScene.Events.Length)
+        if (eventIndex < cutScene.Events.Count)
         {
             var nextEvent = cutScene.Events[eventIndex++];
             if (nextEvent is CSEChangeScene)

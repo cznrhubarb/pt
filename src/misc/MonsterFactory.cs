@@ -25,11 +25,12 @@ public class MonsterFactory
             }
         };
 
-        var lastFourSkills = blueprint.SkillsAvailableByLevel
-            .Where(skill => skill.Key <= level)
-            .OrderByDescending(skill => skill.Key)
+        var lastFourSkills = blueprint.SkillLearnset
+            .LevelSkills
+            .Where(skill => skill.levelLearned <= level)
+            .OrderByDescending(skill => skill.levelLearned)
             .Take(4)
-            .Select(skill => skill.Value.Duplicate() as Skill);
+            .Select(skill => skill.skill.Clone());
         monsterState.Skills.AddRange(lastFourSkills);
 
         monsterState.RecalculateStats();
@@ -56,7 +57,7 @@ public class MonsterFactory
             .OrderByDescending(skill => skill.Key)
             .Select(skill => skill.Value)
             .First()
-            .Duplicate() as Movable;
+            .Clone();
         components.Add(movable);
 
         components.Add(new Health() { Current = monsterState.MaxHealth, Max = monsterState.MaxHealth });

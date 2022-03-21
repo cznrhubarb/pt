@@ -1,0 +1,7 @@
+MonsterID,SkillID,LevelLearned,LearnMethod,learner,skill name
+1,2,1,LevelUp,Bulba,Fire Breath
+1,11,1,LevelUp,Bulba,Trap Shoot
+4,2,1,LevelUp,Mander,Fire Breath
+4,10,1,LevelUp,Mander,Tackle
+149,10,1,LevelUp,WaTrainer,Tackle
+150,10,1,LevelUp,Trainer,Tackle

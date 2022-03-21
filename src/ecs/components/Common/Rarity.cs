@@ -6,5 +6,5 @@ using MonoCustomResourceRegistry;
 public class Rarity : Component
 {
     [Export]
-    public RarityValues Value { get; set; } = RarityValues.Common;
+    public RarityValue Value { get; set; } = RarityValue.Common;
 }

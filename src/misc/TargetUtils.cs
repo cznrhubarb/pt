@@ -63,11 +63,8 @@ public class TargetUtils
             case TargetingMode.StandardLine:
             case TargetingMode.BlockedLine:
                 {
-                    var areaRange = selectedSkill.AreaOfEffect;
-                    var maxAoeHeightDelta = selectedSkill.MaxAoeHeightDelta;
-                    return map.AStar.GetPointsBetweenRange(targetCenter, 0, areaRange)
-                        .Where(pt => Math.Abs(pt.z - targetCenter.z) <= maxAoeHeightDelta)
-                        .Where(pt => !(selectedSkill.AoeExcludesCenter && pt == targetCenter))
+                    return map.AStar.GetPointsBetweenRange(targetCenter, selectedSkill.MinAoeRange, selectedSkill.MaxAoeRange)
+                        .Where(pt => Math.Abs(pt.z - targetCenter.z) <= selectedSkill.MaxAoeHeightDelta)
                         .ToList();
                 }
             case TargetingMode.WholeLine:
@@ -142,7 +139,7 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Str - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling(int.Parse(kvp.Value) * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Protect"))
                             {
                                 damage *= StatusEffect.ProtectDamageModifier;
@@ -155,7 +152,7 @@ public class TargetUtils
                             var statMod = Math.Pow(1.25f, (actingFightStats.Mag - targetFightStats.Tuf) / 20);
                             var baseEleMod = 0; // TODO: Calculate
                             var eleMod = (actingFightStats.Atn + targetFightStats.Atn) / 100 * baseEleMod;
-                            var damage = Math.Ceiling((int)kvp.Value * statMod * (1 + eleMod));
+                            var damage = Math.Ceiling(int.Parse(kvp.Value) * statMod * (1 + eleMod));
                             if (targetStatuses.ContainsKey("Shell"))
                             {
                                 damage *= StatusEffect.ShellDamageModifier;
@@ -166,7 +163,7 @@ public class TargetUtils
                     case "Heal":
                         {
                             var healthComp = target.GetComponent<Health>();
-                            var heal = Math.Ceiling((int)kvp.Value * actingFightStats.Mag / 100d * 4);
+                            var heal = Math.Ceiling(int.Parse(kvp.Value) * actingFightStats.Mag / 100d * 4);
                             targetedComp.TargetEffects.Add(kvp.Key, (int)heal);
                         }
                         break;
@@ -175,7 +172,7 @@ public class TargetUtils
                             var actingPos = actingEntity.GetComponent<TileLocation>().TilePosition;
                             var targetLocation = target.GetComponent<TileLocation>();
                             var pushDirection = (targetLocation.TilePosition - actingPos).ToDirection();
-                            var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pushDirection, (int)kvp.Value);
+                            var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pushDirection, int.Parse(kvp.Value));
                             // Filter out points. We allow any drop, and only a max 1 upwards change
                             var newPos = targetLocation.TilePosition;
                             foreach (var pt in points)
@@ -196,7 +193,7 @@ public class TargetUtils
                             var actingPos = actingEntity.GetComponent<TileLocation>().TilePosition;
                             var targetLocation = target.GetComponent<TileLocation>();
                             var pullDirection = (actingPos - targetLocation.TilePosition).ToDirection();
-                            var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pullDirection, (int)kvp.Value);
+                            var points = map.AStar.GetPointsInLine(targetLocation.TilePosition, pullDirection, int.Parse(kvp.Value));
                             // Filter out points. We assume if we can target a pull, we are close enough on height delta
                             var newPos = targetLocation.TilePosition;
                             foreach (var pt in points)

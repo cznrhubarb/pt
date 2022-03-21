@@ -156,8 +156,8 @@ public class Combat : Manager
     private void BuildActors()
     {
         // HACK: Setting these for testing
-        WorldState.PartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Bulbasaur.tres"), 1));
-        WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(GD.Load<MonsterBlueprint>("res://res/monsters/Charmander.tres"), 1));
+        //WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[1], 1));
+        //WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[4], 1));
 
         // HACK: Just hardcoding some starting points to get started
         var positions = new Queue<Vector3>();

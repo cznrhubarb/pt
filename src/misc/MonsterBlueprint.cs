@@ -6,6 +6,7 @@ using System.Collections.Generic;
 [RegisteredType(nameof(MonsterBlueprint), "res://editoricons/Component.svg", nameof(Resource))]
 public class MonsterBlueprint : Resource
 {
+    // MIKE_TODO: Remove exports after switch to sheets
     // Static things
     [Export]
     public Texture ProfilePicture { get; set; } = null;
@@ -21,15 +22,17 @@ public class MonsterBlueprint : Resource
     [Export]
     public string Name { get; set; } = "";
 
+    public string Description { get; set; } = "";
+
     [Export]
-    public RarityValues Rarity { get; set; } = RarityValues.Common;
+    public RarityValue Rarity { get; set; } = RarityValue.Common;
+
+    public MonsterType MonsterType { get; set; } = MonsterType.Beast;
 
     [Export]
     public Element Element { get; set; } = Element.Neutral;
 
-    // Changes with level, but not individual
-    [Export]
-    public IDictionary<int, Skill> SkillsAvailableByLevel { get; set; } = new Dictionary<int, Skill>();
+    public SkillLearnset SkillLearnset { get; set; } = new SkillLearnset();
 
     [Export]
     public IDictionary<int, Movable> MoveStatsByLevel { get; set; } = new Dictionary<int, Movable>();
@@ -44,5 +47,5 @@ public class MonsterBlueprint : Resource
     [Export]
     public StatBundle PartnershipGrowth { get; set; } = new StatBundle();
 
-    // TODO: Evolution paths and triggers
+    public List<EvolutionPath> EvolutionPaths = new List<EvolutionPath>();
 }
