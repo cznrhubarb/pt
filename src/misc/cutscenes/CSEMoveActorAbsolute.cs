@@ -1,10 +1,8 @@
 ﻿using Ecs;
 using Godot;
 using System.Linq;
-using MonoCustomResourceRegistry;
 using System.Collections.Generic;
 
-[RegisteredType(nameof(CSEMoveActorAbsolute), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSEMoveActorAbsolute : CutSceneEvent
 {
     private static readonly Movable cutSceneMovable = new Movable() 
@@ -18,9 +16,7 @@ public class CSEMoveActorAbsolute : CutSceneEvent
         }
     };
 
-    [Export]
     public NodePath ActorPath { get; set; } = null;
-    [Export]
     public Vector3 FinalPosition { get; set; } = Vector3.Zero;
 
     public override void RunStep()

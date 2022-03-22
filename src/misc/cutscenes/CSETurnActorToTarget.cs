@@ -1,13 +1,9 @@
 ﻿using Ecs;
 using Godot;
-using MonoCustomResourceRegistry;
 
-[RegisteredType(nameof(CSETurnActorToTarget), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
 public class CSETurnActorToTarget : CutSceneEvent
 {
-    [Export]
     public NodePath ActorPath { get; set; } = null;
-    [Export]
     public NodePath TargetPath { get; set; } = null;
 
     public override void RunStep()

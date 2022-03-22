@@ -1,55 +1,15 @@
 ﻿using Ecs;
 using Godot;
-using System.Linq;
-using MonoCustomResourceRegistry;
-using System.Collections.Generic;
 
-// This is a 95% copy of CSEMoveActorAbsolute, but the way to remove
-//  the code duplication is to make this inherit from CSEMAA, but
-//  due to the export keywords, that leaves the editor with extra unused
-//  parameters on this, which is confusing. I'd rather have duplicate code :/
-[RegisteredType(nameof(CSEMoveActorToTarget), "res://editoricons/CutSceneEvent.svg", nameof(Resource))]
-public class CSEMoveActorToTarget : CutSceneEvent
+public class CSEMoveActorToTarget : CSEMoveActorAbsolute
 {
-    private static readonly Movable cutSceneMovable = new Movable()
-    {
-        MaxJump = 2,
-        MaxMove = 99,
-        TerrainCostModifiers = new Dictionary<TerrainType, float>
-        {
-            { TerrainType.Water, 99 },
-            { TerrainType.DeepWater, 99 },
-        }
-    };
-
-    [Export]
-    public NodePath ActorPath { get; set; } = null;
-    [Export]
     public NodePath TargetPath { get; set; } = null;
 
     public override void RunStep()
     {
-        var actor = Manager.GetNode(ActorPath) as Entity;
         var target = Manager.GetNode(TargetPath) as Entity;
-        var actorLocation = actor.GetComponent<TileLocation>();
-        var finalPosition = target.GetComponent<TileLocation>().TilePosition;
+        FinalPosition = target.GetComponent<TileLocation>().TilePosition;
 
-        if (actorLocation.TilePosition != finalPosition)
-        {
-            var map = Manager.GetEntitiesWithComponent<Map>().First().GetComponent<Map>();
-            var path = map.AStar.GetPath(cutSceneMovable, Affiliation.Neutral, actorLocation.TilePosition, finalPosition);
-
-            var tweenSeq = MapUtils.BuildTweenForActor(Manager, actor, path);
-            tweenSeq.Connect("finished", this, nameof(MovementFinished));
-        }
-        else
-        {
-            MovementFinished();
-        }
-    }
-
-    private void MovementFinished()
-    {
-        OnComplete();
+        base.RunStep();
     }
 }

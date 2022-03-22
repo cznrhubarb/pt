@@ -21,14 +21,15 @@ public static class DataLoader
         // Creatures must be loaded before evolution lines and learnsets
         // Skills must be loaded before skill learnsets
 
-        // MIKE_TODO: These need to be one button click to download, rename, and place them all in the right folders
-        // MIKE_TODO: Delete TRES files
-        LoadFile("res://data/blueprints.csv", ParseMonsterBlueprint);
+        // TODO: Currently have a GScript to csv, zip, and download this all with two clicks,
+        //  but it would be nice if it were single click and also moved the files to this data folder.
+        //  Probably need to make it code in here instead of in GSheets to get there.
+        LoadFile("res://data/creatures.csv", ParseMonsterBlueprint);
         LoadFile("res://data/skills.csv", ParseSkill);
-        LoadFile("res://data/evolutionpaths.csv", ParseEvolutionPath);
-        LoadFile("res://data/skilllearnsets.csv", ParseSkillLearnset);
-        LoadFile("res://data/movablelearnsets.csv", ParseMovableLearnset);
-        LoadFile("res://data/cutscenes.csv", ParseCutScene);
+        LoadFile("res://data/evolution_lines.csv", ParseEvolutionPath);
+        LoadFile("res://data/skill_learnsets.csv", ParseSkillLearnset);
+        LoadFile("res://data/movable_learnsets.csv", ParseMovableLearnset);
+        LoadFile("res://data/cut_scenes.csv", ParseCutScene);
     }
 
     private static void LoadFile(string fileName, Action<string[]> parseMethod, int maxCount = -1)
@@ -41,7 +42,6 @@ public static class DataLoader
         file.GetLine();
         while (!file.EofReached())
         {
-            // MIKE_TODO: Handle garbage lines from the skills list
             parseMethod(file.GetCsvLine());
             if (++count == maxCount) break;
         }

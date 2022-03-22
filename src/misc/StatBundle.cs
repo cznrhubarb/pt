@@ -1,22 +1,12 @@
-﻿
-using Godot;
-using MonoCustomResourceRegistry;
+﻿using Godot;
 
-// MIKE_TODO: Remove all tags when migration is complete
-[RegisteredType(nameof(StatBundle), "res://editoricons/Component.svg", nameof(Resource))]
 public class StatBundle : Resource
 {
-    [Export]
     public int Health { get; set; } = 0;
-    [Export]
     public int Atn { get; set; } = 0;
-    [Export]
     public int Dex { get; set; } = 0;
-    [Export]
     public int Mag { get; set; } = 0;
-    [Export]
     public int Str { get; set; } = 0;
-    [Export]
     public int Tuf { get; set; } = 0;
 
     public static StatBundle operator +(StatBundle left, StatBundle right)
