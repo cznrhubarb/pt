@@ -156,13 +156,17 @@ public class Combat : Manager
     private void BuildActors()
     {
         // HACK: Setting these for testing
-        //WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[1], 1));
-        //WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[4], 1));
+        WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[1], 1));
+        WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[2], 1));
+        WorldState.PartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[3], 1));
+        WorldState.RivalPartyState.Add(MonsterFactory.BuildMonster(DataLoader.BlueprintData[4], 1));
 
         // HACK: Just hardcoding some starting points to get started
         var positions = new Queue<Vector3>();
         positions.Enqueue(new Vector3(5, 0, 2));
         positions.Enqueue(new Vector3(5, 1, 2));
+        positions.Enqueue(new Vector3(4, 0, 3));
+        positions.Enqueue(new Vector3(4, 1, 3));
         positions.Enqueue(new Vector3(10, 0, 0));
         positions.Enqueue(new Vector3(11, -1, 0));
 

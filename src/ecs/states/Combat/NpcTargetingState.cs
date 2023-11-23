@@ -83,6 +83,7 @@ public class NpcTargetingState : State
                             foreach (var target in targetedEntities)
                             {
                                 manager.RemoveComponentFromEntity<Targeted>(target);
+                                target.Modulate = Colors.White;
                             }
 
                             manager.AddComponentToEntity(manager.GetNewEntity(), new AdvanceClockEvent());

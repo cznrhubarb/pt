@@ -10,7 +10,6 @@ public class TargetUtils
     public static List<Vector3> GetPotentialTargetLocations(Skill selectedSkill, Map map, Vector3 origin)
     {
         List<Vector3> points = null;
-        // TODO: Is this duplicated code with the method below? Maybe just a little.
         switch (selectedSkill.TargetingMode)
         {
             case TargetingMode.StandardArea:
@@ -243,7 +242,7 @@ public class TargetUtils
                         break;
                     default:
                         // Assume anything not explicitly listed is a status effect
-                        targetedComp.TargetEffects.Add(kvp.Key, kvp.Value);
+                        targetedComp.TargetEffects.Add(kvp.Key, int.Parse(kvp.Value));
                         break;
                 }
             }
@@ -306,6 +305,7 @@ public class TargetUtils
             //GD.Print($"Are ya hitting son? {roll}/{targetedComp.HitChance}");
             if (roll < targetedComp.HitChance)
             {
+                var textEffectDelay = 0f;
                 foreach (var kvp in targetedComp.TargetEffects)
                 {
                     switch (kvp.Key)
@@ -322,7 +322,8 @@ public class TargetUtils
 
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current -= Math.Min(healthComp.Current, damage);
-                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, damage.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                FactoryUtils.BuildTextEffect(manager, target, damage.ToString(), new Color(0.9f, 0.2f, 0.4f), textEffectDelay);
+                                textEffectDelay += FactoryUtils.TextEffectDelay;
                                 targetStatuses.Remove("Sleep");
                                 if (healthComp.Current == 0)
                                 {
@@ -334,7 +335,8 @@ public class TargetUtils
                             {
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current -= Math.Min(healthComp.Current, (int)kvp.Value);
-                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.9f, 0.2f, 0.4f));
+                                FactoryUtils.BuildTextEffect(manager, target, kvp.Value.ToString(), new Color(0.9f, 0.2f, 0.4f), textEffectDelay);
+                                textEffectDelay += FactoryUtils.TextEffectDelay;
                                 targetStatuses.Remove("Sleep");
                                 if (healthComp.Current == 0)
                                 {
@@ -346,7 +348,8 @@ public class TargetUtils
                             {
                                 var healthComp = target.GetComponent<Health>();
                                 healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + (int)kvp.Value);
-                                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f));
+                                FactoryUtils.BuildTextEffect(manager, target, kvp.Value.ToString(), new Color(0.5f, 0.9f, 0.3f), textEffectDelay);
+                                textEffectDelay += FactoryUtils.TextEffectDelay;
                             }
                             break;
                         case "Move":
@@ -373,21 +376,32 @@ public class TargetUtils
                             var textToDisplay = kvp.Key;
                             if (kvp.Key.StartsWith("-"))
                             {
-                                target.GetComponent<StatusBag>().Statuses.Remove(kvp.Key.TrimStart('-'));
+                                targetStatuses.Remove(kvp.Key.TrimStart('-'));
                             }
                             else
                             {
-                                target.GetComponent<StatusBag>().Statuses.Add(kvp.Key, StatusFactory.BuildStatusEffect(kvp.Key, (int)kvp.Value));
+                                if (targetStatuses.ContainsKey(kvp.Key)) {
+                                    if (targetStatuses[kvp.Key].Stacks) {
+                                        targetStatuses[kvp.Key].Count += (int)kvp.Value;
+                                    } else {
+                                        // If a status effect does not stack, we cannot apply it until the previous effect is gone,
+                                        //  even if the new amount would be greater. This prevents things like perma stun lock.
+                                        break;
+                                    }
+                                } else {
+                                    target.GetComponent<StatusBag>().Statuses.Add(kvp.Key, StatusFactory.BuildStatusEffect(kvp.Key, (int)kvp.Value));
+                                }
                                 textToDisplay = "+" + textToDisplay;
                             }
-                            FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, textToDisplay, new Color(0.5f, 0.4f, 1));
+                            FactoryUtils.BuildTextEffect(manager, target, textToDisplay, new Color(0.5f, 0.4f, 1), textEffectDelay);
+                            textEffectDelay += FactoryUtils.TextEffectDelay;
                             break;
                     }
                 }
             }
             else
             {
-                FactoryUtils.BuildTextEffect(manager, target.GetComponent<TileLocation>().TilePosition, "MISS", new Color(0.7f, 0.6f, 0.6f));
+                FactoryUtils.BuildTextEffect(manager, target, "MISS", new Color(0.7f, 0.6f, 0.6f));
             }
         }
     }

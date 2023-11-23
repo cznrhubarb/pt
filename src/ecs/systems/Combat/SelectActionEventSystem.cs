@@ -17,6 +17,13 @@ public class SelectActionEventSystem : Ecs.System
         var actionEvent = entity.GetComponent<SelectActionEvent>();
         var acting = SingleEntityFor(SelectedEntityKey);
 
+        // If the current state is PlayerTargetingState already, we need to undo the time delay we've incremented already
+        if (manager.CurrentState is PlayerTargetingState pts)
+        {
+            var turnSpeed = acting.GetComponent<TurnSpeed>();
+            turnSpeed.TimeToAct -= pts.SelectedSkill.Speed;
+        }
+
         if (actionEvent.SelectedSkill != null)
         {
             manager.ApplyState(new PlayerTargetingState(acting, SingleEntityFor(MapEntityKey), actionEvent.SelectedSkill));

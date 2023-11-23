@@ -27,8 +27,7 @@ public class Movable : Component
             MaxMove = MaxMove,
             MaxJump = MaxJump,
             TravelSpeed = TravelSpeed,
-            // TODO: Should be deep copy
-            TerrainCostModifiers = TerrainCostModifiers
+            TerrainCostModifiers = new Dictionary<TerrainType, float>(TerrainCostModifiers),
         };
     }
 }

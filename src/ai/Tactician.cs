@@ -217,8 +217,8 @@ public class Tactician
             var walkingDistance = path.Length - skill.MaxAoeRange - skill.MaxRange - 1;
             // Doesn't take into account terrain difficulty either :p
             // Integer math on purpose to get a whole number of turns
-            // TODO/BUG: This is div0 if they can't move.
-            var additionalTurnsNeeded = walkingDistance / movable.MaxMove;
+            // Set to Zero if we can't move so it gets filtered out immediately after this step
+            var additionalTurnsNeeded = movable.MaxMove > 0 ? walkingDistance / movable.MaxMove : 0;
             return (path, walkingDistance, additionalTurnsNeeded, target.effects);
         })
             // If turns == 0, that means that we are too close and can't get far enough away to use this skill
@@ -435,7 +435,6 @@ public class Tactician
                 // Maybe we give the enemy trainer a capture ability for lore sake, but they will never use it against the player
                 case "Capture":
                     {
-                        // TODO: This will make the enemy trainer definitely use it on their own peeps though...
                         amount = -999;
                     }
                     break;

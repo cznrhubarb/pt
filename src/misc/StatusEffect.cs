@@ -6,6 +6,7 @@ public class StatusEffect
     public string Name { get; set; } = "";
     public bool Positive { get; set; } = false;
     public bool Tickable { get; set; } = true;
+    public bool Stacks { get; set; } = false;
     public Texture Icon { get; set; } = null;
     public int Count { get; set; } = 1;
     // effect??
@@ -43,9 +44,11 @@ public class StatusFactory
             case "Regen":
                 effect.Icon = GD.Load("res://img/icons/status/bless.png") as Texture;
                 effect.Positive = true;
+                effect.Stacks = true;
                 break;
             case "Poison":
                 effect.Icon = GD.Load("res://img/icons/status/poison.png") as Texture;
+                effect.Stacks = true;
                 break;
             case "Blind":
                 effect.Icon = GD.Load("res://img/icons/status/curse.png") as Texture;

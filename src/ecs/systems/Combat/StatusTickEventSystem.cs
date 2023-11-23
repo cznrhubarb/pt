@@ -19,6 +19,7 @@ public class StatusTickEventSystem : Ecs.System
 
         if (bag != null)
         {
+            var textEffectDelay = 0f;
             bag.Statuses = bag.Statuses.Select(status =>
             {
                 if (status.Value.Tickable)
@@ -34,7 +35,8 @@ public class StatusTickEventSystem : Ecs.System
                             var healthComp = tickingEntity.GetComponent<Health>();
                             var healAmount = (int)(healthComp.Max * StatusEffect.RegenHealPortion);
                             healthComp.Current = Math.Max(healthComp.Max, healthComp.Current + healAmount);
-                            FactoryUtils.BuildTextEffect(manager, tickingEntity.GetComponent<TileLocation>().TilePosition, healAmount.ToString(), new Color(0.5f, 0.9f, 0.3f));
+                            FactoryUtils.BuildTextEffect(manager, tickingEntity, healAmount.ToString(), new Color(0.5f, 0.9f, 0.3f), textEffectDelay);
+                            textEffectDelay += FactoryUtils.TextEffectDelay;
                         }
                         break;
                     case "Poison":
@@ -42,7 +44,8 @@ public class StatusTickEventSystem : Ecs.System
                             var healthComp = tickingEntity.GetComponent<Health>();
                             var damageAmount = (int)(healthComp.Max * StatusEffect.PoisonDamagePortion);
                             healthComp.Current -= Math.Min(healthComp.Current, damageAmount);
-                            FactoryUtils.BuildTextEffect(manager, tickingEntity.GetComponent<TileLocation>().TilePosition, damageAmount.ToString(), new Color(0.9f, 0.2f, 0.8f));
+                            FactoryUtils.BuildTextEffect(manager, tickingEntity, damageAmount.ToString(), new Color(0.9f, 0.2f, 0.8f), textEffectDelay);
+                            textEffectDelay += FactoryUtils.TextEffectDelay;
                             if (healthComp.Current == 0)
                             {
                                 manager.AddComponentToEntity(tickingEntity, new Dying());

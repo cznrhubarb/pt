@@ -1,9 +1,9 @@
 ID,Name,Type,Element,Rarity,baseHp,baseStr,baseMag,baseTuf,baseDex,baseAtn,partnerHp,partnerStr,partnerMag,partnerTuf,partnerDex,partnerAtn,FunFact
-1,Bulba,Beast,Plant,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-2,Ivy,Beast,Plant,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-3,Venu,Beast,Plant,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-4,Mander,Myth,Fire,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-5,Meleon,Myth,Fire,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-6,Izard,Myth,Fire,Rare,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-149,WaTrainer,Myth,Fire,Legendary,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
-150,Trainer,Myth,Fire,Legendary,300,300,300,300,300,300,300,300,300,300,300,300,Bulba
+1,Bulba,Beast,Plant,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+2,Ivy,Beast,Plant,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+3,Venu,Beast,Plant,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+4,Mander,Myth,Fire,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+5,Meleon,Myth,Fire,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+6,Izard,Myth,Fire,Rare,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+149,WaTrainer,Myth,Fire,Legendary,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
+150,Trainer,Myth,Fire,Legendary,2000,300,300,300,300,300,300,300,300,300,300,300,Bulba
